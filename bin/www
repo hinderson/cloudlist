@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var debug = require('debug')('cloudlist-2014');
+var debug = require('debug')('cloudlist');
 var app = require('../app');
 var fs = require('fs');
 var forceSSL = require('express-force-ssl');
