@@ -24,24 +24,26 @@ block content
 			-		collection[id] = songlist[i];
 			-	}
 
-			-	for (var i = 0, len = sortorder.length; i < len; i++) {
-			-		var song = collection[sortorder[i]];
-			-		var index = i;
-			-		index += 1;
-			-		var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
-			-		var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
-			-		featuredartist = featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '';
-			-		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
-			- 		var songAvailable = song.available;
+			- if (sortorder) {
+				-	for (var i = 0, len = sortorder.length; i < len; i++) {
+				-		var song = collection[sortorder[i]];
+				-		var index = i;
+				-		index += 1;
+				-		var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
+				-		var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
+				-		featuredartist = featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '';
+				-		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
+				- 		var songAvailable = song.available;
 
-			li(class=song.available === true ? undefined : "unavailable", data-id="#{song._id}", data-index="#{index}", data-artist="#{artist}#{featuredartist}", data-title="#{song.title}")
-				a(href="/artist/#{song.slugs.artist}/track/#{song.slugs.title}/")
-					div.col.index #{index}
-					div.col.title #{song.title}
-					div.col.artist #{artist}#{featuredartist}
-					div.col.time #{duration}
+				li(class=song.available === true ? undefined : "unavailable", data-id="#{song._id}", data-index="#{index}", data-artist="#{artist}#{featuredartist}", data-title="#{song.title}")
+					a(href="/artist/#{song.slugs.artist}/track/#{song.slugs.title}/")
+						div.col.index #{index}
+						div.col.title #{song.title}
+						div.col.artist #{artist}#{featuredartist}
+						div.col.time #{duration}
 
-			- }
+				- }
+			-}
 	if autostart
 		script.
 			window.autostart = '#{autostart}';

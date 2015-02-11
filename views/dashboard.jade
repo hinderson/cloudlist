@@ -38,45 +38,47 @@ html(lang="en-US")
 						-		collection[id] = songlist[i];
 						-	}
 
-						-	for (var i = 0, len = sortorder.length; i < len; i++) {
-						-		var song = collection[sortorder[i]];
-						-		var index = i;
-						-		index += 1;
-						-		var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
-						-		var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
-						-		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
-						-		var lastModified = song.updated || song.added
+						- if (sortorder) {
+							-	for (var i = 0, len = sortorder.length; i < len; i++) {
+							-		var song = collection[sortorder[i]];
+							-		var index = i;
+							-		index += 1;
+							-		var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
+							-		var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
+							-		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
+							-		var lastModified = song.updated || song.added
 
-						tr(data-id="#{song._id}", data-available="")
-							td.handle
-								span(role="button", class="handle") ☰
-							td.availability
-								if song.available
-									input(type="checkbox", checked)
-								else
-									input(type="checkbox")
-							td.image
-								if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
-									div.img(style="background-image:url(../media/img/#{song.covers[0].src});", title="#{song.covers[0].src}")
-								else
-									div Video
-							td.index
-							td.artist(contenteditable) #{artist}
-							td.featured(contenteditable) #{featuredartist}
-							td.title(contenteditable) #{song.title}
-							//td.album(contenteditable) #{song.album}
-							td.duration #{duration}
-							td.source
-								if song.audio.source === 'soundcloud'
-									a(href="#{song.audio.url}", title="#{song.audio.url}")
-										svg.soundcloud(viewBox="0 0 56.693 56.693", width="40px", height="40px", xmlns="http://www.w3.org/2000/svg")
-											| <path d="M6.079 36.215c.104 0 .188-.082.205-.199l.551-4.33-.551-4.428c-.017-.117-.102-.197-.206-.197s-.19.084-.205.197l-.485 4.428.485 4.33c.015.115.102.199.206.199zm-1.626-1.838v.002-.002zm-.197.193c.1 0 .181-.08.197-.191l.427-2.693-.427-2.738c-.015-.113-.097-.193-.197-.193-.103 0-.184.082-.198.195l-.36 2.736.36 2.691c.014.113.096.193.198.193zm4.007-8.136c-.016-.141-.12-.242-.248-.242-.13 0-.234.102-.247.242l-.46 5.254.46 5.061c.013.141.117.242.247.242.128 0 .232-.102.247-.24l.523-5.062-.522-5.255zm1.706 10.757c.15 0 .274-.121.288-.283l.494-5.221-.494-5.396c-.014-.164-.138-.285-.288-.285-.153 0-.278.121-.29.285l-.436 5.396.436 5.221c.012.162.136.283.29.283zm1.968.086c.176 0 .318-.139.331-.326v.002l.466-5.266-.466-5.008c-.012-.186-.155-.326-.331-.326-.178 0-.321.143-.332.328l-.41 5.006.41 5.264c.011.188.153.326.332.326zm2.793-5.588l-.437-8.145c-.011-.207-.175-.369-.373-.369-.199 0-.362.162-.373.369l-.385 8.145.385 5.266c.011.205.174.367.373.367.198 0 .362-.162.373-.369v.002l.437-5.266zm1.19 5.643c.222 0 .405-.182.416-.412v.004l.407-5.232-.407-10.008c-.011-.232-.193-.412-.416-.412-.223 0-.405.18-.415.412l-.36 10.008.36 5.23c.01.228.193.41.415.41zm2.017-16.937c-.249 0-.449.199-.458.455l-.336 10.842.336 5.178c.008.252.209.451.458.451.246 0 .447-.199.457-.453v.004l.379-5.18-.379-10.842c-.01-.256-.211-.455-.457-.455zm2.031 16.937c.272 0 .491-.219.5-.496v.002l.35-5.145-.35-11.209c-.009-.279-.228-.496-.5-.496-.271 0-.491.217-.5.496l-.311 11.207.311 5.146c.009.276.229.495.5.495zm2.049-.006c.295 0 .533-.238.541-.539v.004l.32-5.098-.32-10.924c-.008-.301-.246-.537-.541-.537-.297 0-.535.236-.542.537l-.286 10.924.286 5.096c.006.299.245.537.542.537zm2.939-5.633l-.292-10.525c-.008-.324-.265-.58-.584-.58-.321 0-.577.256-.584.582l-.261 10.523.262 5.066c.006.32.262.576.583.576.319 0 .576-.256.584-.582v.006l.292-5.066zm1.203 5.653c.339 0 .619-.279.626-.623v.004l.263-5.031-.263-12.523c-.007-.344-.287-.623-.626-.623-.34 0-.619.279-.625.623l-.236 12.52.236 5.033c.006.34.285.62.625.62zm2.07-19.974c-.363 0-.662.3-.668.667l-.273 13.657.273 4.959c.006.361.305.66.668.66s.662-.299.668-.664v.004l.297-4.959-.297-13.658c-.005-.367-.304-.666-.668-.666zm1.895 19.978c.016.002 16.699.01 16.807.01 3.35 0 6.064-2.715 6.064-6.064s-2.715-6.062-6.064-6.062c-.83 0-1.623.168-2.344.469-.484-5.465-5.064-9.75-10.654-9.75-1.369 0-2.702.27-3.879.726-.459.177-.58.358-.584.713v19.244c.004.368.292.676.654.714z"/>
-								else
-									a(href="#{song.audio.url}", title="#{song.audio.url}")
-										img(src="/assets/img/icon-file.jpg", width="40", height="40", class="file")
-							td.updated #{lastModified.toDateString()} #{lastModified.getHours()}:#{lastModified.getMinutes()}:#{lastModified.getSeconds()}
-							td.controls
-								button.delete ✕ Delete
+							tr(data-id="#{song._id}", data-available="")
+								td.handle
+									span(role="button", class="handle") ☰
+								td.availability
+									if song.available
+										input(type="checkbox", checked)
+									else
+										input(type="checkbox")
+								td.image
+									if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
+										div.img(style="background-image:url(../media/img/#{song.covers[0].src});", title="#{song.covers[0].src}")
+									else
+										div Video
+								td.index
+								td.artist(contenteditable) #{artist}
+								td.featured(contenteditable) #{featuredartist}
+								td.title(contenteditable) #{song.title}
+								//td.album(contenteditable) #{song.album}
+								td.duration #{duration}
+								td.source
+									if song.audio.source === 'soundcloud'
+										a(href="#{song.audio.url}", title="#{song.audio.url}")
+											svg.soundcloud(viewBox="0 0 56.693 56.693", width="40px", height="40px", xmlns="http://www.w3.org/2000/svg")
+												| <path d="M6.079 36.215c.104 0 .188-.082.205-.199l.551-4.33-.551-4.428c-.017-.117-.102-.197-.206-.197s-.19.084-.205.197l-.485 4.428.485 4.33c.015.115.102.199.206.199zm-1.626-1.838v.002-.002zm-.197.193c.1 0 .181-.08.197-.191l.427-2.693-.427-2.738c-.015-.113-.097-.193-.197-.193-.103 0-.184.082-.198.195l-.36 2.736.36 2.691c.014.113.096.193.198.193zm4.007-8.136c-.016-.141-.12-.242-.248-.242-.13 0-.234.102-.247.242l-.46 5.254.46 5.061c.013.141.117.242.247.242.128 0 .232-.102.247-.24l.523-5.062-.522-5.255zm1.706 10.757c.15 0 .274-.121.288-.283l.494-5.221-.494-5.396c-.014-.164-.138-.285-.288-.285-.153 0-.278.121-.29.285l-.436 5.396.436 5.221c.012.162.136.283.29.283zm1.968.086c.176 0 .318-.139.331-.326v.002l.466-5.266-.466-5.008c-.012-.186-.155-.326-.331-.326-.178 0-.321.143-.332.328l-.41 5.006.41 5.264c.011.188.153.326.332.326zm2.793-5.588l-.437-8.145c-.011-.207-.175-.369-.373-.369-.199 0-.362.162-.373.369l-.385 8.145.385 5.266c.011.205.174.367.373.367.198 0 .362-.162.373-.369v.002l.437-5.266zm1.19 5.643c.222 0 .405-.182.416-.412v.004l.407-5.232-.407-10.008c-.011-.232-.193-.412-.416-.412-.223 0-.405.18-.415.412l-.36 10.008.36 5.23c.01.228.193.41.415.41zm2.017-16.937c-.249 0-.449.199-.458.455l-.336 10.842.336 5.178c.008.252.209.451.458.451.246 0 .447-.199.457-.453v.004l.379-5.18-.379-10.842c-.01-.256-.211-.455-.457-.455zm2.031 16.937c.272 0 .491-.219.5-.496v.002l.35-5.145-.35-11.209c-.009-.279-.228-.496-.5-.496-.271 0-.491.217-.5.496l-.311 11.207.311 5.146c.009.276.229.495.5.495zm2.049-.006c.295 0 .533-.238.541-.539v.004l.32-5.098-.32-10.924c-.008-.301-.246-.537-.541-.537-.297 0-.535.236-.542.537l-.286 10.924.286 5.096c.006.299.245.537.542.537zm2.939-5.633l-.292-10.525c-.008-.324-.265-.58-.584-.58-.321 0-.577.256-.584.582l-.261 10.523.262 5.066c.006.32.262.576.583.576.319 0 .576-.256.584-.582v.006l.292-5.066zm1.203 5.653c.339 0 .619-.279.626-.623v.004l.263-5.031-.263-12.523c-.007-.344-.287-.623-.626-.623-.34 0-.619.279-.625.623l-.236 12.52.236 5.033c.006.34.285.62.625.62zm2.07-19.974c-.363 0-.662.3-.668.667l-.273 13.657.273 4.959c.006.361.305.66.668.66s.662-.299.668-.664v.004l.297-4.959-.297-13.658c-.005-.367-.304-.666-.668-.666zm1.895 19.978c.016.002 16.699.01 16.807.01 3.35 0 6.064-2.715 6.064-6.064s-2.715-6.062-6.064-6.062c-.83 0-1.623.168-2.344.469-.484-5.465-5.064-9.75-10.654-9.75-1.369 0-2.702.27-3.879.726-.459.177-.58.358-.584.713v19.244c.004.368.292.676.654.714z"/>
+									else
+										a(href="#{song.audio.url}", title="#{song.audio.url}")
+											img(src="/assets/img/icon-file.jpg", width="40", height="40", class="file")
+								td.updated #{lastModified.toDateString()} #{lastModified.getHours()}:#{lastModified.getMinutes()}:#{lastModified.getSeconds()}
+								td.controls
+									button.delete ✕ Delete
+							- }
 						- }
 				p.stats <strong>Total songs:</strong> #{songlist.length}
 			section.add-song

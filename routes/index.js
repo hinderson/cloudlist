@@ -90,10 +90,12 @@ router.get('/dashboard', auth.connect(basic), function (req, res) {
 	var db = req.db;
 	db.collection('songs').find().toArray(function (err, songs) {
 		db.collection('collections').find().toArray(function (err, order) {
+			if (err) throw err;
+
 			res.render('dashboard', {
 				title: 'Dashboard | Cloudlist.io',
 				'songlist' : songs,
-				'sortorder': order[0].items // TEMP: Update to correct collection name
+				'sortorder': order && order[0] && order[0].items
 			});
 		});
 	});
