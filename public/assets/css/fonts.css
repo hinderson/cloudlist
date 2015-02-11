@@ -1,0 +1,16 @@
+@import url("http://fast.fonts.net/t/1.css?apiType=css&projectid=ab6e1c17-d229-4096-81a0-c14c7e40cd0d");
+
+@font-face {
+	font-family: "Helvetica Neue";
+	font-weight: normal;
+	font-style: normal;
+	src: local("Helvetica Neue"),
+		 url("../fonts/bcf54343-d033-41ee-bbd7-2b77df3fe7ba-03.woff") format("woff");
+}
+
+@font-face {
+	font-family: "GT Walsheim Regular";
+	font-weight: normal;
+	font-style: normal;
+	src: url("../fonts/gt-walsheim-regular-web-03.woff") format("woff");
+}

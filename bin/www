@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+var debug = require('debug')('cloudlist-2014');
+var app = require('../app');
+var fs = require('fs');
+var forceSSL = require('express-force-ssl');
+var http = require('http');
+var https = require('https');
+
+var env = process.env.NODE_ENV;
+if ('production' === env) {
+	var files = [
+		'cloudlist_io.crt',
+		'COMODORSADomainValidationSecureServerCA.crt',
+		'COMODORSAAddTrustCA.crt'
+	];
+
+	var file;
+	var ca = (function() {
+		var _i;
+		var _len;
+		var _results;
+
+		_results = [];
+		for (_i = 0, _len = files.length; _i < _len; _i++) {
+			file = files[_i];
+			_results.push(fs.readFileSync('./data/ssl/' + file));
+		}
+		return _results;
+	})();
+
+	var httpsOptions = {
+		ca: ca,
+		key: fs.readFileSync('./data/ssl/cloudlist_io.key'),
+		cert: fs.readFileSync('./data/ssl/cloudlist_io.crt')
+	};
+
+	var server = http.createServer(app);
+	var secureServer = https.createServer(httpsOptions, app);
+
+	secureServer.listen(443)
+	server.listen(80)
+} else {
+	app.set('port', process.env.PORT || 3000);
+	var server = app.listen(app.get('port'), function ( ) {
+		debug('Express server listening on port ' + server.address().port);
+	});
+}

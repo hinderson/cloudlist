@@ -26,3 +26,13 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+# Miscellaneous
+data
+npm-debug.log
+gulp-cache
+dump
+cdn
+public/media
+.awspublish-cloudlist
+tmp
