@@ -1,0 +1,52 @@
+doctype html
+html(lang="en-US")
+	head
+		meta(charset="utf-8")
+		title= title
+		link(rel="stylesheet", href="/assets/css/admin/admin.css")
+	body
+		header(role="banner")
+			h1 Dashboard
+			h2.user-name hinderson
+		main(role="main")
+			section.song-list
+				header
+					h2 My playlists
+
+				// LÄGG TILL SORTORDER HÄR
+
+				ul.playlists
+					- if (sortorder) {
+						-	for (var i = 0, len = sortorder.length; i < len; i++) {
+						-		var collection = playlists[i];
+						-		var index = i;
+						-		index += 1;
+						li
+							div.availability
+								input(type="checkbox", checked)
+							div.image
+								if collection.covers && collection.covers[0]
+									div.img(style="background-image:url(../media/img/#{collection.covers[0].src});", title="#{collection.covers[0].src}")
+							div.title
+								a(href="/playlist/#{collection.slugs.id}/") #{collection.title}
+							div.stats Songs: #{collection.items.length}
+							div.actions
+								button.delete ✕ Delete
+
+						-	}
+
+					- } else {
+						p.empty No playlists :(
+					- }
+			section.add-playlist
+				h2 Add new playlist
+				form(name="addcollection", method="post", action="/addcollection", enctype="multipart/form-data")
+					fieldset.metadata
+						h3 Title
+						label Title
+							input(type="text", placeholder="Title", name="title", required)
+					button(type="submit") Submit
+		script(src="/assets/js/admin/libs/zepto.min.js")
+		script(src="/assets/js/admin/libs/id3.js")
+		script(src="/assets/js/admin/libs/slip.js")
+		script(src="/assets/js/admin/admin.js")

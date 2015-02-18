@@ -4,9 +4,9 @@
 (function () {
 	'use strict';
 
-	function updateIndexInDatabase ( ) {
+	function updateIndexInDatabase (id) {
 
-		var items = document.querySelector('.collection > tbody').children;
+		var items = collection.children;
 		var newSortOrder = [].map.call(items, function (obj) {
 			return obj.getAttribute('data-id');
 		});
@@ -16,6 +16,7 @@
 			type: 'PUT',
 			url: '/orderitems/',
 			data: {
+				'collection': id,
 				'changes': newSortOrder
 			},
 			success: function (response) {
@@ -41,9 +42,14 @@
 
 			// If they did, do our delete
 			var songId = $(this).closest('tr').attr('data-id');
+			var collectionId = $(this).closest('table').attr('data-id');
 			$.ajax({
 				type: 'DELETE',
-				url: '/deletesong/' + songId,
+				url: '/deletesong/',
+				data: {
+					'songId': songId,
+					'collectionId': collectionId
+				},
 				success: function (response) {
 					// Check for a successful (blank) response
 					if (response.msg !== '') {
@@ -174,6 +180,7 @@
 
 	// DRAG AND DROP
 	var collection = document.querySelector('.collection > tbody');
+
 	collection.addEventListener('slip:beforereorder', function (e) {
 		if (/demo-no-reorder/.test(e.target.className)) {
 			e.preventDefault();
@@ -190,6 +197,8 @@
 		e.target.parentNode.appendChild(e.target);
 	}, false);
 
+	var collectionId = document.querySelector('.collection').getAttribute('data-id');
+
 	// Store item order on load
 	var items = document.querySelector('.collection > tbody').children;
 	var sortOrder = [].map.call(items, function (obj) {
@@ -199,7 +208,7 @@
 	collection.addEventListener('slip:reorder', function (e) {
 		e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
 
-		updateIndexInDatabase( );
+		updateIndexInDatabase(collectionId);
 
 		return false;
 

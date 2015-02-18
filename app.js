@@ -14,7 +14,8 @@ var forceSSL = require('express-force-ssl');
 var mongo = require('mongoskin');
 var db = mongo.db('mongodb://localhost:27017/cloudlist', {native_parser:true});
 
-var routes = require('./routes/index');
+// Routes
+var index = require('./routes/index');
 
 var app = express();
 
@@ -73,7 +74,7 @@ app.use(function (req, res, next) {
 	next();
 });
 
-app.use('/', routes);
+app.use('/', index);
 
 // Handle 404
 app.use(function (req, res) {

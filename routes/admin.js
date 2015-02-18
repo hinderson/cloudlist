@@ -27,69 +27,6 @@ function slugify (text) {
 		.replace(/-+$/, ''); // Trim - from end of text
 }
 
-// GET home page
-router.get('/', function (req, res) {
-
-	var db = req.db;
-
-	var id = req.params.id || 'XkHAQRZP';
-
-	db.collection('collections').find({ 'slugs.id': id }).toArray(function (err, collection) {
-		db.collection('songs').find().toArray(function (err, songs) {
-			if (err) throw err;
-
-			res.render('index', {
-				title: 'Cloudlist',
-				playlist: collection[0],
-				songs: songs
-			});
-		});
-	});
-});
-
-// GET individual song page based on slug
-router.get('/artist/:artistslug/track/:trackslug', function (req, res) {
-
-	var db = req.db;
-
-	db.collection('songs').find().toArray(function (err, songs) {
-		db.collection('collections').find().toArray(function (err, order) {
-			db.collection('songs').findOne({
-				'slugs.artist': req.params.artistslug,
-				'slugs.title': req.params.trackslug}, function (err, song) {
-					if (err) throw err;
-					if (song) {
-
-						var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
-						var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
-						featuredartist = featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '';
-
-						// Find index of song
-						var id = song._id.toString();
-						var index = order[0].items.indexOf(id) + 1;
-
-						res.render('index', {
-							// TODO: cdn:
-							path: req.path,
-							title: 'Cloudlist',
-							collectionTitle: order[0] && order[0].title || null,
-							songlist: songs,
-							sortorder: order[0] && order[0].items || null, // TEMP: Update to correct collection name
-							autostart: song._id,
-							songIndex: index,
-							songCover: song.covers[0].screenshot ? song.covers[0].screenshot : song.covers[0].src,
-							songTitle: song.title,
-							songArtist: artist + featuredartist
-						});
-					} else {
-						res.status(400);
-						res.render('404.jade', { title: '404: Page Not Found' });
-					}
-			});
-		});
-	});
-});
-
 // GET Dashboard page
 router.get('/dashboard', auth.connect(basic), function (req, res) {
 
@@ -115,35 +52,14 @@ router.get('/playlist/:id', auth.connect(basic), function (req, res) {
 
 	var id = req.params.id;
 
-	db.collection('collections').find({ 'slugs.id': id }).toArray(function (err, collection) {
-		db.collection('songs').find().toArray(function (err, songs) {
+	db.collection('songs').find().toArray(function (err, songs) {
+		db.collection('collections').find().toArray(function (err, order) {
 			if (err) throw err;
 
 			res.render('dashboard/playlist', {
 				title: 'Cloudlist',
-				playlist: collection[0],
-				songs: songs
-			});
-		});
-	});
-});
-
-// GET Songcatalog API
-router.get('/songcatalog/:id', function (req, res) {
-
-	var db = req.db;
-
-	var env = process.env.NODE_ENV;
-	if ('production' === env) {
-		var oneYear = 31556952000;
-		res.header('Cache-Control', 'max-age=' + oneYear);
-	}
-
-	db.collection('songs').find().toArray(function (err, items) {
-		db.collection('collections').find().toArray(function (err, order) {
-			res.json({
-				'order': order[0] && order[0].items || null,
-				'items': items
+				'songlist' : songs,
+				'sortorder': order && order[0] && order[0].items
 			});
 		});
 	});
@@ -161,6 +77,7 @@ router.post('/addcollection', function (req, res) {
 		'covers': [],
 		'description': '',
 		'items': [],
+		'length': 0,
 		'owner': 1, // TEMP: Update once we have a user system
 		'published': false,
 		'slugs': {
@@ -202,8 +119,6 @@ router.post('/addcollection', function (req, res) {
 router.post('/addsong', function (req, res) {
 
 	var db = req.db;
-
-	var collectionId = req.body.collection;
 
 	var songArtist = req.body.artist || null;
 	var songFeatured = req.body.featuredartist || null;
@@ -419,6 +334,10 @@ router.post('/addsong', function (req, res) {
 	}, function (err, result) {
 		if (err) throw err;
 
+		for (var i in result) {
+			console.log(result[i]);
+		}
+
 		// First count the length of the database
 		db.collection('songs').count(function (err, count) {
 			if (err) throw err;
@@ -452,20 +371,31 @@ router.post('/addsong', function (req, res) {
 					res.send("There was a problem adding the information to the database.");
 				} else {
 
-					// Add newly added song to the collection document
-					var songId = doc[0]._id + '';
-					db.collection('collections').update(
-						{ 'slugs.id': collectionId }, // Find accompanying collection based on slug id
-						{ $push: { items: songId } // Push newly created songId to items array
-						}, function (err, doc) {
-							if (err) throw err;
+					// Add newly added song to the collection doc
+					var songID = doc[0]._id + '';
+					db.collection('collections').findOne({ title: "Best Songs of 2014" }, function (err, items) {
+						if (err) throw err;
 
-							// If it worked, set the header so the address bar doesn't still say /adduser
-							res.location('dashboard');
-							// And forward to success page
-							res.redirect('dashboard');
-						}
-					);
+						var sortOrder = [];
+						sortOrder = items.items;
+						sortOrder.push(songID);
+
+						db.collection('collections').update(
+							{ title: "Best Songs of 2014" },
+							{
+								title: "Best Songs of 2014",
+								items: sortOrder
+							},
+							{ upsert: true }, function (err, doc) {
+								if (err) throw err;
+
+								// If it worked, set the header so the address bar doesn't still say /adduser
+								res.location('dashboard');
+								// And forward to success page
+								res.redirect('dashboard');
+							}
+						);
+					});
 				}
 			});
 		});
@@ -504,15 +434,15 @@ router.put('/updateitem/', function (req, res) {
 /*
  * PUT to reorderitems
  */
-router.put('/orderitems', function (req, res) {
+router.put('/orderitems/', function (req, res) {
 	ObjectID = require('mongoskin').ObjectID;
 	var db = req.db;
-
-	var collection = req.body.collection;
 	var newOrder = req.body.changes;
 
-	db.collection('collections').update({ _id: new ObjectID(collection) }, {'$set': { items: newOrder }}, function (err, result) {
+	db.collection('collections').update({ title: 'Best Songs of 2014' }, {'$set': { items: newOrder }}, function (err, result) {
 		if (err) throw err;
+
+		console.log('New item order:', newOrder);
 
 		res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
 	});
@@ -521,18 +451,10 @@ router.put('/orderitems', function (req, res) {
 /*
  * DELETE to deletesong
  */
-router.delete('/deletesong/', function (req, res) {
+router.delete('/deletesong/:id', function (req, res) {
 	ObjectID = require('mongoskin').ObjectID;
-
 	var db = req.db;
-
-	var songToDelete = req.body.songId;
-	var collectionId = req.body.collectionId;
-
-	console.log(songToDelete);
-	console.log(collectionId);
-
-	return;
+	var songToDelete = req.params.id;
 
 	function deleteAssociatedFiles (song) {
 
