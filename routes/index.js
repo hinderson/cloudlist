@@ -7,6 +7,7 @@ var gm = require('gm');
 var probe = require('node-ffprobe');
 var async = require('async');
 var shortId = require('shortid');
+var ObjectId = require('mongoskin').ObjectID;
 
 // ffmpeg
 var ffmpeg = require('fluent-ffmpeg');
@@ -31,15 +32,38 @@ function slugify (text) {
 router.get('/', function (req, res) {
 
 	var db = req.db;
+	var id = req.params.id || '7kgvszmD';
 
-	var id = req.params.id || 'XkHAQRZP';
+	// TEMP: Redirect to 2014 Best Of playlist
+	res.redirect('/hinderson/best-songs-of-2014/');
+	return;
 
 	db.collection('collections').find({ 'slugs.id': id }).toArray(function (err, collection) {
 		db.collection('songs').find().toArray(function (err, songs) {
 			if (err) throw err;
 
 			res.render('index', {
-				title: 'Cloudlist',
+				title: 'Cloudlist.io',
+				playlist: collection[0],
+				songs: songs
+			});
+		});
+	});
+});
+
+router.get('/hinderson/:playlist', function (req, res) {
+
+	var db = req.db;
+	var playlistTitle = req.params.playlist;
+
+	// Find playlist based on permalink title
+	db.collection('collections').find({ 'slugs.title': playlistTitle }).toArray(function (err, collection) {
+		db.collection('songs').find().toArray(function (err, songs) {
+			if (err) throw err;
+
+			res.render('index', {
+				title: 'Cloudlist.io',
+				baseUrl: '/hinderson/' + playlistTitle,
 				playlist: collection[0],
 				songs: songs
 			});
@@ -71,7 +95,7 @@ router.get('/artist/:artistslug/track/:trackslug', function (req, res) {
 						res.render('index', {
 							// TODO: cdn:
 							path: req.path,
-							title: 'Cloudlist',
+							title: 'Cloudlist.io',
 							collectionTitle: order[0] && order[0].title || null,
 							songlist: songs,
 							sortorder: order[0] && order[0].items || null, // TEMP: Update to correct collection name
@@ -100,7 +124,7 @@ router.get('/dashboard', auth.connect(basic), function (req, res) {
 			if (err) throw err;
 
 			res.render('dashboard/dashboard', {
-				title: 'Cloudlist',
+				title: 'Cloudlist.io',
 				playlists : collections,
 				sortorder: user.collections
 			});
@@ -112,15 +136,14 @@ router.get('/dashboard', auth.connect(basic), function (req, res) {
 router.get('/playlist/:id', auth.connect(basic), function (req, res) {
 
 	var db = req.db;
+	var collectionId = req.params.id;
 
-	var id = req.params.id;
-
-	db.collection('collections').find({ 'slugs.id': id }).toArray(function (err, collection) {
+	db.collection('collections').find({ 'slugs.id': collectionId }).toArray(function (err, collection) {
 		db.collection('songs').find().toArray(function (err, songs) {
 			if (err) throw err;
 
 			res.render('dashboard/playlist', {
-				title: 'Cloudlist',
+				title: 'Cloudlist.io',
 				playlist: collection[0],
 				songs: songs
 			});
@@ -130,8 +153,8 @@ router.get('/playlist/:id', auth.connect(basic), function (req, res) {
 
 // GET Songcatalog API
 router.get('/songcatalog/:id', function (req, res) {
-
 	var db = req.db;
+	var collectionId = req.params.id;
 
 	var env = process.env.NODE_ENV;
 	if ('production' === env) {
@@ -139,14 +162,25 @@ router.get('/songcatalog/:id', function (req, res) {
 		res.header('Cache-Control', 'max-age=' + oneYear);
 	}
 
-	db.collection('songs').find().toArray(function (err, items) {
-		db.collection('collections').find().toArray(function (err, order) {
+	// Find the correct collection based on ID
+	db.collection('collections').find( { _id: ObjectId(collectionId) } ).toArray(function (err, collection) {
+
+		// Turn items into ObjectId's
+		var items = collection[0].items;
+		for (var i = 0, len = items.length; i < len; i++) {
+			items[i] = ObjectId(items[i]);
+		}
+
+		// Match songs that are contained within the collection's items array
+		db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
 			res.json({
-				'order': order[0] && order[0].items || null,
+				'order': collection[0] && collection[0].items || null,
 				'items': items
 			});
 		});
 	});
+
+
 });
 
 // POST to Add Collection Service
@@ -203,7 +237,7 @@ router.post('/addsong', function (req, res) {
 
 	var db = req.db;
 
-	var collectionId = req.body.collection;
+	var collectionId = req.body.collection; // Based on slug ID, not ObjectId
 
 	var songArtist = req.body.artist || null;
 	var songFeatured = req.body.featuredartist || null;
@@ -461,9 +495,9 @@ router.post('/addsong', function (req, res) {
 							if (err) throw err;
 
 							// If it worked, set the header so the address bar doesn't still say /adduser
-							res.location('dashboard');
+							res.location('playlist/' + collectionId);
 							// And forward to success page
-							res.redirect('dashboard');
+							res.redirect('playlist/' + collectionId);
 						}
 					);
 				}
@@ -478,7 +512,6 @@ router.post('/addsong', function (req, res) {
  * PUT to updatesong
  */
 router.put('/updateitem/', function (req, res) {
-	ObjectID = require('mongoskin').ObjectID;
 	var db = req.db;
 	var id = req.body.id;
 	var field = req.body.field;
@@ -494,7 +527,7 @@ router.put('/updateitem/', function (req, res) {
 
 	console.log('Changed the following to ' + id + ':', field, content);
 
-	db.collection('songs').update({_id: new ObjectID(id)}, {'$set': query}, function (err, result) {
+	db.collection('songs').update({_id: ObjectId(id)}, {'$set': query}, function (err, result) {
 		if (err) throw err;
 
 		res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
@@ -505,13 +538,12 @@ router.put('/updateitem/', function (req, res) {
  * PUT to reorderitems
  */
 router.put('/orderitems', function (req, res) {
-	ObjectID = require('mongoskin').ObjectID;
 	var db = req.db;
 
 	var collection = req.body.collection;
 	var newOrder = req.body.changes;
 
-	db.collection('collections').update({ _id: new ObjectID(collection) }, {'$set': { items: newOrder }}, function (err, result) {
+	db.collection('collections').update({ _id: ObjectId(collection) }, {'$set': { items: newOrder }}, function (err, result) {
 		if (err) throw err;
 
 		res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
@@ -522,8 +554,6 @@ router.put('/orderitems', function (req, res) {
  * DELETE to deletesong
  */
 router.delete('/deletesong/', function (req, res) {
-	ObjectID = require('mongoskin').ObjectID;
-
 	var db = req.db;
 
 	var songToDelete = req.body.songId;
@@ -549,7 +579,7 @@ router.delete('/deletesong/', function (req, res) {
 	}
 
 	// Remove song from songs
-	db.collection('songs').find({_id: new ObjectID(songToDelete)}).toArray(function (err, song) {
+	db.collection('songs').find({_id: ObjectId(songToDelete)}).toArray(function (err, song) {
 		if (err) throw err;
 
 		deleteAssociatedFiles(song);

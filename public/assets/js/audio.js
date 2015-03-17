@@ -204,15 +204,15 @@
 				// Set state
 				state.audio = 'playing';
 
-				// Update browser history
+				// Update browser history (incl. document title)
 				var href = Helper.structureSlugs(song.slugs);
-				Cloudlist.history.update(id, href);
+				var documentTitle = '▶ ' + Helper.makeDocumentTitle([Helper.structureArtists(song.artist, song.featured), song.title], ' – ');
+				Cloudlist.history.update(id, href, documentTitle);
 
 				// Scroll to track if out of bounds
 				if (!Helper.inViewport(elem, 250)) {
 					Cloudlist.scrollToElement(elem);
 				}
-
 
 				// Unfocus previous item
 				if (Cloudlist.cache.elems.currentItem) {
@@ -235,6 +235,10 @@
 				soundManager.pause(id);
 				state.audio = 'paused';
 				console.log('Pausing', id);
+
+				// Update document title to remove ▶ character
+				var documentTitle = window.history.state.title.replace('▶ ', '');
+				Cloudlist.history.updateDocumentTitle(documentTitle);
 			},
 
 			resume: function (id) {
@@ -245,6 +249,10 @@
 				// Scroll to track
 				var elem = Cloudlist.cache.elems.collection.querySelector('[data-id="' + id + '"]');
 				Cloudlist.scrollToElement(elem);
+
+				// Update document title with ▶ character
+				var documentTitle = window.history.state.title;
+				Cloudlist.history.updateDocumentTitle(documentTitle);
 			},
 
 			next: function ( ) {
@@ -279,6 +287,7 @@
 				soundManager.stop(id);
 				state.audio = 'stopped';
 				console.log('Stopping', id);
+				// TEMP: Shouldn't this also reset documentTitle?
 			},
 
 			stopAll: function ( ) {

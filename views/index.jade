@@ -36,7 +36,7 @@ block content
 			- 		var songAvailable = song.available;
 
 			li(class=song.available === true ? undefined : "unavailable", data-id="#{song._id}", data-index="#{index}", data-artist="#{artist}#{featuredartist}", data-title="#{song.title}")
-				a(href="/artist/#{song.slugs.artist}/track/#{song.slugs.title}/")
+				a(href="#{baseUrl}/artist/#{song.slugs.artist}/track/#{song.slugs.title}/")
 					div.col.index #{index}
 					div.col.title #{song.title}
 					div.col.artist #{artist}#{featuredartist}

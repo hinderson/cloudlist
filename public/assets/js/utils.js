@@ -133,6 +133,10 @@
 				return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 			},
 
+			makeDocumentTitle: function (args, separator) {
+				return args.join(separator);
+			},
+
 			structureArtists: function (artist, featured, separator) {
 				separator = separator || ' feat. ';
 				artist = Array.isArray(artist) && artist.length > 1 ? artist.slice(0, -1).join(', ') + ' & ' + artist[artist.length -1] : artist;

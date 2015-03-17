@@ -12,7 +12,7 @@ var CDN = require('express-simple-cdn');
 var forceSSL = require('express-force-ssl');
 
 var mongo = require('mongoskin');
-var db = mongo.db('mongodb://localhost:27017/cloudlist', {native_parser:true});
+var db = mongo.db('mongodb://localhost:27017/cloudlist', { native_parser:true });
 
 // Routes
 var index = require('./routes/index');

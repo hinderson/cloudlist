@@ -111,18 +111,18 @@
 				debug: false,
 				lang: document.documentElement.lang,
 				cdn: 'https://static.cloudlist.io',
-				documentTitle: document.title,
+				documentTitle: 'Cloudlist.io',
 				maxItems: 100,
 				collection: {
-					id: '546a722cf1c3194db9e02713',
-					title: 'Year In Review'
+					id: '54df9b9b11c88f49bd62e854', // Old: 54df9b9b11c88f49bd62e854
+					title: 'Best Songs of 2014' // TEMP: Update this dynamically
 				},
 			},
 
 			cache: {
 				collection: {
 					index: [], // This stores the actual index positions
-					order: [], // This stores the current sort order
+					order: [], // This stores the current, updatable sort order
 					items: {}
 				},
 				elems: {
@@ -560,19 +560,19 @@
 					var format = (item.format === 'MP4' && Helper.canPlayMP4()) ? 'video' : 'img';
 					var cdn = s.cdn + '/media/' + format + '/';
 					var cover = document.createElement(format);
-					var src;
+					var filename;
 
 					// Below checks both for video and if the mp4 format is supported in the browser
 					if (format === 'video') {
-						src = cdn + item.src;
+						filename = cdn + item.filename;
 						cover.setAttribute('autoplay', '');
 						cover.setAttribute('loop', '');
 					} else {
-						src = cdn + (item.screenshot ? item.screenshot : item.src);
+						filename = cdn + (item.screenshot ? item.screenshot : item.filename);
 						cover.setAttribute('alt', '');
 					}
 
-					cover.setAttribute('src', src);
+					cover.setAttribute('src', filename);
 					cover.className = 'cover';
 					cover.setAttribute('width', item.width);
 					cover.setAttribute('height', item.height);

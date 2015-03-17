@@ -36,26 +36,24 @@
 				}, 500);
 			},
 
-			update: function (id, href) {
+			update: function (id, href, documentTitle) {
 				var song = Cloudlist.cache.collection.items[id] || null;
+
+				var baseUrl = '/hinderson/best-songs-of-2014';
+				var href = baseUrl + href;
 
 				if (song) {
 					if (window.history.state !== null && window.history.state.id === id) {
 						return;
 					}
 
-					var title = this.makeDocumentTitle([Helper.structureArtists(song.artist, song.featured), song.title, s.documentTitle], ' – ');
-					this.updateDocumentTitle(title);
-					window.history.pushState({id: id, title: title}, null, href || null);
+					documentTitle && this.updateDocumentTitle(documentTitle);
+					window.history.pushState({id: id, title: documentTitle || ''}, null, href || null);
 				}
 			},
 
-			makeDocumentTitle: function (args, separator) {
-				return args.join(separator);
-			},
-
-			updateDocumentTitle: function (title) {
-				document.title = title;
+			updateDocumentTitle: function (title, removeBaseTitle) {
+				document.title = title + (!removeBaseTitle ? (' – ' + s.documentTitle) : '');
 			},
 
 			resetDocumentTitle: function ( ) {
