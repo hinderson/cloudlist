@@ -156,6 +156,13 @@ router.get('/songcatalog/:id', function (req, res) {
 	var db = req.db;
 	var collectionId = req.params.id;
 
+	var host = req.headers.host;
+	var referer = req.headers.referer.split(host)[1];
+
+	console.log(req);
+
+	console.log('Fetching request from ' + referer);
+
 	var env = process.env.NODE_ENV;
 	if ('production' === env) {
 		var oneYear = 31556952000;
@@ -559,18 +566,13 @@ router.delete('/deletesong/', function (req, res) {
 	var songToDelete = req.body.songId;
 	var collectionId = req.body.collectionId;
 
-	console.log(songToDelete);
-	console.log(collectionId);
-
-	return;
-
 	function deleteAssociatedFiles (song) {
 
 		if (song[0].covers) {
-			var source = song[0].covers[0].src;
+			var source = song[0].covers[0].filename;
 			var ext = path.extname(source).slice(1);
 			console.log(ext + 'to delete');
-			fs.unlink('./public/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song[0].covers[0].src);
+			fs.unlink('./public/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song[0].covers[0].filename);
 		}
 
 		if (song[0].audio && song[0].audio.url && song[0].audio.source !== 'soundcloud') {
@@ -579,16 +581,16 @@ router.delete('/deletesong/', function (req, res) {
 	}
 
 	// Remove song from songs
-	db.collection('songs').find({_id: ObjectId(songToDelete)}).toArray(function (err, song) {
+	db.collection('songs').find( { _id: ObjectId(songToDelete) } ).toArray(function (err, song) {
 		if (err) throw err;
 
 		deleteAssociatedFiles(song);
 
 		// Remove song from collection
-		db.collection('collections').update({ title: 'Best Songs of 2014' }, { $pull: { items: songToDelete } }, function (err, result) {
+		db.collection('collections').update( { _id: ObjectId(collectionId) }, { $pull: { items: songToDelete } }, function (err, result) {
 			res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
 
-			db.collection('songs').removeById(songToDelete, function (err, result) {
+			db.collection('songs').remove( { _id: ObjectId(songToDelete) }, function (err, result) {
 				res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
 			});
 		});
