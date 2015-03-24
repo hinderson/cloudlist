@@ -14,9 +14,6 @@ var forceSSL = require('express-force-ssl');
 var mongo = require('mongoskin');
 var db = mongo.db('mongodb://localhost:27017/cloudlist', { native_parser:true });
 
-// Routes
-var index = require('./routes/index');
-
 var app = express();
 
 // Favicon
@@ -74,7 +71,8 @@ app.use(function (req, res, next) {
 	next();
 });
 
-app.use('/', index);
+// Require all routes at the same time
+require('./routes')(app);
 
 // Handle 404
 app.use(function (req, res) {

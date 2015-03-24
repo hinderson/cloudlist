@@ -76,11 +76,11 @@
 			target.parentNode.removeChild(target);
 		};
 
-		var getCollection = function (collectionID) {
+		var getCollection = function () {
 			// Store GET request, structure and store it in global array
 			var XMLHttp = new XMLHttpRequest();
 
-			XMLHttp.open('GET', '/songcatalog/' + collectionID, true);
+			XMLHttp.open('GET', '/api/songs/', true);
 			XMLHttp.onreadystatechange = function ( ) {
 				if (XMLHttp.readyState === 4) {
 					if (XMLHttp.status === 200) {
@@ -151,7 +151,7 @@
 			init: function ( ) {
 				s = this.settings;
 				c = this.cache;
-				getCollection(s.collection.id);
+				getCollection();
 				this.registerEvents();
 				this.registerKeyboardEvents();
 

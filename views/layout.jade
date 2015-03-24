@@ -125,6 +125,11 @@ html(lang="en-US", class="no-js")
 				p However, if you want to just view the content without interacting with it, click the X in the upper corner of this box to close the message, and then scroll away to your heart's content.
 		script.
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-58137452-1', 'auto');ga('send', 'pageview');
+		script.
+			window.collectionId = '#{playlist._id}';
+		if autostart
+			script.
+				window.autostart = '#{autostart}';
 		- if (env === 'production') {
 		//- inject:js
 		script(src="https://static.cloudlist.io/assets/js/global-bfe6cf5a.js")
