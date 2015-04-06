@@ -1,51 +1,35 @@
+'use strict';
+
 var slugify = require('../../utils/slugify.js');
 var shortId = require('shortid');
+var async = require('async');
+var ObjectId = require('mongoskin').ObjectID;
 
 module.exports = function (router) {
 
-	// POST new collection
-	router.post('/addcollection', function (req, res) {
-		var db = req.db;
-		var title =  req.body.title || 'New playlist';
+	// GET all collections
+	router.get('/api/v1/collections', function (req, res) {
+		return false;
+	});
 
-		db.collection('collections').insert({
-			'created': new Date(),
-			'covers': [],
-			'description': '',
-			'items': [],
-			'owner': 1, // TEMP: Update once we have a user system
-			'published': false,
-			'slugs': {
-				'id': shortId.generate(),
-				'title': slugify(title)
-			},
-			'title': title
-		}, function (err, doc) {
-			if (err) {
-				// If it failed, return error
-				res.send("There was a problem adding the information to the database.");
-			} else {
-				console.log('Successfully added created collection');
+	// GET one collection
+	router.get('/api/v1/collections/:id', function (req, res) {
+		return false;
+	});
 
-				// Add new collection to user document
-				var collectionId = doc[0]._id + '';
-				db.collection('users').update(
-					{ _id: 1 },
-					{ $push: { 'collections': collectionId }
-				},
-					function (err) {
-						if (err) throw err;
+	// CREATE new collection
+	router.post('/api/v1/collections/', function (req, res) {
+		return false;
+	});
 
-						console.log('Successfully added collection to user account');
+	// UPDATE single collection
+	router.put('/api/v1/collections/:id', function (req, res) {
+		return false;
+	});
 
-						// If it worked, set the header so the address bar doesn't still say /adduser
-						res.location('dashboard');
-						// And forward to success page
-						res.redirect('dashboard');
-					}
-				)
-			}
-		});
+	// DELETE collection
+	router.delete('/api/v1/collections/:id', function (req, res) {
+		return false;
 	});
 
 };

@@ -17,9 +17,6 @@ block content
 		h3.structural.
 			Song list
 		ol
-
-			-	console.log(data);
-
 			-	var collection = {};
 			-	for (var i = 0, len = songs.length; i < len; i++) {
 			-		var id = songs[i]._id;
@@ -37,7 +34,7 @@ block content
 			-		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
 			- 		var songAvailable = song.available;
 
-			li(class=song.available === true ? undefined : "unavailable", data-index="#{index}", data-artist="#{artist}#{featuredartist}", data-title="#{song.title}")
+			li(class=song.available === true ? undefined : "unavailable", data-id="#{song._id}", data-index="#{index}", data-artist="#{artist}#{featuredartist}", data-title="#{song.title}")
 				a(href="#{baseUrl}/artist/#{song.slugs.artist}/track/#{song.slugs.title}/")
 					div.col.index #{index}
 					div.col.title #{song.title}

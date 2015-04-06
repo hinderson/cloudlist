@@ -5,8 +5,10 @@
 	left:-9999px;
 }
 
-h2.collection-title {
-	text-align:center;
+.collection-title {
+	margin-bottom: 28px;
+	font-size: 30px;
+	font-weight: bold;
 }
 
 .img {
@@ -136,7 +138,6 @@ form .group input {
 	margin:0;
 }
 button[type="submit"] {
-	margin-top:20px;
 	font-size:13px;
 }
 

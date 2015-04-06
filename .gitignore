@@ -29,6 +29,7 @@ node_modules
 
 # Miscellaneous
 data
+config/private
 npm-debug.log
 gulp-cache
 dump

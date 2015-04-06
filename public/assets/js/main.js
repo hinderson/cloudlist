@@ -80,7 +80,7 @@
 			// Store GET request, structure and store it in global array
 			var XMLHttp = new XMLHttpRequest();
 
-			XMLHttp.open('GET', '/api/songs/', true);
+			XMLHttp.open('GET', '/song-collection/', true);
 			XMLHttp.onreadystatechange = function ( ) {
 				if (XMLHttp.readyState === 4) {
 					if (XMLHttp.status === 200) {
@@ -112,11 +112,7 @@
 				lang: document.documentElement.lang,
 				cdn: 'https://static.cloudlist.io',
 				documentTitle: 'Cloudlist.io',
-				maxItems: 100,
-				collection: {
-					id: '54df9b9b11c88f49bd62e854', // Old: 54df9b9b11c88f49bd62e854
-					title: 'Best Songs of 2014' // TEMP: Update this dynamically
-				},
+				maxItems: 100
 			},
 
 			cache: {

@@ -1,31 +1,49 @@
+'use strict';
+
 // General
 var ObjectId = require('mongoskin').ObjectID;
+var parseUrl = require('url');
+
+// Hashid
+var Hashids = require('hashids');
+var secret = require('../config/private/secret.js');
+var hashids = new Hashids(secret);
+
+// Database methods
+var collections = require('../methods/collections.js');
+var songs = require('../methods/songs.js');
 
 module.exports = function (router) {
 
-	// Render home page
+	// Render landing page
 	router.get('/', function (req, res) {
 		// TEMP: Redirect to 2014 Best Of playlist
 		res.redirect('/best-songs-of-2014/');
+	});
 
-		return;
-
-		/*
+	// Return all songs in JSON format
+	router.get('/song-collection', function (req, res) {
 		var db = req.db;
-		var id = req.params.id || '7kgvszmD';
 
-		db.collection('collections').find({ 'slugs.id': id }).toArray(function (err, collection) {
-			db.collection('songs').find().toArray(function (err, songs) {
-				if (err) throw err;
+		// TEMP: Trying out url (maybe put it in a module?)
+		var url = parseUrl.parse(req.headers.referer).pathname.split('/').filter(function(e){return e});
+		var collectionSlug = url[0];
 
-				res.render('index', {
-					title: 'Cloudlist.io',
-					playlist: collection[0],
-					songs: songs
+		var env = process.env.NODE_ENV;
+		if ('production' === env) {
+			var oneYear = 31556952000;
+			res.header('Cache-Control', 'max-age=' + oneYear);
+		}
+
+		// Find the correct collection based on slug
+		db.collection('collections').find( { 'slugs.title': collectionSlug } ).toArray(function (err, collection) {
+			songs.getAll(collection[0]._id, function (result) {
+				res.json({
+					'order': result.order,
+					'items': result.items
 				});
 			});
 		});
-		*/
 	});
 
 	// Frontend: Single collection
@@ -37,6 +55,11 @@ module.exports = function (router) {
 		db.collection('collections').find( { 'slugs.title': collectionSlug } ).toArray(function (err, collection) {
 			db.collection('songs').find( ).toArray(function (err, songs) {
 				if (err) throw err;
+
+				// Redirect to root if slug isn't a collection in the db
+				if (!collection[0]) {
+					return res.redirect('/');
+				}
 
 				res.locals.data = collection[0]._id;
 
@@ -90,20 +113,6 @@ module.exports = function (router) {
 						}
 				});
 			});
-		});
-	});
-
-	// Dashboard: Reorder items
-	router.put('/orderitems', function (req, res) {
-		var db = req.db;
-
-		var collection = req.body.collection;
-		var newOrder = req.body.changes;
-
-		db.collection('collections').update({ _id: ObjectId(collection) }, {'$set': { items: newOrder }}, function (err, result) {
-			if (err) throw err;
-
-			res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
 		});
 	});
 

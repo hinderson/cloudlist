@@ -13,18 +13,12 @@
 
 		// Post to database
 		$.ajax({
-			type: 'PUT',
-			url: '/orderitems/',
+			type: 'POST', // TEMP: Update to real REST API with PUT
+			url: '/update-collection/' + id,
 			data: {
-				'collection': id,
-				'changes': newSortOrder
+				'items': newSortOrder
 			},
-			success: function (response) {
-				// Check for a successful (blank) response
-				if (response.msg !== '') {
-					alert('Error: ' + response.msg);
-				}
-
+			success: function (res) {
 				// Update global sort array
 				sortOrder = newSortOrder;
 			}
@@ -119,7 +113,10 @@
 
 	var deleteButtons = document.querySelectorAll('.song-list button.delete');
 	[].forEach.call(deleteButtons, function (e) {
-		e.addEventListener('click', deleteSong, false);
+		// TEMP
+		return;
+
+		//e.addEventListener('click', deleteSong, false);
 	});
 
 	document.querySelector('input[name="audio"]').onchange = function (e) {
@@ -137,9 +134,11 @@
 		readImgURL(this);
 	};
 
+
+
 	// LIVE EDIT
-	var contentEditables = document.querySelectorAll('[contenteditable]');
-	var postEdit = function (e) {
+	var editableSongs = document.querySelectorAll('table.collection [contenteditable]');
+	var postSongEdit = function (e) {
 		var target = e.target;
 		var id = target.parentNode.getAttribute('data-id');
 		var type = target.className;
@@ -154,29 +153,40 @@
 
 		// Post to database
 		$.ajax({
-			type: 'PUT',
-			url: '/updateitem/',
+			type: 'POST', // TEMP: Update to real REST API with PUT
+			url: '/update-song/' + id,
 			data: {
-				'id': id,
 				'field': type,
 				'content': content
-			},
-			success: function (response) {
-				// Check for a successful (blank) response
-				if (response.msg !== '') {
-					alert('Error: ' + response.msg);
-				}
 			}
 		});
 	};
-	[].forEach.call(contentEditables, function (e) {
-		e.addEventListener('blur', postEdit, false);
+	[].forEach.call(editableSongs, function (e) {
+		e.addEventListener('blur', postSongEdit, false);
 	});
+
+	var editableCollectionTitle = document.querySelector('table.collection .collection-title span');
+	var postCollectionEdit = function (e) {
+		var title = e.target.innerHTML;
+		var id =  document.querySelector('table.collection').getAttribute('data-id');
+
+		// Post to database
+		$.ajax({
+			type: 'POST', // TEMP: Update to real REST API with PUT
+			url: '/update-collection/' + id,
+			data: {
+				'title': title
+			}
+		});
+	};
+	editableCollectionTitle.addEventListener('blur', postCollectionEdit, false);
 
 	var availability = document.querySelectorAll('.availability input');
 	[].forEach.call(availability, function (e) {
-		e.addEventListener('click', postEdit, false);
+		e.addEventListener('click', postSongEdit, false);
 	});
+
+
 
 	// DRAG AND DROP
 	var collection = document.querySelector('.collection > tbody');

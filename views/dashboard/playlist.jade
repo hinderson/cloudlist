@@ -11,11 +11,10 @@ html(lang="en-US")
 			h2.user-name hinderson
 		main(role="main")
 			section.song-list
-				header
-					h2.collection-title
+				- var obfuscatedCollectionId = hashids.encodeHex(playlist._id);
+				table.collection(data-id="#{obfuscatedCollectionId}")
+					caption.collection-title
 						span(contenteditable) #{playlist.title}
-					button.add-song <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g stroke-width="6" stroke-miterlimit="10"><circle cx="50" cy="50" r="47"/><path d="M50 19v60M80 50h-60"/></g></svg><span>Add new song</span>
-				table.collection(data-id="#{playlist._id}")
 					thead
 						tr
 							th.handle
@@ -44,12 +43,13 @@ html(lang="en-US")
 						-		var song = collection[sortorder[i]];
 						-		var index = i;
 						-		index += 1;
+						-		var obfuscatedId = hashids.encodeHex(song._id);
 						-		var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
 						-		var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
 						-		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
-						-		var lastModified = song.updated || song.added
+						-		var lastModified = song.updated || song.added;
 
-						tr(data-id="#{song._id}", data-available="")
+						tr(data-id="#{obfuscatedId}", data-available="")
 							td.handle
 								span(role="button", class="handle") ☰
 							td.availability
@@ -82,12 +82,13 @@ html(lang="en-US")
 										img(src="/assets/img/icon-file.jpg", width="40", height="40", class="file")
 							td.updated #{lastModified.toDateString()} #{lastModified.getHours()}:#{lastModified.getMinutes()}:#{lastModified.getSeconds()}
 							td.controls
-								button.delete ✕ Delete
+								form(name="delete-song", method="post", action="/delete-song/#{obfuscatedId}", enctype="multipart/form-data")
+									button(type="submit").delete ✕ Delete
 						- }
-				p.stats <strong>Total songs:</strong> #{songs.length}
+				p.stats <strong>Total songs:</strong> #{sortorder.length}
 			section.add-song
 				h2 Add new song
-				form(name="addsong", method="post", action="/addsong", enctype="multipart/form-data")
+				form(name="create-song", method="post", action="/create-song/#{obfuscatedCollectionId}", enctype="multipart/form-data")
 					fieldset.source
 						h3 Choose your audio source
 						label Upload audio
@@ -115,7 +116,6 @@ html(lang="en-US")
 							input(type="text", placeholder="Start time", name="starttime")
 						label End time
 							input(type="text", placeholder="End time", name="endtime")
-					input(name="collection", type="hidden", value="#{playlist.slugs.id}")
 					button(type="submit") Submit
 		script(src="/assets/js/admin/libs/zepto.min.js")
 		script(src="/assets/js/admin/libs/id3.js")

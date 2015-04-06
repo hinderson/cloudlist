@@ -1,10 +1,11 @@
-// General
+'use strict';
+
+var db = require('../server').db;
 var fs = require('fs');
 var path = require('path');
+var slugify = require('../utils/slugify.js');
 var async = require('async');
-var slugify = require('../../utils/slugify.js');
 var ObjectId = require('mongoskin').ObjectID;
-var parseUrl = require('url');
 var jsonpClient = require('jsonp-client');
 
 // Graphicsmagick
@@ -14,27 +15,13 @@ var gm = require('gm');
 var ffmpeg = require('fluent-ffmpeg');
 var probe = require('node-ffprobe');
 
-module.exports = function (router) {
+module.exports = {
 
-	// GET all songs
-	router.get('/api/songs/', function (req, res) {
-		var db = req.db;
-		var collectionId = req.params.id;
+	getAll: function (id, result) {
+		if (!id) { return false; }
 
-		var url = parseUrl.parse(req.headers.referer);
-		console.log('Calling', url.pathname.split('/'));
-
-		return;
-
-		var env = process.env.NODE_ENV;
-		if ('production' === env) {
-			var oneYear = 31556952000;
-			res.header('Cache-Control', 'max-age=' + oneYear);
-		}
-
-		// Find the correct collection based on ID
-		db.collection('collections').find( { _id: ObjectId(collectionId) } ).toArray(function (err, collection) {
-
+		// Find the correct collection based on slug
+		db.collection('collections').find( { _id: ObjectId(id) } ).toArray(function (err, collection) {
 			// Turn items into ObjectId's
 			var items = collection[0].items;
 			for (var i = 0, len = items.length; i < len; i++) {
@@ -43,32 +30,30 @@ module.exports = function (router) {
 
 			// Match songs that are contained within the collection's items array
 			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
-				res.json({
-					'order': collection[0] && collection[0].items || null,
-					'items': items
+				return result({
+					order: collection[0].items,
+					items: items
 				});
 			});
 		});
-	});
+	},
 
-	// POST new (single) song
-	router.post('/addsong', function (req, res) {
+	getOne: function (id, result) {
 
-		var db = req.db;
+	},
 
-		var collectionId = req.body.collection; // Based on slug ID, not ObjectId
-
-		var songArtist = req.body.artist || null;
-		var songFeatured = req.body.featuredartist || null;
-		var songTitle = req.body.title || null;
-		var songAlbum = req.body.album || null;
+	create: function (collectionId, meta, files, result) {
+		var songArtist = meta.artist || null;
+		var songFeatured = meta.featuredartist || null;
+		var songTitle = meta.title || null;
+		var songAlbum = meta.album || null;
 		var songDuration = null;
-		var songImage = req.files.image ? req.files.image.name : null;
+		var songImage = files.image ? files.image.name : null;
 		var songCover;
-		var audioUrl = req.files.audio ? req.files.audio.name : null;
-		var streamUrl = req.body.soundcloud || null;
-		var startTime = req.body.starttime || 0;
-		var endTime = req.body.endtime;
+		var audioUrl = files.audio ? files.audio.name : null;
+		var streamUrl = meta.soundcloud || null;
+		var startTime = meta.starttime || 0;
+		var endTime = meta.endtime;
 		var resolvedUrl = null;
 
 		var tempCoverPath;
@@ -77,7 +62,7 @@ module.exports = function (router) {
 		// Main async chain
 		async.series({
 
-			determineAudioSource: function (next) {
+			determineAudioSource: function (callback) {
 
 				// First resolve the URL if it's Soundcloud
 				// Be sure to check for // in the beginning so we don't return true on api.soundcloud
@@ -92,14 +77,14 @@ module.exports = function (router) {
 						// Update resolved URL variable
 						resolvedUrl = data.stream_url;
 
-						next(null);
+						callback(null);
 					});
 
 				} else if (audioUrl) {
 
 					// Analyze audio duration and move the file
-					var tempAudioPath = req.files.audio.path;
-					var targetAudioPath = './public/media/audio/' + req.files.audio.name;
+					var tempAudioPath = files.audio.path;
+					var targetAudioPath = './public/media/audio/' + files.audio.name;
 
 					fs.rename(tempAudioPath, targetAudioPath, function (err) {
 						if (err) throw err;
@@ -115,29 +100,29 @@ module.exports = function (router) {
 								// Update song duration variable
 								songDuration = res.format.duration * 1000; // Converted to milliseconds to match SoundCloud API
 
-								next(null);
+								callback(null);
 							});
 						});
 					});
 
 				} else {
 
-					next(null);
+					callback(null);
 
 				}
 			},
 
-			identifyCover: function (next) {
+			identifyCover: function (callback) {
 				if (!songImage) {
-					next(null);
+					callback(null);
 				}
 
-				tempCoverPath = req.files.image.path;
+				tempCoverPath = files.image.path;
 
 				// First check if we're dealing with an image or a video
-				var ext = path.extname(req.files.image.name);
+				var ext = path.extname(files.image.name);
 				if (ext !== '.mp4') {
-					var filename = req.files.image.name.replace(ext, '.jpg');
+					var filename = files.image.name.replace(ext, '.jpg');
 					targetCoverPath = './public/media/img/' + filename;
 
 					// Resize img
@@ -173,12 +158,12 @@ module.exports = function (router) {
 										filesize: identify.Filesize
 									};
 
-									next(null);
+									callback(null);
 								});
 							});
 					});
 				} else { // Upload mp4
-					targetCoverPath = './public/media/video/' + req.files.image.name;
+					targetCoverPath = './public/media/video/' + files.image.name;
 					var screenshotFolder = './public/media/img/';
 
 					// Take screenshot
@@ -227,7 +212,7 @@ module.exports = function (router) {
 													screenshot: newScreenshot
 												};
 
-												next(null);
+												callback(null);
 											});
 										});
 
@@ -238,9 +223,9 @@ module.exports = function (router) {
 				}
 			},
 
-			processCover: function (next) {
+			processCover: function (callback) {
 				if (!songImage) {
-					next(null);
+					callback(null);
 				}
 
 				fs.rename(tempCoverPath, targetCoverPath, function (err) {
@@ -250,12 +235,12 @@ module.exports = function (router) {
 					fs.unlink(tempCoverPath, function() {
 						if (err) throw err;
 
-						next(null);
+						callback(null);
 					});
 				});
 			},
 
-			formatInputFields: function (next) {
+			formatInputFields: function (callback) {
 				// Check for multiple artists
 				if (songArtist && songArtist.indexOf(',') > -1) {
 					songArtist = songArtist.split(/\s*,\s*/);
@@ -266,18 +251,23 @@ module.exports = function (router) {
 					songFeatured = songFeatured.split(/\s*,\s*/);
 				}
 
-				next(null);
+				callback(null);
 			}
 
-		}, function (err, result) {
+		}, function (err) {
 			if (err) throw err;
 
 			// First count the length of the database
 			db.collection('songs').count(function (err, count) {
 				if (err) throw err;
 
-				// Submit to the DB
-				db.collection('songs').insert({
+				var slugs = {
+					album: songAlbum && slugify(songAlbum),
+					artist: songArtist && slugify((Array.isArray(songArtist) ? songArtist.join('-') : songArtist) + (songFeatured && songFeatured.length > 0 ? (' feat. ' + (Array.isArray(songFeatured) ? songFeatured.join('-') : songFeatured )) : '')),
+					title: songTitle && slugify(songTitle)
+				};
+
+				var song = {
 					'added': new Date(),
 					'album': songAlbum,
 					'artist' : songArtist,
@@ -293,101 +283,97 @@ module.exports = function (router) {
 					'featuredartist': songFeatured,
 					'covers': [songCover],
 					'slugs': {
-						'album': songAlbum && slugify(songAlbum),
-						'artist': songArtist && slugify((Array.isArray(songArtist) ? songArtist.join('-') : songArtist) + (songFeatured && songFeatured.length > 0 ? (' feat. ' + (Array.isArray(songFeatured) ? songFeatured.join('-') : songFeatured )) : '')),
-						'title': songTitle && slugify(songTitle)
+						'album': slugs.album,
+						'artist': slugs.artist,
+						'title': slugs.title
 					},
+					'permalink': '/' + slugs.artist + '-' + slugs.title + '/',
 					'tags': null,
 					'title': songTitle
-				}, function (err, doc) {
-					if (err) {
-						// If it failed, return error
-						res.send("There was a problem adding the information to the database.");
-					} else {
+				};
 
-						// Add newly added song to the collection document
-						var songId = doc[0]._id + '';
-						db.collection('collections').update(
-							{ 'slugs.id': collectionId }, // Find accompanying collection based on slug id
-							{ $push: { items: songId } // Push newly created songId to items array
-							}, function (err, doc) {
-								if (err) throw err;
+				// Submit to the DB
+				db.collection('songs').insert(song, function (err, doc) {
+					if (err) throw err;
 
-								// If it worked, set the header so the address bar doesn't still say /adduser
-								res.location('playlist/' + collectionId);
-								// And forward to success page
-								res.redirect('playlist/' + collectionId);
-							}
-						);
-					}
+					// Add newly added song to the collection document
+					var songId = doc[0]._id + '';
+					console.log(collectionId);
+					db.collection('collections').update(
+						{ _id: ObjectId(collectionId) }, // Find accompanying collection based on slug id
+						{ $push: { items: songId } // Push newly created songId to items array
+						}, function (err, doc) {
+							if (err) throw err;
+
+							return result(song);
+						}
+					);
 				});
 			});
 
 		});
+	},
 
-	});
+	update: function (id, meta, result) {
+		if (!id) { return false; }
 
-	// PUT existing song
-	router.put('/updateitem/', function (req, res) {
-		var db = req.db;
-		var id = req.body.id;
-		var field = req.body.field;
-		var content = req.body.content;
+		var field = meta.field;
+		var content = meta.content;
 
-		var query = {};
+		var query = {
+			updated: new Date()
+		};
+
 		if (field === 'available') {
 			query[field] = (content === 'true' ? true: false);
 		} else {
 			query[field] = content;
 		}
-		query.updated = new Date();
 
-		console.log('Changed the following to ' + id + ':', field, content);
-
-		db.collection('songs').update({_id: ObjectId(id)}, {'$set': query}, function (err, result) {
+		db.collection('songs').update({ _id: ObjectId(id) }, { '$set': query }, function (err) {
 			if (err) throw err;
 
-			res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
+			return result(true);
 		});
-	});
+	},
 
-	// DELETE existing song
-	router.delete('/deletesong/', function (req, res) {
-		var db = req.db;
+	delete: function (id, result) {
+		if (!id) { return false; }
 
-		var songToDelete = req.body.songId;
-		var collectionId = req.body.collectionId;
+		async.waterfall([
+			function (callback) {
+				// Remove song from database
+				db.collection('songs').findAndRemove( { _id: ObjectId(id) }, [], callback);
+			},
+			function (song, sort, callback) {
+				// Remove all associated files (audio files, images, etc.)
+				if (song.covers) {
+					var source = song.covers[0].filename;
+					var ext = path.extname(source).slice(1);
+					fs.unlink('./public/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song.covers[0].filename);
+				}
 
-		function deleteAssociatedFiles (song) {
+				if (song.audio && song.audio.url && song.audio.source !== 'soundcloud') {
+					fs.unlink('./public/media/audio/' + song.audio.url);
+				}
 
-			if (song[0].covers) {
-				var source = song[0].covers[0].filename;
-				var ext = path.extname(source).slice(1);
-				console.log(ext + 'to delete');
-				fs.unlink('./public/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song[0].covers[0].filename);
-			}
-
-			if (song[0].audio && song[0].audio.url && song[0].audio.source !== 'soundcloud') {
-				fs.unlink('./public/media/audio/' + song[0].audio.url);
-			}
-		}
-
-		// Remove song from songs
-		db.collection('songs').find( { _id: ObjectId(songToDelete) } ).toArray(function (err, song) {
-			if (err) throw err;
-
-			deleteAssociatedFiles(song);
-
-			// Remove song from collection
-			db.collection('collections').update( { _id: ObjectId(collectionId) }, { $pull: { items: songToDelete } }, function (err, result) {
-				res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
-
-				db.collection('songs').remove( { _id: ObjectId(songToDelete) }, function (err, result) {
-					res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
+				callback();
+			},
+			function (callback) {
+				// Return an array of collections that associates with the song
+				db.collection('collections').find({ items: id }).toArray(function (err, collections) {
+					// Delete every reference to the song from item array
+					collections.forEach(function (collection) {
+						var collectionId = collection._id;
+						db.collection('collections').update( { _id: ObjectId(collectionId) }, { $pull: { items: id } }, callback);
+					});
 				});
-			});
+			}
+		], function (err) {
+			if (err) throw err;
 
+			return result(true);
 		});
-	});
+	}
 
 };

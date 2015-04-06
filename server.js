@@ -13,6 +13,7 @@ var forceSSL = require('express-force-ssl');
 
 var mongo = require('mongoskin');
 var db = mongo.db('mongodb://localhost:27017/cloudlist', { native_parser:true });
+exports.db = db;
 
 var app = express();
 
@@ -46,6 +47,12 @@ if ('production' === env) {
 		});
 	});
 }
+
+// Expose ID encryption util globally
+var Hashids = require('hashids');
+var secret = require('./config/private/secret.js');
+var hashids = new Hashids(secret);
+app.locals.hashids = hashids;
 
 app.use(logger('dev'));
 app.use(compression());

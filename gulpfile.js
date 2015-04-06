@@ -122,7 +122,7 @@ gulp.task('audio', function ( ) {
 // Amazon S3
 gulp.task('publish', function ( ) {
 	var headers = {'Cache-Control': 'max-age=315360000, no-transform, public'};
-	var aws = require('./data/aws.json');
+	var aws = require('./config/private/aws.json');
 	var publisher = awspublish.create(aws);
 
 	var regular = gulp.src(['./cdn/**/*', '!./cdn/**/*.{css,js,woff}'])
@@ -143,7 +143,7 @@ gulp.task('publish', function ( ) {
 
 gulp.task('publish-media', function ( ) {
 	var headers = {'Cache-Control': 'max-age=315360000, no-transform, public'};
-	var aws = require('./data/aws.json');
+	var aws = require('./config/private/aws.json');
 	var publisher = awspublish.create(aws);
 
 	return gulp.src(['./cdn/**/*', '!./cdn/assets/**'])

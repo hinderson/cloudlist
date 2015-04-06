@@ -39,7 +39,8 @@
 			update: function (id, href, documentTitle) {
 				var song = Cloudlist.cache.collection.items[id] || null;
 
-				var baseUrl = '/hinderson/best-songs-of-2014';
+				// TEMP
+				var baseUrl = '/best-songs-of-2014';
 				var href = baseUrl + href;
 
 				if (song) {

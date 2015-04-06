@@ -21,6 +21,7 @@ html(lang="en-US")
 						-		var collection = playlists[i];
 						-		var index = i;
 						-		index += 1;
+						-		var obfuscatedId = hashids.encodeHex(collection._id);
 						li
 							div.availability
 								input(type="checkbox", checked)
@@ -28,19 +29,20 @@ html(lang="en-US")
 								if collection.covers && collection.covers[0]
 									div.img(style="background-image:url(../media/img/#{collection.covers[0].src});", title="#{collection.covers[0].src}")
 							div.title
-								a(href="/playlist/#{collection.slugs.id}/") #{collection.title}
+								a(href="/hinderson/#{obfuscatedId}/edit") #{collection.title}
 							div.stats Songs: #{collection.items.length}
 							div.actions
-								button.delete ✕ Delete
+								form(name="delete-collection", method="post", action="/delete-collection/#{obfuscatedId}", enctype="multipart/form-data")
+									button(type="submit").delete ✕ Delete
 
 						-	}
 
 					- } else {
 						p.empty No playlists :(
 					- }
-			section.add-playlist
-				h2 Add new playlist
-				form(name="addcollection", method="post", action="/addcollection", enctype="multipart/form-data")
+			section.create-playlist
+				h2 Create new playlist
+				form(name="create-collection", method="post", action="/create-collection", enctype="multipart/form-data")
 					fieldset.metadata
 						h3 Title
 						label Title
