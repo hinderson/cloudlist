@@ -43,7 +43,8 @@ module.exports = function (router) {
 	// Frontend: Single collection
 	router.get('/:collection', function (req, res) {
 		collections.getOne(null, req.params.collection, function (result) {
-			res.render('index', {
+			var template = result.collection.template;
+			res.render('templates/' + template, {
 				title: 'Cloudlist.io',
 				path: req.params.collection,
 				playlist: result.collection,
@@ -55,7 +56,8 @@ module.exports = function (router) {
 	// Frontend: Single song
 	router.get('/:collection/:permalink', function (req, res) {
 		collections.getOne(null, req.params.collection, function (result) {
-			res.render('index', {
+			var template = result.collection.template;
+			res.render('templates/' + template, {
 				title: 'Cloudlist.io',
 				path: req.params.permalink,
 				playlist: result.collection,
