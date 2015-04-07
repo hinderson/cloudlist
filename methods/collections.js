@@ -23,21 +23,22 @@ module.exports = {
 	},
 
 	getOne: function (id, slug, result) {
-		if (!id) { return false; }
+		if (id === null && slug === null) { return false; }
 
 		// Find collection based on id or slug
 		var query = {};
 		if (id) {
 			query._id = ObjectId(id);
 		} else {
-			query.slugs.title = slug;
+			query.permalink = slug;
 		}
 
 		db.collection('collections').find(query).toArray(function (err, collection) {
 			// Turn items into ObjectId's
-			var items = collection[0].items;
-			for (var i = 0, len = items.length; i < len; i++) {
-				items[i] = ObjectId(items[i]);
+			var objectIds = collection[0].items;
+			var items = [];
+			for (var i = 0, len = objectIds.length; i < len; i++) {
+				items.push(ObjectId(objectIds[i]));
 			}
 
 			// Match songs that are contained within the collection's items array
@@ -59,10 +60,12 @@ module.exports = {
 			'description': '',
 			'items': [],
 			'owner': 1, // TEMP: Update once we have a user system
+			'permalink': slugify(title),
 			'published': false,
 			'slugs': {
 				'title': slugify(title)
 			},
+			'template': 'default',
 			'title': title
 		};
 
@@ -99,6 +102,12 @@ module.exports = {
 		var items = meta.items;
 		if (items) {
 			query.items = items;
+		}
+
+		// Update template
+		var template = meta.template;
+		if (template) {
+			query.template = template;
 		}
 
 		db.collection('collections').update( { _id: ObjectId(id) }, { '$set': query }, function (err) {

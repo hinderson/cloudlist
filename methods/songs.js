@@ -23,9 +23,10 @@ module.exports = {
 		// Find the correct collection based on slug
 		db.collection('collections').find( { _id: ObjectId(id) } ).toArray(function (err, collection) {
 			// Turn items into ObjectId's
-			var items = collection[0].items;
-			for (var i = 0, len = items.length; i < len; i++) {
-				items[i] = ObjectId(items[i]);
+			var objectIds = collection[0].items;
+			var items = [];
+			for (var i = 0, len = objectIds.length; i < len; i++) {
+				items.push(ObjectId(objectIds[i]));
 			}
 
 			// Match songs that are contained within the collection's items array
@@ -287,7 +288,7 @@ module.exports = {
 						'artist': slugs.artist,
 						'title': slugs.title
 					},
-					'permalink': '/' + slugs.artist + '-' + slugs.title + '/',
+					'permalink': slugs.artist + '-' + slugs.title,
 					'tags': null,
 					'title': songTitle
 				};

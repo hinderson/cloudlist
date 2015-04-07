@@ -39,9 +39,8 @@
 			update: function (id, href, documentTitle) {
 				var song = Cloudlist.cache.collection.items[id] || null;
 
-				// TEMP
-				var baseUrl = '/best-songs-of-2014';
-				var href = baseUrl + href;
+				var baseUrl = baseUrl || window.location.pathname.split('/')[1];
+				var href = '/' + baseUrl + '/' + href + '/';
 
 				if (song) {
 					if (window.history.state !== null && window.history.state.id === id) {

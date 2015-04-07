@@ -1,3 +1,12 @@
+//- Determine if this is a single song or not
+-	var single;
+-	for (var i = 0, len = songs.length; i < len; i++) {
+-		if (songs[i].permalink === path) {
+-			single = songs[i];
+-			break;2
+-		}
+-	}
+
 doctype html
 html(lang="en-US", class="no-js")
 	head
@@ -10,15 +19,24 @@ html(lang="en-US", class="no-js")
 		<meta name="description" content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud." />
 
 		<meta property="og:site_name" content="Cloudlist" />
-		<meta property="og:url" content="https://cloudlist.io#{path}" />
+		<meta property="og:url" content="https://cloudlist.io/#{path}/" />
 
-		- if (songArtist) {
-			<meta property="og:title" content="#{songTitle} by #{songArtist}" />
-			<meta property="og:image" content="https://static.cloudlist.io/media/img/#{songCover}" />
-			<meta property="og:description" content="At position no. #{songIndex} in the list Best Songs of 2014: &quot;#{songTitle}&quot; by #{songArtist}." />
+		- if (single) {
+		<meta property="og:title" content="#{single.title} by #{single.artist}" />
+		//- Determine if it's a screenshot of a moving mp4, or just a regular image
+		- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
+		<meta property="og:image" content="https://static.cloudlist.io/media/img/#{cover}" />
+		//- Determine index position of song
+		- var id = single._id.toString();
+		- var index = playlist.items.indexOf(id) + 1;
+		//– Structure artist and titles
+		- var artist = Array.isArray(single.artist) && single.artist.length > 1 ? single.artist.slice(0, -1).join(', ') + ' & ' + single.artist[single.artist.length -1] : single.artist;
+		- var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
+		- var combinedArtist = artist + (featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '');
+		<meta property="og:description" content="At position no. #{index} in the list Best Songs of 2014: &quot;#{single.title}&quot; by #{combinedArtist}." />
 		- } else {
-			<meta property="og:image" content="https://static.cloudlist.io/media/img/cloudlist-splash.jpg" />
-			<meta property="og:description" content="An (interactive) list of the year's best songs" />
+		<meta property="og:image" content="https://static.cloudlist.io/media/img/cloudlist-splash.jpg" />
+		<meta property="og:description" content="#{playlist.description}" />
 		- }
 
 		- if (env === 'production') {
@@ -125,11 +143,9 @@ html(lang="en-US", class="no-js")
 				p However, if you want to just view the content without interacting with it, click the X in the upper corner of this box to close the message, and then scroll away to your heart's content.
 		script.
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-58137452-1', 'auto');ga('send', 'pageview');
-		script.
-			window.collectionId = '#{playlist._id}';
-		if autostart
+		if single
 			script.
-				window.autostart = '#{autostart}';
+				window.autostart = '#{single._id}';
 		- if (env === 'production') {
 		//- inject:js
 		script(src="https://static.cloudlist.io/assets/js/global-bfe6cf5a.js")

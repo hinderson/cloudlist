@@ -148,7 +148,7 @@
 			},
 
 			structureSlugs: function (slugs) {
-				return '/artist/' + slugs.artist + '/track/' + slugs.title + '/';
+				return 'artist/' + slugs.artist + '/track/' + slugs.title;
 			},
 
 			moveToBackOfArray: function (element, array) {
