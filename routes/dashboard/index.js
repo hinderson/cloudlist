@@ -15,7 +15,7 @@ var hashids = new Hashids(secret);
 // Database methods
 var collections = require('../../methods/collections.js');
 var songs = require('../../methods/songs.js');
-var songs = require('../../methods/users.js');
+var users = require('../../methods/users.js');
 
 module.exports = function (router) {
 
@@ -24,7 +24,7 @@ module.exports = function (router) {
 		var user = 1;
 		collections.getAll(user, function (result) {
 			res.render('dashboard/index', {
-				playlists : result.collections,
+				collections: result.collections,
 				sortorder: result.sortorder
 			});
 		});

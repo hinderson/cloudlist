@@ -57,6 +57,7 @@
     "gulp-gzip": "0.0.8",
     "gulp-s3": "~0.3.0",
     "gulp-svgstore": "~3.0.0",
-    "gulp-svgmin": "~0.4.8"
+    "gulp-svgmin": "~0.4.8",
+    "gulp-ruby-sass": "~1.0.1"
   }
 }

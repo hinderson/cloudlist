@@ -52,6 +52,12 @@ select {
 	font-size:20px;
 }
 
+caption small {
+	display: block;
+	margin-top: 14px;
+	font-size: 16px;
+}
+
 table {
 	position:relative;
 	width:100%;

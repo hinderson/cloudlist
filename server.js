@@ -54,8 +54,9 @@ var secret = require('./config/private/secret.js');
 var hashids = new Hashids(secret);
 app.locals.hashids = hashids;
 
-// Send global project title
+// Send globals
 app.locals.rootTitle = 'Cloudlist.io';
+app.locals.rootHost = 'production' === env ? 'https:://www.cloudlist.io' : 'http://localhost:3000'
 
 app.use(logger('dev'));
 app.use(compression());

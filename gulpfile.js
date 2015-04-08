@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var sass = require('gulp-ruby-sass');
 var imagemin = require('gulp-imagemin');
 var pngcrush = require('imagemin-pngcrush');
 var minifyCSS = require('gulp-minify-css');
@@ -17,6 +18,21 @@ var inject = require("gulp-inject");
 var replace = require("gulp-replace");
 var svgstore = require('gulp-svgstore');
 var svgmin = require('gulp-svgmin');
+
+// Sass
+gulp.task('sass', function() {
+	return sass('./public/assets/_sass/')
+		.on('error', function (err) {
+			console.error('Error!', err.message);
+		})
+		.pipe(gulp.dest('./public/assets/css/'));
+});
+
+// Watcher for Sass
+var watcher = gulp.watch('./public/assets/_sass/**/*.scss', ['sass']);
+watcher.on('change', function (event) {
+	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+});
 
 // SVG Store
 gulp.task('svgstore', function () {
@@ -167,7 +183,7 @@ gulp.task('inject', function ( ) {
 });
 
 gulp.task('default', function ( ) {
-	gulp.start('jshint');
+	gulp.start('jshint', 'sass');
 });
 
 // Run deploy task for media folder

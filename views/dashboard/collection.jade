@@ -15,12 +15,14 @@ html(lang="en-US")
 					label(for="template") Template:
 					select#template(name="template")
 						option(selected=playlist.template == "default", value="default") Default
-						option(selected=playlist.template == "2014", value="best-songs-of-2014") Best Songs of 2014
+						option(selected=playlist.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
 					input(type="submit", value="OK")
 				- var obfuscatedCollectionId = hashids.encodeHex(playlist._id);
 				table.collection(data-id="#{obfuscatedCollectionId}")
 					caption.collection-title
 						span(contenteditable) #{playlist.title}
+						small
+							a(href="#{rootHost}/#{playlist.permalink}", target="_blank") #{rootHost}/#{playlist.permalink}
 					thead
 						tr
 							th.handle

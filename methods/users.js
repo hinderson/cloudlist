@@ -13,8 +13,12 @@ module.exports = {
 		});
 	},
 
-	getOne: function (id, slug, result) {
+	getOne: function (id, result) {
+		db.collection('users').findOne({ _id: id }, function (err, user) {
+			if (err) throw err;
 
+			return result(user);
+		});
 	},
 
 	create: function (title, result) {

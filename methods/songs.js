@@ -15,49 +15,28 @@ var gm = require('gm');
 var ffmpeg = require('fluent-ffmpeg');
 var probe = require('node-ffprobe');
 
-// Database methods
-var collections = require('../methods/collections.js');
-
 module.exports = {
 
 	getAll: function (id, result) {
-		if (!id) { return false; }
 
-		// First fetch items attributed to collection
-		collections.getOne(id, null, function (collection) {
-			// Turn items into ObjectId's
-			var objectIds = collection.items;
-			var items = [];
-			for (var i = 0, len = objectIds.length; i < len; i++) {
-				items.push(ObjectId(objectIds[i]));
-			}
-
-			// Match songs that are contained within the collection's items array
-			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
-				return result({
-					order: collection[0].items,
-					items: items
-				});
-			});
-		});
 	},
 
 	getOne: function (id, result) {
 
 	},
 
-	create: function (collectionId, meta, files, result) {
-		var songArtist = meta.artist || null;
-		var songFeatured = meta.featuredartist || null;
-		var songTitle = meta.title || null;
-		var songAlbum = meta.album || null;
+	create: function (collectionId, args, files, result) {
+		var songArtist = args.artist || null;
+		var songFeatured = args.featuredartist || null;
+		var songTitle = args.title || null;
+		var songAlbum = args.album || null;
 		var songDuration = null;
 		var songImage = files.image ? files.image.name : null;
 		var songCover;
 		var audioUrl = files.audio ? files.audio.name : null;
-		var streamUrl = meta.soundcloud || null;
-		var startTime = meta.starttime || 0;
-		var endTime = meta.endtime;
+		var streamUrl = args.soundcloud || null;
+		var startTime = args.starttime || 0;
+		var endTime = args.endtime;
 		var resolvedUrl = null;
 
 		var tempCoverPath;

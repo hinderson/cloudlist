@@ -5,12 +5,14 @@ var slugify = require('../utils/slugify.js');
 var async = require('async');
 var ObjectId = require('mongoskin').ObjectID;
 
+// Database methods
+var users = require('../methods/users.js');
+
 module.exports = {
 
 	getAll: function (user, result) {
 		var user = 1; // TEMP: User system
-
-		db.collection('users').findOne({ _id: user }, function (err, user) {
+		users.getOne(user, function (user) {
 			db.collection('collections').find().toArray(function (err, collections) {
 				if (err) throw err;
 
@@ -34,7 +36,7 @@ module.exports = {
 		}
 
 		db.collection('collections').find(query).toArray(function (err, collection) {
-			if (err) throw err;
+			if (err) return false;
 
 			// Turn items into ObjectId's
 			var objectIds = collection[0].items;

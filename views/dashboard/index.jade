@@ -14,12 +14,12 @@ html(lang="en-US")
 				header
 					h2 My playlists
 
-				// LÄGG TILL SORTORDER HÄR
+				//- LÄGG TILL SORTORDER HÄR
 
 				ul.playlists
-					- if (sortorder) {
+					- if (collections) {
 						-	for (var i = 0, len = sortorder.length; i < len; i++) {
-						-		var collection = playlists[i];
+						-		var collection = collections[i];
 						-		var index = i;
 						-		index += 1;
 						-		var obfuscatedId = hashids.encodeHex(collection._id);
