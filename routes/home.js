@@ -17,25 +17,17 @@ module.exports = function (router) {
 
 	// Return all songs in JSON format
 	router.get('/song-collection', function (req, res) {
-		var db = req.db;
+		// TEMP: Trying out url module (maybe put it in a module?)
+		var collection = parseUrl.parse(req.headers.referer).pathname.split('/').filter(function(e){return e})[0];
 
-		// TEMP: Trying out url (maybe put it in a module?)
-		var url = parseUrl.parse(req.headers.referer).pathname.split('/').filter(function(e){return e});
-		var collectionSlug = url[0];
+		collections.getOne(null, collection, function (result) {
+			if ('production' === process.env.NODE_ENV) {
+				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
+			}
 
-		var env = process.env.NODE_ENV;
-		if ('production' === env) {
-			var oneYear = 31556952000;
-			res.header('Cache-Control', 'max-age=' + oneYear);
-		}
-
-		// Find the correct collection based on slug
-		db.collection('collections').find( { 'slugs.title': collectionSlug } ).toArray(function (err, collection) {
-			songs.getAll(collection[0]._id, function (result) {
-				res.json({
-					'order': result.order,
-					'items': result.items
-				});
+			res.json({
+				order: result.collection.items,
+				items: result.songs
 			});
 		});
 	});
@@ -45,7 +37,6 @@ module.exports = function (router) {
 		collections.getOne(null, req.params.collection, function (result) {
 			var template = result.collection.template;
 			res.render('templates/' + template, {
-				title: 'Cloudlist.io',
 				path: req.params.collection,
 				playlist: result.collection,
 				songs: result.songs
@@ -58,7 +49,6 @@ module.exports = function (router) {
 		collections.getOne(null, req.params.collection, function (result) {
 			var template = result.collection.template;
 			res.render('templates/' + template, {
-				title: 'Cloudlist.io',
 				path: req.params.permalink,
 				playlist: result.collection,
 				songs: result.songs

@@ -15,6 +15,7 @@ var hashids = new Hashids(secret);
 // Database methods
 var collections = require('../../methods/collections.js');
 var songs = require('../../methods/songs.js');
+var songs = require('../../methods/users.js');
 
 module.exports = function (router) {
 
@@ -22,13 +23,11 @@ module.exports = function (router) {
 	router.get('/hinderson', auth.connect(basic), function (req, res) {
 		var user = 1;
 		collections.getAll(user, function (result) {
-			res.render('dashboard/dashboard', {
-				title: 'Cloudlist.io',
+			res.render('dashboard/index', {
 				playlists : result.collections,
 				sortorder: result.sortorder
 			});
 		});
-
 	});
 
 	// GET Single collection page
@@ -36,8 +35,7 @@ module.exports = function (router) {
 		// TODO: Fix so that it's slug based
 		var id = hashids.decodeHex(req.params.id);
 		collections.getOne(id, null, function (result) {
-			res.render('dashboard/playlist', {
-				title: 'Cloudlist.io',
+			res.render('dashboard/collection', {
 				playlist: result.collection,
 				songs: result.songs
 			});

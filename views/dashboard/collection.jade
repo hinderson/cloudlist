@@ -2,7 +2,7 @@ doctype html
 html(lang="en-US")
 	head
 		meta(charset="utf-8")
-		title= title
+		title= rootTitle
 		link(rel="stylesheet", href="/assets/css/admin/admin.css")
 	body
 		header(role="banner")
@@ -15,7 +15,7 @@ html(lang="en-US")
 					label(for="template") Template:
 					select#template(name="template")
 						option(selected=playlist.template == "default", value="default") Default
-						option(selected=playlist.template == "2014", value="2014") Best Songs of 2014
+						option(selected=playlist.template == "2014", value="best-songs-of-2014") Best Songs of 2014
 					input(type="submit", value="OK")
 				- var obfuscatedCollectionId = hashids.encodeHex(playlist._id);
 				table.collection(data-id="#{obfuscatedCollectionId}")

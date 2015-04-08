@@ -34,6 +34,8 @@ module.exports = {
 		}
 
 		db.collection('collections').find(query).toArray(function (err, collection) {
+			if (err) throw err;
+
 			// Turn items into ObjectId's
 			var objectIds = collection[0].items;
 			var items = [];
@@ -43,6 +45,8 @@ module.exports = {
 
 			// Match songs that are contained within the collection's items array
 			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
+				if (err) throw err;
+
 				return result({
 					collection: collection[0],
 					songs: items
@@ -87,27 +91,24 @@ module.exports = {
 		});
 	},
 
-	update: function (id, meta, result) {
+	update: function (id, args, result) {
 		if (!id) { return false; }
 
 		var query = {};
 
 		// Update collection title
-		var title = meta.title;
-		if (title) {
-			query.title = title;
+		if (args.title) {
+			query.title = args.title;
 		}
 
 		// Update items
-		var items = meta.items;
-		if (items) {
-			query.items = items;
+		if (args.items) {
+			query.items = args.items;
 		}
 
 		// Update template
-		var template = meta.template;
-		if (template) {
-			query.template = template;
+		if (args.template) {
+			query.template = args.template;
 		}
 
 		db.collection('collections').update( { _id: ObjectId(id) }, { '$set': query }, function (err) {

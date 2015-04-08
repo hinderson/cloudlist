@@ -11,7 +11,7 @@ doctype html
 html(lang="en-US", class="no-js")
 	head
 		meta(charset="utf-8")
-		title= title
+		title= rootTitle
 		<script>document.documentElement.className = document.documentElement.className.replace(/(^|\\\b)no-js(\b|$)/, 'js');if (!("ontouchstart" in document.documentElement)) {document.documentElement.className += " no-touch";}</script>
 
 		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
@@ -27,8 +27,7 @@ html(lang="en-US", class="no-js")
 		- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
 		<meta property="og:image" content="https://static.cloudlist.io/media/img/#{cover}" />
 		//- Determine index position of song
-		- var id = single._id.toString();
-		- var index = playlist.items.indexOf(id) + 1;
+		- var index = playlist.items.indexOf(single._id) + 1;
 		//– Structure artist and titles
 		- var artist = Array.isArray(single.artist) && single.artist.length > 1 ? single.artist.slice(0, -1).join(', ') + ' & ' + single.artist[single.artist.length -1] : single.artist;
 		- var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
@@ -64,33 +63,7 @@ html(lang="en-US", class="no-js")
 					| <svg viewBox="0 0 5.245 8.712"><use xlink:href="#icon-info"></use></svg>
 				input.volume-slider(type="range", step="1", value="90", min="0", max="100")
 
-		main(role="main")
-			section.hero.group
-				h1.collection-title
-					div(data-string="Best")
-						span B
-						span e
-						span s
-						span t
-					div(data-string="songs")
-						span s
-						span o
-						span n
-						span g
-						span s
-					div(data-string="of")
-						span o
-						span f
-					div(data-string="2014")
-						span 2
-						span 0
-						span 1
-						span 4
-
-			block content
-
-			footer.go-to-top
-				a(href="#top") Top ↑
+		block content
 
 		footer(role="contentinfo")
 			small.structural Copyright 2014

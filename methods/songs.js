@@ -15,15 +15,18 @@ var gm = require('gm');
 var ffmpeg = require('fluent-ffmpeg');
 var probe = require('node-ffprobe');
 
+// Database methods
+var collections = require('../methods/collections.js');
+
 module.exports = {
 
 	getAll: function (id, result) {
 		if (!id) { return false; }
 
-		// Find the correct collection based on slug
-		db.collection('collections').find( { _id: ObjectId(id) } ).toArray(function (err, collection) {
+		// First fetch items attributed to collection
+		collections.getOne(id, null, function (collection) {
 			// Turn items into ObjectId's
-			var objectIds = collection[0].items;
+			var objectIds = collection.items;
 			var items = [];
 			for (var i = 0, len = objectIds.length; i < len; i++) {
 				items.push(ObjectId(objectIds[i]));
@@ -315,11 +318,11 @@ module.exports = {
 		});
 	},
 
-	update: function (id, meta, result) {
+	update: function (id, args, result) {
 		if (!id) { return false; }
 
-		var field = meta.field;
-		var content = meta.content;
+		var field = args.field;
+		var content = args.content;
 
 		var query = {
 			updated: new Date()
