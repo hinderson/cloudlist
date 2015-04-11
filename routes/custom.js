@@ -17,8 +17,6 @@ module.exports = function (router) {
 			songs.forEach(function (song) {
 				var permalink = song.slugs.artist + '-' + song.slugs.title;
 
-				console.log(permalink);
-
 				db.collection('songs').update( { 'slugs.title': song.slugs.title }, { '$set': { 'permalink': permalink } }, function (err) {
 					if (err) throw err;
 
