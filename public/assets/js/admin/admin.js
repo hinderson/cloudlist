@@ -25,6 +25,32 @@
 		});
 	}
 
+	function authenticateSpotifyUser (event) {
+		event.preventDefault();
+
+		$.ajax({
+			type: 'GET',
+			url: '/authenticate-spotify-user',
+			success: function (url) {
+				window.open(url, '_blank');
+			}
+		});
+	}
+
+	function createSpotifyPlaylist (event) {
+		event.preventDefault();
+
+		var tempTitle = 'Cloudlist: Ny spellista';
+
+		$.ajax({
+			type: 'GET',
+			url: '/create-spotify-playlist/' + tempTitle,
+			success: function (url) {
+				console.log('success!');
+			}
+		});
+	}
+
 	function deleteSong (event) {
 		event.preventDefault();
 
@@ -64,6 +90,7 @@
 
 			reader.onload = function (e) {
 				$('form .img').attr('style', 'background-image:url(' + e.target.result + ');');
+				clearImageSearchResults();
 			};
 
 			reader.readAsDataURL(input.files[0]);
@@ -77,6 +104,7 @@
 	function populateInputs (data) {
 		if (data.artist || data.user && data.user.username) {
 			document.querySelector('input[name="artist"]').value = data.artist || data.user && data.user.username;
+			fetchArtistImages(data.artist || data.user && data.user.username);
 		}
 
 		if (data.title) {
@@ -111,6 +139,96 @@
 		}
 	}
 
+	function fetchArtistImages (artist) {
+		$.ajax({
+			url: '/fetch-artist-images/',
+			data: {
+				artist: artist
+			},
+			success: function (data) {
+				populateImageSearchResults(data);
+			}
+		});
+	}
+
+	function populateImageSearchResults (images) {
+		clearImageSearchResults();
+
+		var imageSection = document.querySelector('fieldset.image');
+
+		var container = document.createElement('div');
+		container.className = "search-results";
+
+		for (var i = 0, len = images.length; i < len; i++) {
+			var imageUrl = images[i];
+
+			var radio = document.createElement('input');
+			radio.id = 'img-' + i;
+			radio.name = 'image';
+			radio.type = 'radio';
+			radio.value = imageUrl;
+
+			var label = document.createElement('label');
+			label.setAttribute('for', 'img-' + i);
+
+			var img = document.createElement('img');
+			img.src = imageUrl;
+			img.alt = '';
+
+			label.appendChild(img);
+			container.appendChild(radio);
+			container.appendChild(label);
+		}
+
+		var or = document.createElement('p');
+		or.innerHTML = '<em>or</em>';
+		container.appendChild(or);
+
+		imageSection.insertBefore(container, imageSection.childNodes[2]);
+	}
+
+	function clearImageSearchResults () {
+		var container = document.querySelector('fieldset.image .search-results');
+		if (container) {
+			container.parentNode.removeChild(container);
+		}
+	}
+
+	function toggleElemVisibility (elem) {
+		if (elem.style.display == 'block' || elem.style.display=='') {
+			elem.style.display = 'none';
+		} else {
+			elem.style.display = 'block';
+		}
+	}
+
+	function toggleAdvancedInputs (event) {
+		event.preventDefault();
+
+		var target = event.target;
+
+		if (target.classList.contains('expanded')) {
+			target.classList.remove('expanded');
+			target.innerHTML = '+ More';
+		} else {
+			target.classList.add('expanded');
+			target.innerHTML = '- Less';
+		}
+
+		toggleElemVisibility(advancedInputs);
+	}
+
+	var advancedInputs = document.querySelector('form .advanced');
+	advancedInputs.style.display = 'none';
+
+	var showHideBtn = document.createElement('a');
+	showHideBtn.innerHTML = '+ More';
+	showHideBtn.className = 'expand-advanced';
+	showHideBtn.href = '/';
+	advancedInputs.parentNode.insertBefore(showHideBtn, advancedInputs.nextSibling);
+	showHideBtn.addEventListener('click', toggleAdvancedInputs, false);
+
+
 	var deleteButtons = document.querySelectorAll('.song-list button.delete');
 	[].forEach.call(deleteButtons, function (e) {
 		// TEMP
@@ -118,6 +236,13 @@
 
 		//e.addEventListener('click', deleteSong, false);
 	});
+
+	var authenticateSpotifyUserBtn = document.querySelector('#spotify');
+	authenticateSpotifyUserBtn.addEventListener('click', createSpotifyPlaylist, false);
+
+	document.querySelector('input[name="artist"]').onchange = function (e) {
+		fetchArtistImages(this.value);
+	};
 
 	document.querySelector('input[name="audio"]').onchange = function (e) {
 		id3(this.files[0], function (err, tags) {

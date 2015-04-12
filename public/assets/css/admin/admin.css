@@ -168,6 +168,15 @@ button.add-song span {
 	vertical-align:middle;
 }
 
+.add-song button[type="submit"] {
+	margin-top: 20px;
+}
+
+.expand-advanced {
+	display: inline-block;
+	margin-bottom: 10px;
+}
+
 span.handle {
 	color:#d6d6d6;
 	cursor:-moz-grab;
@@ -191,9 +200,37 @@ span.handle:focus {
 	overflow-x: hidden;
 }
 
+/* Image search results */
+.image .search-results img {
+	max-width: 250px;
+	max-height: 250px;
+}
 
-.bajs {
-	box-shadow: 2px 4px 2px 0 rgba(0, 0, 0, 0.5);
+.image .search-results input {
+	position: absolute;
+	left: -9999px;
+}
+
+.image .search-results label {
+	display: inline-block;
+	vertical-align: middle;
+	cursor: pointer;
+	font-size: 0;
+	border-radius: 3px;
+}
+
+.image .search-results label:hover,
+.image .search-results label:focus {
+	background-color: #efefef;
+}
+
+.image .search-results input:checked + label {
+	background-color: #1082ff;
+}
+
+.image .search-results img {
+	padding: 5px;
+	border-radius: 3px;
 }
 
 

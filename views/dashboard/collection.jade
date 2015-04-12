@@ -17,6 +17,7 @@ html(lang="en-US")
 						option(selected=playlist.template == "default", value="default") Default
 						option(selected=playlist.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
 					input(type="submit", value="OK")
+					button#spotify Export to Spotify playlist
 				- var obfuscatedCollectionId = hashids.encodeHex(playlist._id);
 				table.collection(data-id="#{obfuscatedCollectionId}")
 					caption.collection-title
@@ -114,17 +115,20 @@ html(lang="en-US")
 							input(type="text", placeholder="Song title", name="title", required)
 						label Album title
 							input(type="text", placeholder="Album title", name="album")
+						div.advanced
+							label Tags
+								input(type="text", placeholder="Tags", name="tags")
+							label Start time
+								input(type="text", placeholder="Start time", name="starttime")
+							label End time
+								input(type="text", placeholder="End time", name="endtime")
+					fieldset.image
+						h3 Choose image
 						label Upload image
 							div.group
 								div.img
 								input(type="file", name="image", accept="image/*, video/*")
-						label Tags
-							input(type="text", placeholder="Tags", name="tags")
-						label Start time
-							input(type="text", placeholder="Start time", name="starttime")
-						label End time
-							input(type="text", placeholder="End time", name="endtime")
-					button(type="submit") Submit
+					button(type="submit") Add song
 		script(src="/assets/js/admin/libs/zepto.min.js")
 		script(src="/assets/js/admin/libs/id3.js")
 		script(src="/assets/js/admin/libs/slip.js")

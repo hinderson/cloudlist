@@ -2,6 +2,9 @@
 
 var db = require('../server').db;
 var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var crypto = require('crypto');
 var path = require('path');
 var slugify = require('../utils/slugify.js');
 var async = require('async');
@@ -39,7 +42,8 @@ module.exports = {
 		var endTime = args.endtime;
 		var resolvedUrl = null;
 
-		var tempCoverPath;
+		var tempCoverPath = files.image ? files.image.path : null;
+		var tempFilename = files.image ? files.image.name : null;
 		var targetCoverPath;
 
 		// Main async chain
@@ -95,17 +99,42 @@ module.exports = {
 				}
 			},
 
-			identifyCover: function (callback) {
-				if (!songImage) {
-					callback(null);
+			processImageSearchResults: function (callback) {
+				var image = args.image || null;
+				if (!image) {
+					return callback(null);
 				}
 
-				tempCoverPath = files.image.path;
+				var downloadImage = function (url, dest, cb) {
+					var file = fs.createWriteStream(dest);
+					var request = https.get(url, function (response) {
+						response.pipe(file);
+						file.on('finish', function ( ) {
+							file.close(cb(file));  // close() is async, call cb after close completes.
+						});
+						}).on('error', function (err) { // Handle errors
+							fs.unlink(dest); // Delete the file async. (But we don't check the result)
+						if (cb) cb(err.message);
+					});
+				};
+
+				tempFilename = crypto.randomBytes(16).toString('hex');
+				downloadImage(image, './tmp/' + tempFilename, function (file) {
+					tempCoverPath = file.path;
+
+					callback(null);
+				});
+			},
+
+			identifyCoverType: function (callback) {
+				if (!tempCoverPath) {
+					return callback(null);
+				}
 
 				// First check if we're dealing with an image or a video
-				var ext = path.extname(files.image.name);
+				var ext = path.extname(tempCoverPath);
 				if (ext !== '.mp4') {
-					var filename = files.image.name.replace(ext, '.jpg');
+					var filename = ext ? tempFilename.replace(ext, '.jpg') : (tempFilename + '.jpg'); // If there is no extension
 					targetCoverPath = './public/media/img/' + filename;
 
 					// Resize img
@@ -207,8 +236,8 @@ module.exports = {
 			},
 
 			processCover: function (callback) {
-				if (!songImage) {
-					callback(null);
+				if (!tempCoverPath) {
+					return callback(null);
 				}
 
 				fs.rename(tempCoverPath, targetCoverPath, function (err) {
