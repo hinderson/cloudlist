@@ -2,8 +2,7 @@
 
 var db = require('../server').db;
 var fs = require('fs');
-var http = require('http');
-var https = require('https');
+var request = require('request');
 var crypto = require('crypto');
 var path = require('path');
 var slugify = require('../utils/slugify.js');
@@ -105,16 +104,17 @@ module.exports = {
 					return callback(null);
 				}
 
-				var downloadImage = function (url, dest, cb) {
-					var file = fs.createWriteStream(dest);
-					var request = https.get(url, function (response) {
-						response.pipe(file);
-						file.on('finish', function ( ) {
-							file.close(cb(file));  // close() is async, call cb after close completes.
-						});
-						}).on('error', function (err) { // Handle errors
-							fs.unlink(dest); // Delete the file async. (But we don't check the result)
-						if (cb) cb(err.message);
+				var downloadImage = function (sourceUrl, dest, cb) {
+
+					var file = request
+						.get(sourceUrl)
+						.on('error', function(err) {
+							fs.unlink(dest);
+						})
+						.pipe(fs.createWriteStream(dest));
+
+					file.on('finish', function ( ) {
+						file.close(cb(file));  // close() is async, call cb after close completes.
 					});
 				};
 
