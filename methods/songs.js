@@ -105,7 +105,6 @@ module.exports = {
 				}
 
 				var downloadImage = function (sourceUrl, dest, cb) {
-
 					var file = request
 						.get(sourceUrl)
 						.on('error', function(err) {

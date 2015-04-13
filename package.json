@@ -32,7 +32,8 @@
     "hashids": "1.0.1",
     "spotify-web-api-node": "~2.0.1",
     "lastfmapi": "0.0.6",
-    "request": "~2.55.0"
+    "request": "~2.55.0",
+    "echojs": "~0.1.4"
   },
   "devDependencies": {
     "gulp": "~3.8.10",

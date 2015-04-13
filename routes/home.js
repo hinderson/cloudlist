@@ -14,6 +14,13 @@ var lastFmCredentials = require('../config/private/lastfm-api.js');
 var LastfmAPI = require('lastfmapi');
 var lastfm = new LastfmAPI(lastFmCredentials);
 
+// Echonest API
+var echonestCredentials = require('../config/private/echonest-api.js');
+var EchojsAPI = require('echojs');
+var echojs = new EchojsAPI({
+	key: echonestCredentials.api_key
+});
+
 // Hashid
 var Hashids = require('hashids');
 var secret = require('../config/private/secret.js');
@@ -65,7 +72,16 @@ module.exports = function (router) {
 				.then(function (data) {
 					images.push(data.body.images[0].url); // Fetch the first in array = the one with highest resolution
 
-					res.json(images);
+					echojs('artist/images').get({
+						name: query
+					}, function (err, data) {
+						var response = data.response.images;
+						for (var i = 0, len = response.length; i < len; i++) {
+							images.push(response[i].url);
+						}
+
+						res.json(images);
+					});
 				})
 				.catch(function (error) {
 					console.error(error);
