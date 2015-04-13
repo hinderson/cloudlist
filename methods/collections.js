@@ -36,7 +36,7 @@ module.exports = {
 		}
 
 		db.collection('collections').find(query).toArray(function (err, collection) {
-			if (err) return false;
+			if (collection === undefined || collection.length === 0) return result(false);
 
 			// Turn items into ObjectId's
 			var objectIds = collection[0].items;
