@@ -26,9 +26,6 @@ html(lang="en-US")
 							a(href="#{rootHost}/#{playlist.permalink}", target="_blank") #{rootHost}/#{playlist.permalink}
 					thead
 						tr
-							th.handle
-							th.available
-								span.structural Availability
 							th.image
 								span.structural Image
 							th.index Index
@@ -39,7 +36,10 @@ html(lang="en-US")
 							th.duration Duration
 							th.source Source
 							th.updated Last modified
+							th.available
+								span.structural Availability
 							th.controls
+							th.handle
 					tbody
 						-	var collection = {};
 						-	for (var i = 0, len = songs.length; i < len; i++) {
@@ -59,13 +59,6 @@ html(lang="en-US")
 						-		var lastModified = song.updated || song.added;
 
 						tr(data-id="#{obfuscatedId}", data-available="")
-							td.handle
-								span(role="button", class="handle") ☰
-							td.availability
-								if song.available
-									input(type="checkbox", checked)
-								else
-									input(type="checkbox")
 							td.image
 								if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
 									// TODO: Eventually, remove all src (filename is the way to go)
@@ -90,9 +83,16 @@ html(lang="en-US")
 									a(href="#{song.audio.url}", title="#{song.audio.url}")
 										img(src="/assets/img/icon-file.jpg", width="40", height="40", class="file")
 							td.updated #{lastModified.toDateString()} #{lastModified.getHours()}:#{lastModified.getMinutes()}:#{lastModified.getSeconds()}
+							td.availability
+								if song.available
+									input(type="checkbox", checked)
+								else
+									input(type="checkbox")
 							td.controls
 								form(name="delete-song", method="post", action="/delete-song/#{obfuscatedId}", enctype="multipart/form-data")
 									button(type="submit").delete ✕ Delete
+							td.handle
+								span(role="button", class="handle") ☰
 						- }
 				p.stats <strong>Total songs:</strong> #{sortorder.length}
 			section.add-song

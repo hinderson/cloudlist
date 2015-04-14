@@ -3,6 +3,7 @@
 // General
 var ObjectId = require('mongoskin').ObjectID;
 var parseUrl = require('url');
+var async = require('async');
 
 // Spotify Web API
 var spotifyCredentials = require('../../config/private/spotify-api.js');
@@ -46,69 +47,57 @@ module.exports = function (router) {
 
 	router.get('/fetch-artist-images', function (req, res) {
 		var query = req.query.artist;
-		var images = [];
 
-		lastfm.artist.getInfo({
-			'artist' : query
-		}, function (err, data) {
+		async.parallel([
+			function (callback) {
+				lastfm.artist.getInfo({ 'artist' : query }, function (err, data) {
+					callback(err, data.image[data.image.length - 1]['#text']);
+				});
+			},
+			function (callback) {
+				spotifyApi.searchArtists(query)
+					.then(function (data) {
+						return data.body.artists.items[0].id;
+					})
+					.then(function (data) {
+						return spotifyApi.getArtist(data);
+					})
+					.then(function (data) {
+						callback(null, data.body.images[0].url);
+					})
+					.catch(function (error) {
+						console.error(error);
+					});
+			},
+			function (callback) {
+				echojs('artist/images').get({ 'name': query }, function (err, data) {
+					var response = data.response.images;
+					var allResults = [];
+					for (var i = 0, len = response.length; i < len; i++) {
+						allResults.push(response[i].url);
+					}
+					callback(err, allResults);
+				});
+			}
+		], function (err, response) {
 			if (err) console.log(err);
 
-			if (data) {
-				images.push(data.image[data.image.length - 1]['#text']); // Fetch the last one in array = the one with highest resolution
-			}
-
-			spotifyApi.searchArtists(query)
-				.then(function(data) {
-					return data.body.artists.items[0].id;
-				})
-				.then(function (data) {
-					return spotifyApi.getArtist(data);
-				})
-				.then(function (data) {
-					if (data) {
-						images.push(data.body.images[0].url); // Fetch the first in array = the one with highest resolution
-					}
-
-					echojs('artist/images').get({
-						name: query
-					}, function (err, data) {
-						var response = data.response.images;
-						for (var i = 0, len = response.length; i < len; i++) {
-							images.push(response[i].url);
-						}
-
-						res.json(images);
-					});
-				})
-				.catch(function (error) {
-					console.error(error);
-				});
+			// Flattened multi-layered response array
+			var images = [].concat.apply([], response);
+			return res.json(images);
 		});
 	});
 
 	router.get('/create-spotify-playlist/:title', function (req, res) {
-		// Temp: Hardcoded code returned in the redirect URI
-		var code = 'AQCHryS3eB5n86AF6as62hyFcxn6nU-UqPaYh38oZ0vAdM_yB-S2t_PG41UUNC3xvi9DtfSm8NdFKX3sksLWf8IMNIDrhpEJD2CrlR-o8HpCZFQ4Df-PoA2nLPntgmSfboDQGnk4-W1FR8zsNPL6mu_fMNCt5bX_z-28dGR6dRR5RXO2K-i1zwuEKEyoZeSRBjyAtfckDSqKtyI1ylElAjM6iw';
 		var title = req.params.title;
+		var user =  'koeeoaddi'; // TODO: Cloudlist Spotify account
 
-		spotifyApi.authorizationCodeGrant(code)
-			/*.then(function (data) {
-				return data.body.tracks.map(function(t) { return t.id; });
-			})*/
+		spotifyApi.clientCredentialsGrant()
 			.then(function (data) {
-				console.log('The token expires in ' + data.body['expires_in']);
-				console.log('The access token is ' + data.body['access_token']);
-				console.log('The refresh token is ' + data.body['refresh_token']);
-
-				// Set the access token on the API object to use it in later calls
-				spotifyApi.setAccessToken(data.body['access_token']);
-				spotifyApi.setRefreshToken(data.body['refresh_token']);
+				return spotifyApi.setAccessToken(data.body['access_token']);
 			})
 			.then(function (data) {
-				return spotifyApi.getMe();
-			})
-			.then(function (data) {
-				return spotifyApi.createPlaylist(data.body.id, title, { 'public' : false });
+				return spotifyApi.createPlaylist(user, title, { 'public' : false });
 			})
 			.then(function (data) {
 				var songs = [];

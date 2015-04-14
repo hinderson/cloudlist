@@ -12,13 +12,12 @@
 }
 
 .img {
-	width:40px;
-	height:40px;
-	background-position:50% 50%;
-	background-repeat:no-repeat;
-	background-size:cover;
-	border-radius:1px;
-	border:1px solid #ccc;
+	width: 54px;
+	height: 54px;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	border: 1px solid #ddd;
 }
 
 button {
@@ -87,14 +86,14 @@ tbody td {
 	max-width:170px;
 }
 tbody td.handle {
-	padding:0 4px 0 15px;
+	padding: 0 15px 0 6px;
 }
 tbody .image {
-	padding-left:8px;
-	padding-right:0;
+	padding-left: 8px;
+	padding-right: 0;
 }
 tbody .availability {
-	font-size:22px;
+	font-size: 22px;
 }
 tr[data-available="true"] .availability {
 	color:#00cb59;
@@ -111,7 +110,7 @@ table .source {
 	text-align:center;
 }
 table .source .soundcloud {
-	fill:#ff5d00;
+	fill: #ff5d00;
 }
 table .controls {
 	position:relative;
@@ -178,16 +177,17 @@ button.add-song span {
 }
 
 span.handle {
-	color:#d6d6d6;
-	cursor:-moz-grab;
-	cursor:-webkit-grab;
-	cursor:grab;
-	-webkit-font-smoothing:antialiased;
+	font-size: 20px;
+	color: #d6d6d6;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+	cursor: grab;
+	-webkit-font-smoothing: antialiased;
 }
 span.handle:active {
-	cursor:-moz-grabbing;
-	cursor:-webkit-grabbing;
-	cursor:grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+	cursor: grabbing;
 }
 span.handle:hover,
 span.handle:focus {
