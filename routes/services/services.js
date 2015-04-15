@@ -5,6 +5,11 @@ var ObjectId = require('mongoskin').ObjectID;
 var parseUrl = require('url');
 var async = require('async');
 
+// Hashid
+var Hashids = require('hashids');
+var secret = require('../../config/private/secret.js');
+var hashids = new Hashids(secret);
+
 // Spotify Web API
 var spotifyCredentials = require('../../config/private/spotify-api.js');
 var SpotifyWebApi = require('spotify-web-api-node');
@@ -25,6 +30,7 @@ var echojs = new EchojsAPI({
 // Database methods
 var collections = require('../../methods/collections.js');
 var songs = require('../../methods/songs.js');
+var users = require('../../methods/users.js');
 
 module.exports = function (router) {
 
@@ -82,42 +88,87 @@ module.exports = function (router) {
 		], function (err, response) {
 			if (err) console.log(err);
 
-			// Flattened multi-layered response array
+			// Flatten multi-layered response array
 			var images = [].concat.apply([], response);
+
 			return res.json(images);
 		});
 	});
 
-	router.get('/create-spotify-playlist/:title', function (req, res) {
-		var title = req.params.title;
-		var user =  'koeeoaddi'; // TODO: Cloudlist Spotify account
+	router.get('/spotify/create-playlist/:id', function (req, res) {
 
-		spotifyApi.clientCredentialsGrant()
-			.then(function (data) {
-				return spotifyApi.setAccessToken(data.body['access_token']);
-			})
-			.then(function (data) {
-				return spotifyApi.createPlaylist(user, title, { 'public' : false });
-			})
-			.then(function (data) {
-				var songs = [];
+		// TEMP: Render the link in the Jade view instead
 
-				var artist = 'Steely Dan';
-				var title = 'My Old School';
-				spotifyApi.searchTracks('artist:' + artist + ', title:' + title + '').then(function (song) {
-					songs.push(song.body.tracks.items[0].uri);
+		var scopes = ['playlist-modify-private', 'playlist-modify-public'];
+		var state = req.params.id; // This is a decoded id
 
-					return spotifyApi.addTracksToPlaylist(data.body.owner.id, data.body.id, songs);
+		// Construct a Spotify authorization URL (could probably be made by hand)
+		var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+
+		res.send(authorizeURL);
+	});
+
+	router.get('/spotify/callback', function (req, res) {
+
+		// Taken from the "state" query that's sent into Spotify's authentication process
+		var id = hashids.decodeHex(req.query.state) || null;
+
+		var code = req.query.code || null;
+
+		collections.getOne(id, null, function (result) {
+			var songs = result.songs;
+
+			var user = 'koeeoaddi';
+			var title = 'Cloudlist.io: ' + result.title + ' by Mattias Hinderson';
+			//console.log('User', result.owner, users.getOne(result.owner));
+
+			// Retrieve an access token and a refresh token
+			spotifyApi.authorizationCodeGrant(code)
+				.then(function (data) {
+					console.log('The token expires in ' + data.body['expires_in']);
+					console.log('The access token is ' + data.body['access_token']);
+					console.log('The refresh token is ' + data.body['refresh_token']);
+
+					// Set the access token on the API object to use it in later calls
+					spotifyApi.setAccessToken(data.body['access_token']);
+					spotifyApi.setRefreshToken(data.body['refresh_token']);
+				})
+				.then(function ( ) {
+					return spotifyApi.createPlaylist(user, title, { 'public' : false });
+				})
+				.then(function (data) {
+					var spotifySongs = [];
+
+					async.each(songs, function (song, callback) {
+						var artist = song.artist;
+						var title = song.title;
+
+						spotifyApi.searchTracks('artist:' + artist + ', title:' + title + '')
+							.then(function (data) {
+								if (data.body.tracks.items.length) {
+									spotifySongs.push(data.body.tracks.items[0].uri);
+								}
+								callback();
+							})
+							.catch(function (err) {
+								console.error('Song couldn\'t be found', err);
+								callback();
+							});
+
+					}, function (err) {
+						if (!err) {
+							spotifyApi.addTracksToPlaylist(user, data.body.id, spotifySongs);
+
+							var publicPlaylistUrl = data.body.external_urls.spotify;
+							res.redirect(publicPlaylistUrl);
+						}
+					});
+				})
+				.catch(function (err) {
+					console.error(err);
 				});
+		});
 
-			})
-			.then(function (data) {
-				console.log('Success', data);
-
-			})
-			.catch(function (error) {
-				console.error(error);
-			});
 	});
 
 };

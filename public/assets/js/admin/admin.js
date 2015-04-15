@@ -25,28 +25,14 @@
 		});
 	}
 
-	function authenticateSpotifyUser (event) {
-		event.preventDefault();
-
-		$.ajax({
-			type: 'GET',
-			url: '/authenticate-spotify-user',
-			success: function (url) {
-				window.open(url, '_blank');
-			}
-		});
-	}
-
 	function createSpotifyPlaylist (event) {
 		event.preventDefault();
 
-		var tempTitle = 'Cloudlist: Ny spellista';
-
 		$.ajax({
 			type: 'GET',
-			url: '/create-spotify-playlist/' + tempTitle,
+			url: '/spotify/create-playlist/' + collectionId,
 			success: function (url) {
-				console.log('success!');
+				window.open(url, '_blank');
 			}
 		});
 	}
