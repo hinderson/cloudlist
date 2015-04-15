@@ -15,6 +15,25 @@ module.exports = {
 			text += possible.charAt(Math.floor(Math.random() * possible.length));
 		}
 		return text;
+	},
+
+	sortObj: function (obj, sortOrder) {
+		var sortedObjects = [];
+		var len = obj.length;
+
+		for (var i = 0; i < len; i++) {
+			var id = obj[i]._id; // TEMP: Make it automatic
+			obj[id] = obj[i];
+		}
+
+		for (var i = 0; i < len; i++) {
+			var id = sortOrder[i];
+			sortedObjects.push(obj[id]);
+		}
+
+		return sortedObjects;
 	}
+
+
 
 };

@@ -4,6 +4,7 @@ var db = require('../server').db;
 var slugify = require('../utils/slugify.js');
 var async = require('async');
 var ObjectId = require('mongoskin').ObjectID;
+var utils = require('../utils/utils');
 
 // Database methods
 var users = require('../methods/users.js');
@@ -39,7 +40,8 @@ module.exports = {
 			if (collection === undefined || collection.length === 0) return result(false);
 
 			// Turn items into ObjectId's
-			var objectIds = collection[0].items;
+			var collection = collection[0];
+			var objectIds = collection.items;
 			var items = [];
 			for (var i = 0, len = objectIds.length; i < len; i++) {
 				items.push(ObjectId(objectIds[i]));
@@ -49,9 +51,11 @@ module.exports = {
 			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
 				if (err) throw err;
 
+				var sortedSongs = utils.sortObj(items, collection.items);
+
 				return result({
-					collection: collection[0],
-					songs: items
+					collection: collection,
+					songs: sortedSongs
 				});
 			});
 		});
