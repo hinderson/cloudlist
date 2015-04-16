@@ -110,16 +110,14 @@ module.exports = function (router) {
 
 	router.get('/spotify/callback', function (req, res) {
 
-		// Taken from the "state" query that's sent into Spotify's authentication process
 		var id = hashids.decodeHex(req.query.state) || null;
-
 		var code = req.query.code || null;
 
 		collections.getOne(id, null, function (result) {
-			var songs = result.songs;
+			var spotifySongs = [];
 
 			var user = 'koeeoaddi';
-			var title = 'Cloudlist.io: ' + result.title + ' by Mattias Hinderson';
+			var title = 'Cloudlist.io: ' + result.collection.title + ' by Mattias Hinderson';
 			//console.log('User', result.owner, users.getOne(result.owner));
 
 			// Retrieve an access token and a refresh token
@@ -133,17 +131,12 @@ module.exports = function (router) {
 					spotifyApi.setAccessToken(data.body['access_token']);
 					spotifyApi.setRefreshToken(data.body['refresh_token']);
 				})
-				.then(function ( ) {
-					return spotifyApi.createPlaylist(user, title, { 'public' : false });
-				})
 				.then(function (data) {
-					var spotifySongs = [];
 
-					async.each(songs, function (song, callback) {
-						var artist = song.artist;
-						var title = song.title;
+					var songs = result.songs;
+					async.eachSeries(songs, function (song, callback) {
 
-						spotifyApi.searchTracks('artist:' + artist + ', title:' + title + '')
+						spotifyApi.searchTracks('artist:' + song.artist + ', title:' + song.title + '')
 							.then(function (data) {
 								if (data.body.tracks.items.length) {
 									spotifySongs.push(data.body.tracks.items[0].uri);
@@ -156,12 +149,16 @@ module.exports = function (router) {
 							});
 
 					}, function (err) {
-						if (!err) {
-							spotifyApi.addTracksToPlaylist(user, data.body.id, spotifySongs);
+						spotifyApi.createPlaylist(user, title, { 'public' : false })
+							.then(function (data) {
+								spotifyApi.addTracksToPlaylist(user, data.body.id, spotifySongs);
 
-							var publicPlaylistUrl = data.body.external_urls.spotify;
-							res.redirect(publicPlaylistUrl);
-						}
+								var publicPlaylistUrl = data.body.external_urls.spotify;
+								res.redirect(publicPlaylistUrl);
+							})
+							.catch(function (err) {
+								console.error(err);
+							});
 					});
 				})
 				.catch(function (err) {
