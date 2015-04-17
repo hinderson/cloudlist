@@ -57,7 +57,9 @@ module.exports = function (router) {
 		async.parallel([
 			function (callback) {
 				lastfm.artist.getInfo({ 'artist' : query }, function (err, data) {
-					callback(err, data.image[data.image.length - 1]['#text']);
+					if (err) console.error(err);
+
+					callback(null, data ? data.image[data.image.length - 1]['#text'] : null);
 				});
 			},
 			function (callback) {
@@ -71,22 +73,33 @@ module.exports = function (router) {
 					.then(function (data) {
 						callback(null, data.body.images[0].url);
 					})
-					.catch(function (error) {
-						console.error(error);
+					.catch(function (err) {
+						if (err) console.error(err);
+
+						callback(null, null);
 					});
 			},
 			function (callback) {
 				echojs('artist/images').get({ 'name': query }, function (err, data) {
+					if (err) console.error(err);
+
 					var response = data.response.images;
-					var allResults = [];
-					for (var i = 0, len = response.length; i < len; i++) {
-						allResults.push(response[i].url);
+					if (response) {
+						var allResults = [];
+						for (var i = 0, len = response.length; i < len; i++) {
+							allResults.push(response[i].url);
+						}
+						callback(null, allResults);
+					} else {
+						callback(null, null);
 					}
-					callback(err, allResults);
 				});
 			}
 		], function (err, response) {
 			if (err) console.log(err);
+
+			// Remove null responses from array
+			response = response.filter(function (n) { return n !== null });
 
 			// Flatten multi-layered response array
 			var images = [].concat.apply([], response);
@@ -116,7 +129,7 @@ module.exports = function (router) {
 		collections.getOne(id, null, function (result) {
 			var spotifySongs = [];
 
-			var user = 'koeeoaddi';
+			var user = 'cloudlist.io';
 			var title = 'Cloudlist.io: ' + result.collection.title + ' by Mattias Hinderson';
 			//console.log('User', result.owner, users.getOne(result.owner));
 
@@ -149,7 +162,7 @@ module.exports = function (router) {
 							});
 
 					}, function (err) {
-						spotifyApi.createPlaylist(user, title, { 'public' : false })
+						spotifyApi.createPlaylist(user, title, { 'public' : true })
 							.then(function (data) {
 								spotifyApi.addTracksToPlaylist(user, data.body.id, spotifySongs);
 

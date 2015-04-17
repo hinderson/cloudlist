@@ -138,6 +138,8 @@
 	}
 
 	function populateImageSearchResults (images) {
+		if (!images.length) { return; }
+
 		clearImageSearchResults();
 
 		var imageSection = document.querySelector('fieldset.image');
