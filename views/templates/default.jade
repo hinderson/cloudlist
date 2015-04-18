@@ -3,10 +3,10 @@ extends ../layout
 block content
 	main(role="main")
 		section.hero.group
-			h1 #{playlist.title}
+			h1 #{collection.title}
 		section.collection.group
 			header.collection-header.group
-				h3.collection-sub-title #{playlist.title}
+				h3.collection-sub-title #{collection.title}
 				h4.structural Sort tracks:
 				ul(class="sort group")
 					li.col.index(data-sort-type="index")

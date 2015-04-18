@@ -36,8 +36,9 @@ module.exports = function (router) {
 
 	// Return all songs in JSON format
 	router.get('/song-collection', function (req, res) {
+
 		// TEMP: Trying out url module (maybe put it in a module?)
-		var collection = parseUrl.parse(req.headers.referer).pathname.split('/').filter(function (e) { return e })[0];
+		var collection = parseUrl.parse(req.headers.referer).pathname.split('/').filter(function (e) { return e })[1];
 
 		collections.getOne(null, collection, function (result) {
 			if ('production' === process.env.NODE_ENV) {
@@ -129,56 +130,57 @@ module.exports = function (router) {
 		var code = req.query.code || null;
 
 		collections.getOne(id, null, function (result) {
-			var spotifySongs = [];
+			users.getOne(result.collection.owner, function (user) {
 
-			var user = 'cloudlist.io';
-			var title = 'Cloudlist.io: ' + result.collection.title + ' by Mattias Hinderson';
-			//console.log('User', result.owner, users.getOne(result.owner));
+				var spotifySongs = [];
+				var spotifyAccount = 'cloudlist.io';
+				var playlistTitle = 'Cloudlist.io: ' + result.collection.title + ' by ' + user.name.first + ' ' + user.name.last;
 
-			// Retrieve an access token and a refresh token
-			spotifyApi.authorizationCodeGrant(code)
-				.then(function (data) {
-					console.log('The token expires in ' + data.body['expires_in']);
-					console.log('The access token is ' + data.body['access_token']);
-					console.log('The refresh token is ' + data.body['refresh_token']);
+				// Retrieve an access token and a refresh token
+				spotifyApi.authorizationCodeGrant(code)
+					.then(function (data) {
+						console.log('The token expires in ' + data.body['expires_in']);
+						console.log('The access token is ' + data.body['access_token']);
+						console.log('The refresh token is ' + data.body['refresh_token']);
 
-					// Set the access token on the API object to use it in later calls
-					spotifyApi.setAccessToken(data.body['access_token']);
-					spotifyApi.setRefreshToken(data.body['refresh_token']);
-				})
-				.then(function (data) {
+						// Set the access token on the API object to use it in later calls
+						spotifyApi.setAccessToken(data.body['access_token']);
+						spotifyApi.setRefreshToken(data.body['refresh_token']);
+					})
+					.then(function (data) {
 
-					var songs = result.songs;
-					async.eachSeries(songs, function (song, callback) {
+						var songs = result.songs;
+						async.eachSeries(songs, function (song, callback) {
 
-						spotifyApi.searchTracks('artist:' + song.artist + ', title:' + song.title + '')
-							.then(function (data) {
-								if (data.body.tracks.items.length) {
-									spotifySongs.push(data.body.tracks.items[0].uri);
-								}
-								callback();
-							})
-							.catch(function (err) {
-								console.error('Song couldn\'t be found', err);
-								callback();
-							});
+							spotifyApi.searchTracks('artist:' + song.artist + ', title:' + song.title + '')
+								.then(function (data) {
+									if (data.body.tracks.items.length) {
+										spotifySongs.push(data.body.tracks.items[0].uri);
+									}
+									callback();
+								})
+								.catch(function (err) {
+									console.error('Song couldn\'t be found', err);
+									callback();
+								});
 
-					}, function (err) {
-						spotifyApi.createPlaylist(user, title, { 'public' : true })
-							.then(function (data) {
-								spotifyApi.addTracksToPlaylist(user, data.body.id, spotifySongs);
+						}, function (err) {
+							spotifyApi.createPlaylist(spotifyAccount, playlistTitle, { 'public' : true })
+								.then(function (data) {
+									spotifyApi.addTracksToPlaylist(spotifyAccount, data.body.id, spotifySongs);
 
-								var publicPlaylistUrl = data.body.external_urls.spotify;
-								res.redirect(publicPlaylistUrl);
-							})
-							.catch(function (err) {
-								console.error(err);
-							});
+									var publicPlaylistUrl = data.body.external_urls.spotify;
+									res.redirect(publicPlaylistUrl);
+								})
+								.catch(function (err) {
+									console.error(err);
+								});
+						});
+					})
+					.catch(function (err) {
+						console.error(err);
 					});
-				})
-				.catch(function (err) {
-					console.error(err);
-				});
+			});
 		});
 
 	});

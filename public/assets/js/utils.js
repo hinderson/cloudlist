@@ -10,6 +10,12 @@
 	Helper = (function () {
 
 		return {
+			forEach: function (array, callback, scope) {
+				for (var i = 0, len = array.length; i < len; i++) {
+					callback.call(scope, i, array[i]);
+				}
+			},
+
 			delegate: function (criteria, listener) {
 				return function (e) {
 					var el = e.target;

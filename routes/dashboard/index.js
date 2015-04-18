@@ -20,23 +20,30 @@ var users = require('../../methods/users.js');
 module.exports = function (router) {
 
 	// GET Dashboard home page
-	router.get('/hinderson', auth.connect(basic), function (req, res) {
-		var user = 1;
-		collections.getAll(user, function (result) {
-			res.render('dashboard/index', {
-				collections: result.collections,
-				sortorder: result.sortorder
+	router.get('/:user', auth.connect(basic), function (req, res, next) {
+		var name = req.params.user;
+		users.getOne(null, name, function (user) {
+			if (!user) return next();
+
+			var userId = user._id;
+			collections.getAll(userId, function (result) {
+				res.render('dashboard/index', {
+					collections: result.collections,
+					sortorder: result.sortorder
+				});
 			});
 		});
 	});
 
 	// GET Single collection page
-	router.get('/hinderson/:id/edit', auth.connect(basic), function (req, res) {
+	router.get('/:user/:id/edit', auth.connect(basic), function (req, res, next) {
 		// TODO: Fix so that it's slug based
 		var id = hashids.decodeHex(req.params.id);
 		collections.getOne(id, null, function (result) {
+			if (!result) return next();
+
 			res.render('dashboard/collection', {
-				playlist: result.collection,
+				collection: result.collection,
 				songs: result.songs
 			});
 		});

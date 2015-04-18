@@ -12,9 +12,8 @@ var users = require('../methods/users.js');
 module.exports = {
 
 	getAll: function (user, result) {
-		var user = 1; // TEMP: User system
-		users.getOne(user, function (user) {
-			db.collection('collections').find().toArray(function (err, collections) {
+		users.getOne(user, null, function (user) {
+			db.collection('collections').find( ).toArray(function (err, collections) {
 				if (err) throw err;
 
 				return result({
@@ -51,7 +50,7 @@ module.exports = {
 			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
 				if (err) throw err;
 
-				var sortedSongs = utils.sortObj(items, collection.items);
+				var sortedSongs = utils.sortObj(items, '_id', collection.items);
 
 				return result({
 					collection: collection,

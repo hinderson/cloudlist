@@ -14,16 +14,16 @@ html(lang="en-US")
 				form.template(method="POST", action="/")
 					label(for="template") Template:
 					select#template(name="template")
-						option(selected=playlist.template == "default", value="default") Default
-						option(selected=playlist.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
+						option(selected=collection.template == "default", value="default") Default
+						option(selected=collection.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
 					input(type="submit", value="OK")
 					button#spotify Export to Spotify playlist
-				- var obfuscatedCollectionId = hashids.encodeHex(playlist._id);
+				- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
 				table.collection(data-id="#{obfuscatedCollectionId}")
 					caption.collection-title
-						span(contenteditable) #{playlist.title}
+						span(contenteditable) #{collection.title}
 						small
-							a(href="#{rootHost}/#{playlist.permalink}", target="_blank") #{rootHost}/#{playlist.permalink}
+							a(href="#{rootHost}/hinderson/#{collection.permalink}/", target="_blank") #{rootHost}/hinderson/#{collection.permalink}/
 					thead
 						tr
 							th.image
@@ -89,11 +89,11 @@ html(lang="en-US")
 				form(name="create-song", method="post", action="/create-song/#{obfuscatedCollectionId}", enctype="multipart/form-data")
 					fieldset.source
 						h3 Choose your audio source
-						label Upload audio
-							input(type="file", name="audio", accept="audio/*")
-						p <em>or</em>
 						label Enter Soundcloud URL
 							input(type="text", placeholder="Soundcloud URL", name="soundcloud")
+						p <em>or</em>
+						label Upload audio
+							input(type="file", name="audio", accept="audio/*")
 					fieldset.metadata
 						h3 Enter metadata
 						label Artist(s)

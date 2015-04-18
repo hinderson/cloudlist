@@ -13,8 +13,17 @@ module.exports = {
 		});
 	},
 
-	getOne: function (id, result) {
-		db.collection('users').findOne({ _id: id }, function (err, user) {
+	getOne: function (id, name, result) {
+
+		// Find user based on id or name
+		var query = {};
+		if (id) {
+			query._id = ObjectId(id);
+		} else {
+			query.username = name;
+		}
+
+		db.collection('users').findOne(query, function (err, user) {
 			if (err) throw err;
 
 			return result(user);

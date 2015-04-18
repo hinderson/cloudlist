@@ -75,8 +75,12 @@
 			var reader = new FileReader();
 
 			reader.onload = function (e) {
+				var images = document.querySelectorAll('fieldset.image .search-results input');
+				images = images.reverse();
+				for (var i = 0, len = images.length; i < len; i++) {
+					images[i].setAttribute('checked', false);
+				}
 				$('form .img').attr('style', 'background-image:url(' + e.target.result + ');');
-				clearImageSearchResults();
 			};
 
 			reader.readAsDataURL(input.files[0]);

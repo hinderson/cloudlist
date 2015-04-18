@@ -8,7 +8,7 @@
 -	}
 -	if (single) {
 		//- Determine index position of song
--		var index = playlist.items.indexOf(single._id) + 1;
+-		var index = collection.items.indexOf(single._id) + 1;
 		//- Structure artist and titles
 -		var artist = Array.isArray(single.artist) && single.artist.length > 1 ? single.artist.slice(0, -1).join(', ') + ' & ' + single.artist[single.artist.length -1] : single.artist;
 -		var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
@@ -19,7 +19,7 @@ doctype html
 html(lang="en-US", class="no-js")
 	head
 		meta(charset="utf-8")
-		title= (single ? combinedArtist + ', "' + single.title + '"' : playlist.title) + ' – ' + rootTitle
+		title= (single ? combinedArtist + ', "' + single.title + '"' : collection.title) + ' – ' + rootTitle
 		<script>document.documentElement.className = document.documentElement.className.replace(/(^|\\\b)no-js(\b|$)/, 'js');if (!("ontouchstart" in document.documentElement)) {document.documentElement.className += " no-touch";}</script>
 
 		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
@@ -37,7 +37,7 @@ html(lang="en-US", class="no-js")
 		<meta property="og:description" content="At position no. #{index} in the list Best Songs of 2014: &quot;#{single.title}&quot; by #{combinedArtist}." />
 		- } else {
 		<meta property="og:image" content="https://static.cloudlist.io/media/img/cloudlist-splash.jpg" />
-		<meta property="og:description" content="#{playlist.description}" />
+		<meta property="og:description" content="#{collection.description}" />
 		- }
 
 		- if (env === 'production') {
