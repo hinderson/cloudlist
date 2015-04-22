@@ -50,9 +50,10 @@
 			},
 
 			updateDocumentTitle: function (title, removeBaseTitle) {
-				var id = window.history.state.id;
 				document.title = title + (!removeBaseTitle ? (' – ' + s.documentTitle) : '');
-				window.history.replaceState({id: id, title: title});
+				if (window.history.state) {
+					window.history.replaceState({id: window.history.state.idid, title: title});
+				}
 			},
 
 			resetDocumentTitle: function ( ) {

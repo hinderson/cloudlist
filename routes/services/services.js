@@ -2,7 +2,6 @@
 
 // General
 var ObjectId = require('mongoskin').ObjectID;
-var parseUrl = require('url');
 var async = require('async');
 
 // Hashid
@@ -34,13 +33,11 @@ var users = require('../../methods/users.js');
 
 module.exports = function (router) {
 
-	// Return all songs in JSON format
+	// Return all songs in JSON format (based on sent cookie)
 	router.get('/song-collection', function (req, res) {
 
-		// TEMP: Trying out url module (maybe put it in a module?)
-		var collection = parseUrl.parse(req.headers.referer).pathname.split('/').filter(function (e) { return e })[1];
-
-		collections.getOne(null, collection, function (result) {
+		var collectionId = hashids.decodeHex(req.cookies.cl_collection);
+		collections.getOne(collectionId, null, function (result) {
 			if ('production' === process.env.NODE_ENV) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}

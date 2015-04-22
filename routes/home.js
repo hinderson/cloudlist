@@ -1,6 +1,12 @@
 'use strict';
 
+// General
 var utils = require('../utils/utils');
+
+// Hashid
+var Hashids = require('hashids');
+var secret = require('../config/private/secret.js');
+var hashids = new Hashids(secret);
 
 // Database methods
 var collections = require('../methods/collections.js');
@@ -13,6 +19,11 @@ module.exports = function (router) {
 		collections.getOne(null, req.params.collection, function (result) {
 			if (!result) return next();
 
+			// Set view state cookie
+			var collectionId = hashids.encodeHex(result.collection._id);
+			res.cookie('cl_collection', collectionId, { maxAge: 900000 });
+
+			// Render template
 			var template = result.collection.template;
 			res.render('templates/' + template, {
 				path: req.params.user + '/' + req.params.collection,
@@ -27,6 +38,11 @@ module.exports = function (router) {
 		collections.getOne(null, req.params.collection, function (result) {
 			if (!result) return next();
 
+			// Set view state cookie
+			var collectionId = hashids.encodeHex(result.collection._id);
+			res.cookie('cl_collection', collectionId, { maxAge: 900000 });
+
+			// Render template
 			var single = utils.findByKey(result.songs, 'permalink', req.params.permalink);
 			var template = result.collection.template;
 			res.render('templates/' + template, {

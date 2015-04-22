@@ -20,7 +20,7 @@ html(lang="en-US", class="no-js")
 		<meta name="description" content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud." />
 
 		<meta property="og:site_name" content="Cloudlist" />
-		<meta property="og:url" content="https://cloudlist.io/#{path}/#{single.permalink}" />
+		<meta property="og:url" content="https://cloudlist.io/#{path}/#{single ? single.permalink : ''}" />
 
 		- if (single) {
 		<meta property="og:title" content="#{single.title} by #{single.artist}" />
