@@ -39,9 +39,6 @@
 			update: function (id, href, documentTitle) {
 				var song = Cloudlist.cache.collection.items[id] || null;
 
-				var baseUrl = baseUrl || window.location.pathname.split('/')[1];
-				var href = '/' + baseUrl + '/' + href + '/';
-
 				if (song) {
 					if (window.history.state !== null && window.history.state.id === id) {
 						return;
@@ -53,7 +50,9 @@
 			},
 
 			updateDocumentTitle: function (title, removeBaseTitle) {
+				var id = window.history.state.id;
 				document.title = title + (!removeBaseTitle ? (' – ' + s.documentTitle) : '');
+				window.history.replaceState({id: id, title: title});
 			},
 
 			resetDocumentTitle: function ( ) {

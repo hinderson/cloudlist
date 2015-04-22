@@ -51,4 +51,10 @@ module.exports = {
 		return sortedObjects;
 	},
 
+	findByKey: function (source, type, key) {
+		return source.filter(function (obj) {
+			return obj[type] === key;
+		})[ 0 ];
+	},
+
 };

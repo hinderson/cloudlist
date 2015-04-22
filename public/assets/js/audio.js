@@ -204,9 +204,9 @@
 				// Set state
 				state.audio = 'playing';
 
-				// Update browser history (incl. document title)
+				// Update document title
 				var documentTitle = '▶ ' + Helper.makeDocumentTitle([Helper.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
-				Cloudlist.history.update(id, song.permalink, documentTitle);
+				Cloudlist.history.updateDocumentTitle(documentTitle);
 
 				// Scroll to track if out of bounds
 				if (!Helper.inViewport(elem, 250)) {
@@ -250,7 +250,7 @@
 				Cloudlist.scrollToElement(elem);
 
 				// Update document title with ▶ character
-				var documentTitle = window.history.state.title;
+				var documentTitle = '▶ ' + window.history.state.title;
 				Cloudlist.history.updateDocumentTitle(documentTitle);
 			},
 

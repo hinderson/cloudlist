@@ -15,7 +15,9 @@
 		var itemClickHandler = function (e) {
 			e.preventDefault();
 
+			var href = e.delegateTarget.href;
 			var id = e.delegateTarget.parentNode.getAttribute('data-id');
+			Cloudlist.history.update(id, href);
 			Cloudlist.audio.toggle(id);
 		};
 

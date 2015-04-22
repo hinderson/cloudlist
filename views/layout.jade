@@ -1,14 +1,7 @@
 //- Determine if this is a single song or not
--	var single;
--	for (var i = 0, len = songs.length; i < len; i++) {
--		if (songs[i].permalink === path) {
--			single = songs[i];
--			break;
--		}
--	}
 -	if (single) {
 		//- Determine index position of song
--		var index = collection.items.indexOf(single._id) + 1;
+-		var index = collection.items.indexOf(single._id.toString()) + 1;
 		//- Structure artist and titles
 -		var artist = Array.isArray(single.artist) && single.artist.length > 1 ? single.artist.slice(0, -1).join(', ') + ' & ' + single.artist[single.artist.length -1] : single.artist;
 -		var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
@@ -27,7 +20,7 @@ html(lang="en-US", class="no-js")
 		<meta name="description" content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud." />
 
 		<meta property="og:site_name" content="Cloudlist" />
-		<meta property="og:url" content="https://cloudlist.io/#{path}/" />
+		<meta property="og:url" content="https://cloudlist.io/#{path}/#{single.permalink}" />
 
 		- if (single) {
 		<meta property="og:title" content="#{single.title} by #{single.artist}" />

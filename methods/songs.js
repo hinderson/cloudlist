@@ -28,10 +28,10 @@ module.exports = {
 	},
 
 	create: function (collectionId, args, files, result) {
-		var songArtist = args.artist || null;
-		var songFeatured = args.featuredartist || null;
-		var songTitle = args.title || null;
-		var songAlbum = args.album || null;
+		var songArtist = args.artist.trim() || null;
+		var songFeatured = args.featuredartist.trim() || null;
+		var songTitle = args.title.trim() || null;
+		var songAlbum = args.album.trim() || null;
 		var songDuration = null;
 		var songImage = files.image ? files.image.name : null;
 		var songCover;

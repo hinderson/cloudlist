@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require('../utils/utils');
+
 // Database methods
 var collections = require('../methods/collections.js');
 var songs = require('../methods/songs.js');
@@ -13,7 +15,7 @@ module.exports = function (router) {
 
 			var template = result.collection.template;
 			res.render('templates/' + template, {
-				path: req.params.collection,
+				path: req.params.user + '/' + req.params.collection,
 				collection: result.collection,
 				songs: result.songs
 			});
@@ -25,11 +27,13 @@ module.exports = function (router) {
 		collections.getOne(null, req.params.collection, function (result) {
 			if (!result) return next();
 
+			var single = utils.findByKey(result.songs, 'permalink', req.params.permalink);
 			var template = result.collection.template;
 			res.render('templates/' + template, {
-				path: req.params.permalink,
+				path: req.params.user + '/' + req.params.collection,
 				collection: result.collection,
-				songs: result.songs
+				songs: result.songs,
+				single: single
 			});
 		});
 	});

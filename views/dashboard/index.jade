@@ -30,7 +30,7 @@ html(lang="en-US")
 								if collection.covers && collection.covers[0]
 									div.img(style="background-image:url(../media/img/#{collection.covers[0].src});", title="#{collection.covers[0].src}")
 							div.title
-								a(href="/hinderson/#{obfuscatedId}/edit") #{collection.title}
+								a(href="/hinderson/#{obfuscatedId}/edit/") #{collection.title}
 							div.stats Songs: #{collection.items.length}
 							div.actions
 								form(name="delete-collection", method="post", action="/delete-collection/#{obfuscatedId}", enctype="multipart/form-data")
