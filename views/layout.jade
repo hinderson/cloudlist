@@ -1,10 +1,11 @@
 //- Determine if this is a single song or not
 -	if (single) {
+-		console.log(single);
 		//- Determine index position of song
 -		var index = collection.items.indexOf(single._id.toString()) + 1;
 		//- Structure artist and titles
 -		var artist = Array.isArray(single.artist) && single.artist.length > 1 ? single.artist.slice(0, -1).join(', ') + ' & ' + single.artist[single.artist.length -1] : single.artist;
--		var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
+-		var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? single.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
 -		var combinedArtist = artist + (featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '');
 -	}
 

@@ -37,13 +37,13 @@
 			},
 
 			update: function (id, href, documentTitle) {
+				if (window.history.state !== null && window.history.state.id === id) {
+					this.updateDocumentTitle(documentTitle);
+					return;
+				}
+
 				var song = Cloudlist.cache.collection.items[id] || null;
-
 				if (song) {
-					if (window.history.state !== null && window.history.state.id === id) {
-						return;
-					}
-
 					documentTitle && this.updateDocumentTitle(documentTitle);
 					window.history.pushState({id: id, title: documentTitle || ''}, null, href || null);
 				}
@@ -52,7 +52,7 @@
 			updateDocumentTitle: function (title, removeBaseTitle) {
 				document.title = title + (!removeBaseTitle ? (' – ' + s.documentTitle) : '');
 				if (window.history.state) {
-					window.history.replaceState({id: window.history.state.idid, title: title});
+					window.history.replaceState({id: window.history.state.id, title: title});
 				}
 			},
 

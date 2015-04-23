@@ -204,9 +204,10 @@
 				// Set state
 				state.audio = 'playing';
 
-				// Update document title
+				// Update browser history (incl. document title)
+				var href = elemLink.href;
 				var documentTitle = '▶ ' + Helper.makeDocumentTitle([Helper.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
-				Cloudlist.history.updateDocumentTitle(documentTitle);
+				Cloudlist.history.update(id, href, documentTitle);
 
 				// Scroll to track if out of bounds
 				if (!Helper.inViewport(elem, 250)) {
