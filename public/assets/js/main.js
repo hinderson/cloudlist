@@ -471,11 +471,11 @@
 					runTime = time - startTime;
 
 					if (duration > runTime) {
-						window.scrollTo(0, easing(runTime, start, delta, duration));
+						window.scrollTo(0, Math.floor(easing(runTime, start, delta, duration)));
 						Helper.requestAnimFrame.call(window, loop);
 					} else {
 						if (destination !== delta + start) {
-							window.scrollTo(0, delta + start);
+							window.scrollTo(0, Math.floor(delta + start));
 						}
 						if (typeof callback === 'function') {
 							callback(+new Date());
@@ -515,6 +515,7 @@
 							if (reset) {
 								var span = text.getElementsByTagName('span');
 								text.innerHTML = span && span[0] && span[0].textContent;
+
 								text.classList.remove('overflow');
 							} else if (!text.classList.contains('overflow')) {
 								text.innerHTML = '<span>' + content + '</span><span>' + content + '</span>';
@@ -524,6 +525,7 @@
 
 								spans[0].style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
 								spans[1].style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
+
 								text.classList.add('overflow');
 							}
 						}

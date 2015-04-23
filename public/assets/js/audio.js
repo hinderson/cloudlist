@@ -102,8 +102,8 @@
 				var time = elem.getElementsByClassName('time')[0];
 				var firstChild = time.firstChild;
 				var currentProgress = document.createElement('span');
-				currentProgress.innerHTML = '0:00 / ';
 				Helper.requestAnimFrame.call(window, function ( ) {
+					currentProgress.innerHTML = '0:00 / ';
 					time.insertBefore(currentProgress, firstChild);
 				});
 

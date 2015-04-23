@@ -10,6 +10,7 @@ var multer = require('multer');
 var compression = require('compression');
 var CDN = require('express-simple-cdn');
 var forceSSL = require('express-force-ssl');
+var utils = require('./utils/utils');
 
 var mongo = require('mongoskin');
 var db = mongo.db('mongodb://localhost:27017/cloudlist', { native_parser:true });
@@ -53,6 +54,9 @@ var Hashids = require('hashids');
 var secret = require('./config/private/secret.js');
 var hashids = new Hashids(secret);
 app.locals.hashids = hashids;
+
+// Expose structure song util globally
+app.locals.structureSong = utils.structureSong;
 
 // Send globals
 app.locals.rootTitle = 'Cloudlist.io';

@@ -51,11 +51,7 @@ html(lang="en-US")
 							tr(data-id="#{obfuscatedId}", data-available="")
 								td.image
 									if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
-										// TODO: Eventually, remove all src (filename is the way to go)
-										if song.covers[0].src
-											div.img(style="background-image:url(/media/img/#{song.covers[0].src});", title="#{song.covers[0].src}")
-										else
-											div.img(style="background-image:url(/media/img/#{song.covers[0].filename});", title="#{song.covers[0].filename}")
+										div.img(style="background-image:url(/media/img/#{song.covers[0].filename});", title="#{song.covers[0].filename}")
 									else
 										div Video
 								td.index

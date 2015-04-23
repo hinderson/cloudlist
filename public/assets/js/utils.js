@@ -200,8 +200,7 @@
 			},
 
 			isOverflowed: function (element) {
-				var rect = element.getBoundingClientRect();
-				return element.scrollWidth > rect.width;
+				return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
 			},
 
 			simulateMouseEvent: function (node, eventType) {

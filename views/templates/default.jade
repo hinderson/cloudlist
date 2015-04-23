@@ -4,6 +4,7 @@ block content
 	main(role="main")
 		section.hero.group
 			h1 #{collection.title}
+			button Click to play
 		section.collection.group
 			header.collection-header.group
 				h3.collection-sub-title #{collection.title}
@@ -21,19 +22,14 @@ block content
 				Song list
 			ol
 				each song, index in songs
-					-	var songId = hashids.encodeHex(song._id);
-					-	var songIndex = index + 1;
-					-	var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
-					-	var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
-					-	featuredartist = featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '';
-					-	var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
+					- song = structureSong(song);
 
-					li(class=song.available === true ? undefined : "unavailable", data-id="#{song._id}", data-index="#{songIndex}", data-artist="#{artist}#{featuredartist}", data-title="#{song.title}")
+					li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.artist}", data-title="#{song.title}")
 						a(href="/#{path}/#{song.permalink}/")
-							div.col.index #{songIndex}
+							div.col.index #{index+1}
 							div.col.title #{song.title}
-							div.col.artist #{artist}#{featuredartist}
-							div.col.time #{duration}
+							div.col.artist #{song.artist}
+							div.col.time #{song.duration}
 
 		footer.go-to-top
 			a(href="#top") Top ↑
