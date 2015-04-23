@@ -238,9 +238,8 @@
 			}, 150),
 
 			updateDOM: function ( ) {
-				ticking = false;
-
 				lastScrollY = window.pageYOffset;
+				ticking = false;
 
 				// Disable and enable hover events
 				c.elems.HTML.classList.add('scrolling');
@@ -451,8 +450,7 @@
 			},
 
 			scrollToPosition: function (destination, duration, callback) {
-				var el = Helper.getScrollingElement();
-				var start = el.scrollTop;
+				var start = lastScrollY;
 				var startTime = 0;
 				var delta = destination - start;
 
@@ -473,11 +471,11 @@
 					runTime = time - startTime;
 
 					if (duration > runTime) {
+						window.scrollTo(0, easing(runTime, start, delta, duration));
 						Helper.requestAnimFrame.call(window, loop);
-						el.scrollTop = easing(runTime, start, delta, duration);
 					} else {
 						if (destination !== delta + start) {
-							el.scrollTop = delta + start;
+							window.scrollTo(0, delta + start);
 						}
 						if (typeof callback === 'function') {
 							callback(+new Date());
