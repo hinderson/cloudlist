@@ -51,6 +51,18 @@ module.exports = {
 		return sortedObjects;
 	},
 
+	generateHashmap: function (obj) {
+		var generatedObjects = {};
+		var len = obj.length;
+
+		for (var i = 0; i < len; i++) {
+			var id = obj[i]._id;
+			generatedObjects[id] = obj[i];
+		}
+
+		return generatedObjects;
+	},
+
 	findByKey: function (source, type, key) {
 		return source.filter(function (obj) {
 			return obj[type] === key;

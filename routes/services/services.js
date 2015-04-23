@@ -3,6 +3,7 @@
 // General
 var ObjectId = require('mongoskin').ObjectID;
 var async = require('async');
+var utils = require('../../utils/utils');
 
 // Hashid
 var Hashids = require('hashids');
@@ -42,12 +43,8 @@ module.exports = function (router) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}
 
-			// Make hashmap of items
-			var items = {};
-			for (var i = 0, len = result.songs.length; i < len; i++) {
-				var id = result.songs[i]._id;
-				items[id] = result.songs[i];
-			}
+			// Make songs into hashmap
+			var items = utils.generateHashmap(result.songs);
 
 			res.json({
 				collection: {
