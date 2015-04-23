@@ -7,25 +7,23 @@ var requireFiles = function (directory, app) {
 
 	fs.readdirSync(directory).forEach(function (fileName, index) {
 		// Recurse if directory
-		if (fs.lstatSync(directory + '/' + fileName).isDirectory()) {
-			requireFiles(directory + '/' + fileName, app);
-		} else {
+		if (!fs.lstatSync(directory + '/' + fileName).isDirectory()) {
 			// Skip this file
 			if (fileName === 'index.js' && directory === __dirname) return;
 
 			// Skip unknown filetypes
 			if (validFileTypes.indexOf(fileName.split('.').pop()) === -1) return;
 
-			// Skip dashboard so we can require it manually
-			if (directory.substr(directory.lastIndexOf('/') + 1) === 'dashboard') return;
-
 			// Require the file.
 			require(directory + '/' + fileName)(app);
 		}
 	})
-}
+};
 
 module.exports = function (app) {
+	// Require directories in order to avoid collisions
+	requireFiles(__dirname + '/api', app);
+	requireFiles(__dirname + '/services', app);
 	requireFiles(__dirname, app);
-	require(__dirname + '/dashboard/index.js')(app); // Require dashboard manually
-}
+	requireFiles(__dirname + '/dashboard', app); // Since dashboard requires auth, this is put in last place
+};
