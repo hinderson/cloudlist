@@ -176,6 +176,16 @@
 						document.body;
 			},
 
+			getElemDistanceFromDoc: function (element) {
+				var rect = element.getBoundingClientRect();
+				var docEl = document.documentElement;
+
+				return {
+					left: rect.left + (window.pageXOffset || docEl.scrollLeft || 0),
+					top: rect.top + (window.pageYOffset || docEl.scrollTop || 0)
+				};
+			},
+
 			inViewport: function (element, offset) {
 				var rect = element.getBoundingClientRect();
 				var winWidth = window.innerWidth;

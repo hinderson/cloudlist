@@ -9,7 +9,7 @@
 
 	Cloudlist = (function () {
 		var s, c; // Private aliases: settings, cache
-		var ticking, focusInterval, scrollInterval; // Private variables
+		var ticking, focusInterval, scrollInterval, lastScrollY = 0; // Private variables
 
 		// Private functions
 		var itemClickHandler = function (e) {
@@ -135,7 +135,7 @@
 					x: 0,
 					y: 0
 				},
-				collectionTop: document.getElementsByClassName('collection')[0].getBoundingClientRect().top
+				collectionTop: Helper.getElemDistanceFromDoc(document.getElementsByClassName('collection')[0]).top
 			},
 
 			init: function ( ) {
@@ -234,11 +234,13 @@
 				this.updateDOM();
 
 				// Update position of collection top
-				c.collectionTop = c.elems.collection.getBoundingClientRect().top;
+				c.collectionTop = Helper.getElemDistanceFromDoc(c.elems.collection).top;
 			}, 150),
 
 			updateDOM: function ( ) {
 				ticking = false;
+
+				lastScrollY = window.pageYOffset;
 
 				// Disable and enable hover events
 				c.elems.HTML.classList.add('scrolling');
@@ -265,7 +267,7 @@
 
 				// Add sticky-header class
 				if (window.innerWidth > 600) {
-					if (window.pageYOffset > c.collectionTop) {
+					if (lastScrollY > c.collectionTop) {
 						c.elems.HTML.classList.add('sticky-header');
 					} else {
 						c.elems.HTML.classList.remove('sticky-header');
@@ -489,7 +491,7 @@
 
 			scrollToElement: function (element) {
 				var rect = element.getBoundingClientRect();
-				var offsetTop = rect.top + window.pageYOffset;
+				var offsetTop = rect.top + lastScrollY;
 				var elementHeight = rect.height;
 				var offset = (window.innerHeight / 2) - (elementHeight / 2);
 
