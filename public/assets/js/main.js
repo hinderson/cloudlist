@@ -84,22 +84,13 @@
 			XMLHttp.onreadystatechange = function ( ) {
 				if (XMLHttp.readyState === 4) {
 					if (XMLHttp.status === 200) {
-						var collection = {};
 						var response = JSON.parse(XMLHttp.responseText);
 
-						var items = response.items;
-						var order = response.order;
-
-						for (var i = 0, len = items.length; i < len; i++) {
-							var id = items[i]._id;
-							delete items[i]._id;
-							collection[id] = items[i];
-						}
-
-						// Expose the collection to the namespace
-						c.collection.items = collection;
-						c.collection.order = order;
-						c.collection.index = order.slice();
+						// Expose the collection
+						c.collection = response.collection;
+						c.collection.items = response.items;
+						c.collection.order = response.order;
+						c.collection.index = response.order.slice();
 					}
 				}
 			};

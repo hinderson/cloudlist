@@ -42,9 +42,21 @@ module.exports = function (router) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}
 
+			// Make hashmap of items
+			var items = {};
+			for (var i = 0, len = result.songs.length; i < len; i++) {
+				var id = result.songs[i]._id;
+				items[id] = result.songs[i];
+			}
+
 			res.json({
+				collection: {
+					id: result.collection._id,
+					title: result.collection.title,
+					owner: result.collection.owner
+				},
 				order: result.collection.items,
-				items: result.songs
+				items: items
 			});
 		});
 	});
