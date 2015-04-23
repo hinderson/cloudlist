@@ -176,11 +176,9 @@
 						elem.classList.remove('playing');
 
 						// Remove DOM elements
-						Helper.requestAnimFrame.call(window, function ( ) {
-							iconState.parentNode.removeChild(iconState);
-							currentProgress.parentNode.removeChild(currentProgress);
-							progressBar.parentNode.removeChild(progressBar);
-						});
+						iconState.parentNode.removeChild(iconState);
+						currentProgress.parentNode.removeChild(currentProgress);
+						progressBar.parentNode.removeChild(progressBar);
 
 						state.audio = 'stopped';
 						this.destroy(id);
@@ -192,11 +190,9 @@
 						elem.classList.remove('playing');
 
 						// Remove DOM elements
-						Helper.requestAnimFrame.call(window, function ( ) {
-							iconState.parentNode.removeChild(iconState);
-							currentProgress.parentNode.removeChild(currentProgress);
-							progressBar.parentNode.removeChild(progressBar);
-						});
+						iconState.parentNode.removeChild(iconState);
+						currentProgress.parentNode.removeChild(currentProgress);
+						progressBar.parentNode.removeChild(progressBar);
 
 						state.audio = 'stopped';
 						this.destroy(id);

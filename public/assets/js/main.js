@@ -480,7 +480,6 @@
 						if (typeof callback === 'function') {
 							callback(+new Date());
 						}
-						window.cancelAnimationFrame(loop);
 					}
 				}
 
