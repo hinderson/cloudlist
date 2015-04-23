@@ -5,7 +5,7 @@ var fs = require('fs');
 var requireFiles = function (directory, app) {
 	var validFileTypes = ['js'];
 
-	fs.readdirSync(directory).forEach(function (fileName) {
+	fs.readdirSync(directory).forEach(function (fileName, index) {
 		// Recurse if directory
 		if (fs.lstatSync(directory + '/' + fileName).isDirectory()) {
 			requireFiles(directory + '/' + fileName, app);
@@ -16,6 +16,9 @@ var requireFiles = function (directory, app) {
 			// Skip unknown filetypes
 			if (validFileTypes.indexOf(fileName.split('.').pop()) === -1) return;
 
+			// Skip dashboard so we can require it manually
+			if (directory.substr(directory.lastIndexOf('/') + 1) === 'dashboard') return;
+
 			// Require the file.
 			require(directory + '/' + fileName)(app);
 		}
@@ -24,4 +27,5 @@ var requireFiles = function (directory, app) {
 
 module.exports = function (app) {
 	requireFiles(__dirname, app);
+	require(__dirname + '/dashboard/index.js')(app); // Require dashboard manually
 }

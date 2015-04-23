@@ -7,6 +7,8 @@ var ObjectId = require('mongoskin').ObjectID;
 
 module.exports = function (router) {
 
+	/*
+
 	// GET all collections
 	router.get('/api/v1/collections', function (req, res) {
 		return false;
@@ -31,5 +33,7 @@ module.exports = function (router) {
 	router.delete('/api/v1/collections/:id', function (req, res) {
 		return false;
 	});
+
+	*/
 
 };

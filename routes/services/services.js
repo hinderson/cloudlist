@@ -34,7 +34,7 @@ var users = require('../../methods/users.js');
 module.exports = function (router) {
 
 	// Return all songs in JSON format (based on sent cookie)
-	router.get('/song-collection', function (req, res) {
+	router.get('/song-collection', function (req, res, next) {
 
 		var collectionId = hashids.decodeHex(req.cookies.cl_collection);
 		collections.getOne(collectionId, null, function (result) {
