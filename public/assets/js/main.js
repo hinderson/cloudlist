@@ -86,6 +86,9 @@
 					if (XMLHttp.status === 200) {
 						var response = JSON.parse(XMLHttp.responseText);
 
+						// Set document title
+						s.documentTitle = response.collection.title + ' – Cloudlist.io';
+
 						// Expose the collection
 						c.collection = response.collection;
 						c.collection.items = response.items;
@@ -102,7 +105,7 @@
 				debug: false,
 				lang: document.documentElement.lang,
 				cdn: 'https://static.cloudlist.io',
-				documentTitle: 'Cloudlist.io',
+				documentTitle: '',
 				maxItems: 100
 			},
 

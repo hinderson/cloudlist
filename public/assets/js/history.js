@@ -17,12 +17,7 @@
 
 			listen: function ( ) {
 				var checkState = function (e) {
-					console.log('Current state:', e.state);
 					if (e.state === null) {
-						/*
-						this.resetDocumentTitle();
-						this.core.audio.stopAll();
-						*/
 						window.location.reload(true);
 					} else {
 						this.updateDocumentTitle(window.history.state.title);
