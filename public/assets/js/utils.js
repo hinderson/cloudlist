@@ -178,14 +178,15 @@
 
 			inViewport: function (element, offset) {
 				var rect = element.getBoundingClientRect();
-				var doc = Helper.getScrollingElement();
+				var winWidth = window.innerWidth;
+				var winHeight = window.innerHeight;
 
 				offset = offset || 0;
 
-				return	(rect.bottom - offset) > 0 &&
-						rect.right > 0 &&
-						rect.left < (window.innerWidth || doc.clientWidth) &&
-						rect.top < (window.innerHeight || doc.clientHeight) - offset;
+				return (rect.bottom - offset) > 0 &&
+					rect.right > 0 &&
+					rect.left < winWidth &&
+					rect.top < winHeight - offset;
 			},
 
 			isOverflowed: function (element) {

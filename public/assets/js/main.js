@@ -9,7 +9,7 @@
 
 	Cloudlist = (function () {
 		var s, c; // Private aliases: settings, cache
-		var ticking, focusInterval, scrollInterval, lastScrollY = 0; // Private variables
+		var ticking, focusInterval, scrollInterval; // Private variables
 
 		// Private functions
 		var itemClickHandler = function (e) {
@@ -220,8 +220,6 @@
 			}, 150),
 
 			scrollEvent: function ( ) {
-				lastScrollY = window.pageYOffset;
-
 				if (!ticking) {
 					ticking = true;
 
@@ -267,7 +265,7 @@
 
 				// Add sticky-header class
 				if (window.innerWidth > 600) {
-					if (lastScrollY > c.collectionTop) {
+					if (window.pageYOffset > c.collectionTop) {
 						c.elems.HTML.classList.add('sticky-header');
 					} else {
 						c.elems.HTML.classList.remove('sticky-header');
@@ -452,8 +450,8 @@
 
 			scrollToPosition: function (destination, duration, callback) {
 				var el = Helper.getScrollingElement();
-				var startTime = 0;
 				var start = el.scrollTop;
+				var startTime = 0;
 				var delta = destination - start;
 
 				// Default easing function
@@ -482,8 +480,7 @@
 						if (typeof callback === 'function') {
 							callback(+new Date());
 						}
-						// TODO: Do we need to cancel it?
-						//window.cancelAnimationFrame(loop);
+						window.cancelAnimationFrame(loop);
 					}
 				}
 
@@ -492,7 +489,7 @@
 
 			scrollToElement: function (element) {
 				var rect = element.getBoundingClientRect();
-				var offsetTop = rect.top + lastScrollY;
+				var offsetTop = rect.top + window.pageYOffset;
 				var elementHeight = rect.height;
 				var offset = (window.innerHeight / 2) - (elementHeight / 2);
 
@@ -516,7 +513,6 @@
 
 					if (text.classList.contains('title') || text.classList.contains('artist')) {
 						if (Helper.isOverflowed(text)) {
-
 							if (reset) {
 								var span = text.getElementsByTagName('span');
 								text.innerHTML = span && span[0] && span[0].textContent;
@@ -529,7 +525,6 @@
 
 								spans[0].style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
 								spans[1].style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
-
 								text.classList.add('overflow');
 							}
 						}

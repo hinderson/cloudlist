@@ -103,17 +103,23 @@
 				var firstChild = time.firstChild;
 				var currentProgress = document.createElement('span');
 				currentProgress.innerHTML = '0:00 / ';
-				time.insertBefore(currentProgress, firstChild);
+				Helper.requestAnimFrame.call(window, function ( ) {
+					time.insertBefore(currentProgress, firstChild);
+				});
 
 				// Insert progress element
 				var progressBar = document.createElement('div');
 				progressBar.className = 'progress';
-				elemLink.appendChild(progressBar);
+				Helper.requestAnimFrame.call(window, function ( ) {
+					elemLink.appendChild(progressBar);
+				});
 
 				// Insert play icon
 				var iconState = Helper.createSVGFragment('icon-audio-playing', '0 0 73.784 58.753');
 				iconState.setAttribute('class', 'state-playing');
-				elemLink.insertBefore(iconState, elemLink.firstChild);
+				Helper.requestAnimFrame.call(window, function ( ) {
+					elemLink.insertBefore(iconState, elemLink.firstChild);
+				});
 
 				// Add loading class
 				elem.classList.add('loading');
@@ -150,38 +156,50 @@
 						elem.classList.add('paused');
 
 						var pauseIcon = Helper.updateSVGFragment(iconState, 'icon-audio-paused');
-						pauseIcon.setAttribute('class', 'state-paused');
+						Helper.requestAnimFrame.call(window, function ( ) {
+							pauseIcon.setAttribute('class', 'state-paused');
+						});
 					},
 					onresume: function ( ) {
 						elem.classList.remove('paused');
 						elem.classList.add('playing');
 
 						var pauseIcon = Helper.updateSVGFragment(iconState, 'icon-audio-playing');
-						pauseIcon.setAttribute('class', 'state-playing');
+						Helper.requestAnimFrame.call(window, function ( ) {
+							pauseIcon.setAttribute('class', 'state-playing');
+						});
 					},
 					onstop: function ( ) {
+						// Remove all classes
 						elem.classList.remove(color);
 						elem.classList.remove('paused');
 						elem.classList.remove('playing');
-						state.audio = 'stopped';
-						this.destroy(id);
 
 						// Remove DOM elements
-						iconState.parentNode.removeChild(iconState);
-						currentProgress.parentNode.removeChild(currentProgress);
-						progressBar.parentNode.removeChild(progressBar);
+						Helper.requestAnimFrame.call(window, function ( ) {
+							iconState.parentNode.removeChild(iconState);
+							currentProgress.parentNode.removeChild(currentProgress);
+							progressBar.parentNode.removeChild(progressBar);
+						});
+
+						state.audio = 'stopped';
+						this.destroy(id);
 					}.bind(this),
 					onfinish: function ( ) {
+						// Remove all classes
 						elem.classList.remove(color);
 						elem.classList.remove('paused');
 						elem.classList.remove('playing');
-						state.audio = 'stopped';
-						this.destroy(id);
 
 						// Remove DOM elements
-						iconState.parentNode.removeChild(iconState);
-						currentProgress.parentNode.removeChild(currentProgress);
-						progressBar.parentNode.removeChild(progressBar);
+						Helper.requestAnimFrame.call(window, function ( ) {
+							iconState.parentNode.removeChild(iconState);
+							currentProgress.parentNode.removeChild(currentProgress);
+							progressBar.parentNode.removeChild(progressBar);
+						});
+
+						state.audio = 'stopped';
+						this.destroy(id);
 						this.next();
 					}.bind(this),
 					whileplaying: function ( ) {
@@ -189,8 +207,10 @@
 						var position = this.position - song.audio.starttime;
 						var percent = position / duration * 100;
 
-						currentProgress.innerHTML = Helper.convertToReadableTime(position + 500) + ' / ';
-						progressBar.style.width = percent + '%';
+						Helper.requestAnimFrame.call(window, function ( ) {
+							currentProgress.innerHTML = Helper.convertToReadableTime(position + 500) + ' / ';
+							progressBar.style.width = percent + '%';
+						});
 					}
 				});
 
@@ -209,11 +229,6 @@
 				var documentTitle = '▶ ' + Helper.makeDocumentTitle([Helper.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
 				Cloudlist.history.update(id, href, documentTitle);
 
-				// Scroll to track if out of bounds
-				if (!Helper.inViewport(elem, 250)) {
-					Cloudlist.scrollToElement(elem);
-				}
-
 				// Unfocus previous item
 				if (Cloudlist.cache.elems.currentItem) {
 					var prevElem = Cloudlist.cache.elems.currentItem;
@@ -223,6 +238,11 @@
 
 				// Load item cover & scroll overflowing text
 				Helper.simulateMouseEvent(elem.firstChild, 'mouseover');
+
+				// Scroll to track if out of bounds
+				if (!Helper.inViewport(elem, 250)) {
+					Cloudlist.scrollToElement(elem);
+				}
 
 				// Cache node/element globally
 				Cloudlist.cache.elems.currentItem = elem;

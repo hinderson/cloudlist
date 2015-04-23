@@ -33,7 +33,7 @@
 
 			update: function (id, href, documentTitle) {
 				if (window.history.state !== null && window.history.state.id === id) {
-					this.updateDocumentTitle(documentTitle);
+					documentTitle && this.updateDocumentTitle(documentTitle);
 					return;
 				}
 
@@ -45,9 +45,9 @@
 			},
 
 			updateDocumentTitle: function (title, removeBaseTitle) {
-				document.title = title + (!removeBaseTitle ? (' – ' + s.documentTitle) : '');
-				if (window.history.state) {
-					window.history.replaceState({id: window.history.state.id, title: title});
+				var updatedTitle = document.title = title + (!removeBaseTitle ? (' – ' + s.documentTitle) : '');
+				if (window.history.state && window.history.state.id) {
+					window.history.state.title = updatedTitle;
 				}
 			},
 
