@@ -65,13 +65,13 @@
 				newStrong.classList.remove('asc');
 				newStrong.classList.add('desc');
 
-				var desc = Helper.createSVGFragment('icon-caret-desc', '0 0 586.666 293.333');
+				var desc = utils.createSVGFragment('icon-caret-desc', '0 0 586.666 293.333');
 				newStrong.appendChild(desc);
 			} else {
 				newStrong.classList.remove('desc');
 				newStrong.classList.add('asc');
 
-				var asc = Helper.createSVGFragment('icon-caret-asc', '0 0 612 306');
+				var asc = utils.createSVGFragment('icon-caret-asc', '0 0 612 306');
 				newStrong.appendChild(asc);
 			}
 
@@ -141,7 +141,7 @@
 					x: 0,
 					y: 0
 				},
-				collectionTop: Helper.getElemDistanceFromDoc(document.getElementsByClassName('collection')[0]).top
+				collectionTop: utils.getElemDistanceFromDoc(document.getElementsByClassName('collection')[0]).top
 			},
 
 			init: function ( ) {
@@ -160,13 +160,13 @@
 			},
 
 			registerEvents: function ( ) {
-				c.elems.collection.addEventListener('click', Helper.delegate(Helper.criteria.hasTagName('a'), itemClickHandler), false);
+				c.elems.collection.addEventListener('click', utils.delegate(utils.criteria.hasTagName('a'), itemClickHandler), false);
 
-				c.elems.collection.addEventListener('mouseover', Helper.delegate(Helper.criteria.hasTagName('a'), itemHoverHandler), false);
+				c.elems.collection.addEventListener('mouseover', utils.delegate(utils.criteria.hasTagName('a'), itemHoverHandler), false);
 
-				c.elems.collection.addEventListener('mouseout', Helper.delegate(Helper.criteria.hasTagName('a'), itemHoverHandler), false);
+				c.elems.collection.addEventListener('mouseout', utils.delegate(utils.criteria.hasTagName('a'), itemHoverHandler), false);
 
-				c.elems.sort.addEventListener('click', Helper.delegate(Helper.criteria.hasTagNames(['span', 'strong']), sortClickHandler), false);
+				c.elems.sort.addEventListener('click', utils.delegate(utils.criteria.hasTagNames(['span', 'strong']), sortClickHandler), false);
 
 				c.elems.fullscreen.addEventListener('click', this.toggleFullscreen, false);
 
@@ -225,7 +225,7 @@
 				this.viewportHeight = window.innerHeight;
 			},
 
-			storeMousePosition: Helper.debounce(function (x, y) {
+			storeMousePosition: utils.debounce(function (x, y) {
 				c.mousePosition = {
 					x: x,
 					y: y
@@ -236,7 +236,6 @@
 				lastScrollY = window.pageYOffset;
 
 				var requestTick = function ( ) {
-					this.updateParallax();
 					this.throttleHoverStates();
 
 					// Add sticky-header class
@@ -252,19 +251,21 @@
 					window.clearTimeout(this.focusInterval);
 					this.focusInterval = window.setTimeout(function ( ) {
 						var elem = c.elems.currentItem;
-						if (elem && !Helper.inViewport(elem, 250) && this.audio.state.audio === 'playing') {
+						if (elem && !utils.inViewport(elem, 250) && this.audio.state.audio === 'playing') {
 							this.scrollToElement(elem);
 						} else {
 							window.clearTimeout(this.focusInterval);
 						}
 					}.bind(this), 6000);
 
+					pubsub.publish('scrolling', lastScrollY);
+
 					// Stop ticking
 					ticking = false;
 				};
 
 				if (!ticking) {
-					Helper.requestAnimFrame.call(window, requestTick.bind(this));
+					utils.requestAnimFrame.call(window, requestTick.bind(this));
 					ticking = true;
 				}
 			},
@@ -277,51 +278,28 @@
 				}, 100);
 			},
 
-			resizeEvent: Helper.debounce(function ( ) {
+			resizeEvent: utils.debounce(function ( ) {
 				this.storeViewportDimensions();
 
 				// Find overflowing elements and determine animation duration based on elem width
 				this.findOverflowingElements();
 
 				// Update position of collection top
-				c.collectionTop = Helper.getElemDistanceFromDoc(c.elems.collection).top;
+				c.collectionTop = utils.getElemDistanceFromDoc(c.elems.collection).top;
+
+				pubsub.publish('resize');
 			}, 250),
-
-			updateParallax: function ( ) {
-				// Bail if we've reached the collection
-				if (lastScrollY > c.collectionTop) {
-					return;
-				}
-
-				var translateY3d = function (elem, value) {
-					var translate = 'translate3d(0px,' + value + 'px, 0px)';
-					elem.style['-webkit-transform'] = translate;
-					elem.style['-moz-transform'] = translate;
-					elem.style['-ms-transform'] = translate;
-					elem.style['-o-transform'] = translate;
-					elem.style.transform = translate;
-				};
-
-				var speedDivider = 10;
-				var translateValue = lastScrollY / speedDivider;
-
-				if (translateValue < 0) {
-					translateValue = 0;
-				}
-
-				translateY3d(c.elems.heroContent, translateValue);
-			},
 
 			findOverflowingElements: function ( ) {
 				var elems = c.elems.scrollableOverflowElems;
-				Helper.forEach(elems, function (index, item) {
-					if (Helper.isOverflowed(item)) {
+				utils.forEach(elems, function (index, item) {
+					if (utils.isOverflowed(item)) {
 						// Calculate animation duration based on character count
 						var animDuration = item.textContent.length * 0.35;
 
-						Helper.forEach(item.children, function (index, span) {
-							Helper.requestAnimFrame.call(window, function ( ) {
-								span.style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
+						utils.requestAnimFrame.call(window, function ( ) {
+							utils.forEach(item.children, function (index, span) {
+								span.style[utils.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
 							});
 						});
 
@@ -349,6 +327,8 @@
 					} else if (document.documentElement.webkitRequestFullscreen) {
 						document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
 					}
+
+					pubsub.publish('fullscreen', true);
 				} else {
 					if (document.exitFullscreen) {
 						document.exitFullscreen();
@@ -359,6 +339,8 @@
 					} else if (document.webkitExitFullscreen) {
 						document.webkitExitFullscreen();
 					}
+
+					pubsub.publish('fullscreen', false);
 				}
 			},
 
@@ -514,7 +496,7 @@
 				}
 
 				var items = target.children;
-				Helper.forEach(items, function (index, item) {
+				utils.forEach(items, function (index, item) {
 					if (item.classList.contains('overflow')) {
 						if (!reset) {
 							item.classList.add('scroll-overflow');
@@ -549,13 +531,11 @@
 				}
 
 				function loop (time) {
-					var runTime;
-
 					startTime || (startTime = time);
-					runTime = time - startTime;
+					var runTime = time - startTime;
 
 					if (duration > runTime) {
-						Helper.requestAnimFrame.call(window, loop);
+						utils.requestAnimFrame.call(window, loop);
 						window.scrollTo(0, easing(runTime, start, delta, duration));
 					} else {
 						if (destination !== delta + start) {
@@ -567,14 +547,13 @@
 					}
 				}
 
-				Helper.requestAnimFrame.call(window, loop);
+				utils.requestAnimFrame.call(window, loop);
 			},
 
 			scrollToElement: function (element) {
 				var rect = element.getBoundingClientRect();
 				var offsetTop = rect.top + lastScrollY;
-				var elementHeight = rect.height;
-				var offset = (this.viewportHeight / 2) - (elementHeight / 2);
+				var offset = (this.viewportHeight / 2) - (rect.height / 2);
 
 				this.scrollToPosition(offsetTop - offset, 500);
 			},
@@ -589,7 +568,7 @@
 
 				if (c.coversLoaded.indexOf(id) === -1) {
 					var item = c.collection.items[id].covers[0];
-					var format = (item.format === 'MP4' && Helper.canPlayMP4()) ? 'video' : 'img';
+					var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
 					var cdn = s.cdn + '/media/' + format + '/';
 					var cover = document.createElement(format);
 					var filename;
@@ -628,7 +607,7 @@
 				var leftMax = (this.viewportWidth - item.width) - margin;
 				var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
 
-				Helper.requestAnimFrame.call(window, function ( ) {
+				utils.requestAnimFrame.call(window, function ( ) {
 					cover.style.cssText = 'top: ' + topPos +'px; left: ' + leftPos +'px';
 				});
 			}

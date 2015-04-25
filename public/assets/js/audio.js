@@ -102,7 +102,7 @@
 				var time = elem.getElementsByClassName('time')[0];
 				var firstChild = time.firstChild;
 				var currentProgress = document.createElement('span');
-				Helper.requestAnimFrame.call(window, function ( ) {
+				utils.requestAnimFrame.call(window, function ( ) {
 					currentProgress.innerHTML = '0:00 / ';
 					time.insertBefore(currentProgress, firstChild);
 				});
@@ -110,14 +110,14 @@
 				// Insert progress element
 				var progressBar = document.createElement('div');
 				progressBar.className = 'progress';
-				Helper.requestAnimFrame.call(window, function ( ) {
+				utils.requestAnimFrame.call(window, function ( ) {
 					elemLink.appendChild(progressBar);
 				});
 
 				// Insert play icon
-				var iconState = Helper.createSVGFragment('icon-audio-playing', '0 0 73.784 58.753');
+				var iconState = utils.createSVGFragment('icon-audio-playing', '0 0 73.784 58.753');
 				iconState.setAttribute('class', 'state-playing');
-				Helper.requestAnimFrame.call(window, function ( ) {
+				utils.requestAnimFrame.call(window, function ( ) {
 					elemLink.insertBefore(iconState, elemLink.firstChild);
 				});
 
@@ -155,8 +155,8 @@
 						elem.classList.remove('playing');
 						elem.classList.add('paused');
 
-						var pauseIcon = Helper.updateSVGFragment(iconState, 'icon-audio-paused');
-						Helper.requestAnimFrame.call(window, function ( ) {
+						var pauseIcon = utils.updateSVGFragment(iconState, 'icon-audio-paused');
+						utils.requestAnimFrame.call(window, function ( ) {
 							pauseIcon.setAttribute('class', 'state-paused');
 						});
 					},
@@ -164,8 +164,8 @@
 						elem.classList.remove('paused');
 						elem.classList.add('playing');
 
-						var pauseIcon = Helper.updateSVGFragment(iconState, 'icon-audio-playing');
-						Helper.requestAnimFrame.call(window, function ( ) {
+						var pauseIcon = utils.updateSVGFragment(iconState, 'icon-audio-playing');
+						utils.requestAnimFrame.call(window, function ( ) {
 							pauseIcon.setAttribute('class', 'state-playing');
 						});
 					},
@@ -203,8 +203,8 @@
 						var position = this.position - song.audio.starttime;
 						var percent = position / duration * 100;
 
-						Helper.requestAnimFrame.call(window, function ( ) {
-							currentProgress.innerHTML = Helper.convertToReadableTime(position + 500) + ' / ';
+						utils.requestAnimFrame.call(window, function ( ) {
+							currentProgress.innerHTML = utils.convertToReadableTime(position + 500) + ' / ';
 							progressBar.style.width = percent + '%';
 						});
 					}
@@ -222,23 +222,23 @@
 
 				// Update browser history (incl. document title)
 				var href = elemLink.href;
-				var documentTitle = '▶ ' + Helper.makeDocumentTitle([Helper.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
+				var documentTitle = '▶ ' + utils.makeDocumentTitle([utils.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
 				Cloudlist.history.update(id, href, documentTitle);
+
+				// Scroll to track if out of bounds
+				if (!utils.inViewport(elem, 250)) {
+					Cloudlist.scrollToElement(elem);
+				}
 
 				// Unfocus previous item
 				if (Cloudlist.cache.elems.currentItem) {
 					var prevElem = Cloudlist.cache.elems.currentItem;
 					Cloudlist.cache.elems.currentItem = null;
-					Helper.simulateMouseEvent(prevElem.firstChild, 'mouseout');
+					utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
 				}
 
 				// Load item cover & scroll overflowing text
-				Helper.simulateMouseEvent(elem.firstChild, 'mouseover');
-
-				// Scroll to track if out of bounds
-				if (!Helper.inViewport(elem, 250)) {
-					Cloudlist.scrollToElement(elem);
-				}
+				utils.simulateMouseEvent(elem.firstChild, 'mouseover');
 
 				// Cache node/element globally
 				Cloudlist.cache.elems.currentItem = elem;

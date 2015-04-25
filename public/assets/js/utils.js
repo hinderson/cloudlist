@@ -5,9 +5,9 @@
 	'use strict';
 
 	// Namespace
-	var Helper = Helper || { };
+	var utils = utils || { };
 
-	Helper = (function () {
+	utils = (function () {
 
 		return {
 			forEach: function (array, callback, scope) {
@@ -30,7 +30,7 @@
 
 			partialDelegate: function (criteria) {
 				return function (handler) {
-					return Helper.delegate(criteria, handler);
+					return utils.delegate(criteria, handler);
 				};
 			},
 
@@ -40,20 +40,20 @@
 				},
 				hasClass: function (cls) {
 					return function (e) {
-						return Helper.criteria.isAnElement(e) && e.classList.contains(cls);
+						return utils.criteria.isAnElement(e) && e.classList.contains(cls);
 					};
 				},
 				hasTagName: function (tag) {
 					return function (e) {
-						return Helper.criteria.isAnElement(e) && e.nodeName === tag.toUpperCase();
+						return utils.criteria.isAnElement(e) && e.nodeName === tag.toUpperCase();
 					};
 				},
 				hasTagNames: function (tags) {
 					if (tags.length > 0) {
 						return function (e) {
 							for (var i = 0, len = tags.length; i < len; i++) {
-								if (Helper.criteria.isAnElement(e) && e.nodeName === tags[i].toUpperCase()) {
-									return Helper.criteria.isAnElement(e) && e.nodeName === tags[i].toUpperCase();
+								if (utils.criteria.isAnElement(e) && e.nodeName === tags[i].toUpperCase()) {
+									return utils.criteria.isAnElement(e) && e.nodeName === tags[i].toUpperCase();
 								}
 							}
 						};
@@ -78,7 +78,7 @@
 			},
 
 			addClass: function (element, name) {
-				if (!Helper.hasClass(element, name)) {
+				if (!utils.hasClass(element, name)) {
 					var className = element.className;
 					className += ' ' + name;
 					element.className = className.trim();
@@ -100,10 +100,10 @@
 			},
 
 			toggleClass: function (element, name) {
-				if (Helper.hasClass(element, name)) {
-					Helper.removeClass(element, name);
+				if (utils.hasClass(element, name)) {
+					utils.removeClass(element, name);
 				} else {
-					Helper.addClass(element, name);
+					utils.addClass(element, name);
 				}
 			},
 
@@ -312,6 +312,6 @@
 	}());
 
 	// Expose access to the constructor
-	window.Helper = Helper;
+	window.utils = utils;
 
 }());
