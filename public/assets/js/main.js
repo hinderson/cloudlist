@@ -9,7 +9,7 @@
 
 	Cloudlist = (function () {
 		var s, c; // Private aliases: settings, cache
-		var ticking, focusInterval, scrollInterval, lastScrollY = 0; // Private variables
+		var ticking = false, lastScrollY = 0; // Private variables
 
 		// Private functions
 		var itemClickHandler = function (e) {
@@ -22,11 +22,14 @@
 		var itemHoverHandler = function (e) {
 			var target = e.delegateTarget;
 
-			if (e.type === 'mouseover') {
-				Cloudlist.loadItemCover(target);
-				Cloudlist.scrollOverflowingText(target);
-			} else {
-				Cloudlist.scrollOverflowingText(target, true);
+			switch (e.type) {
+				case 'mouseover':
+					Cloudlist.loadItemCover(target);
+					Cloudlist.scrollOverflowingText(target);
+					break;
+				case 'mouseout':
+					Cloudlist.scrollOverflowingText(target, true);
+					break;
 			}
 		};
 
@@ -117,9 +120,12 @@
 				},
 				elems: {
 					HTML: document.getElementsByTagName('html')[0],
+					heroContent: document.getElementsByClassName('hero-inner')[0],
+					collectionHeader: document.getElementsByClassName('collection-header')[0],
 					collectionTitle: document.getElementsByClassName('collection-title')[0],
 					collectionSubTitle: document.getElementsByClassName('collection-sub-title')[0],
 					collection: document.getElementsByClassName('collection')[0],
+					scrollableOverflowElems: document.querySelectorAll('.artist, .title'),
 					sort: document.getElementsByClassName('sort')[0],
 					closeDialog: document.getElementsByClassName('close-dialog')[0],
 					dialogOverlay: document.getElementsByClassName('dialog-overlay')[0],
@@ -144,6 +150,8 @@
 				getCollection();
 				this.registerEvents();
 				this.registerKeyboardEvents();
+				this.findOverflowingElements();
+				this.storeViewportDimensions();
 
 				// TODO: Clean up this intro animation
 				setTimeout(function ( ) {
@@ -212,6 +220,11 @@
 				}
 			},
 
+			storeViewportDimensions: function ( ) {
+				this.viewportWidth = window.innerWidth;
+				this.viewportHeight = window.innerHeight;
+			},
+
 			storeMousePosition: Helper.debounce(function (x, y) {
 				c.mousePosition = {
 					x: x,
@@ -220,58 +233,103 @@
 			}, 150),
 
 			scrollEvent: function ( ) {
-				if (!ticking) {
-					ticking = true;
+				lastScrollY = window.pageYOffset;
 
-					Helper.requestAnimFrame.call(window, function ( ) {
-						this.updateDOM();
-					}.bind(this));
+				var requestTick = function ( ) {
+					this.updateParallax();
+					this.throttleHoverStates();
+
+					// Add sticky-header class
+					if (this.viewportWidth > 600) {
+						if (lastScrollY > c.collectionTop) {
+							c.elems.HTML.classList.add('sticky-header');
+						} else {
+							c.elems.HTML.classList.remove('sticky-header');
+						}
+					}
+
+					// Re-focus on currently playing track
+					window.clearTimeout(this.focusInterval);
+					this.focusInterval = window.setTimeout(function ( ) {
+						var elem = c.elems.currentItem;
+						if (elem && !Helper.inViewport(elem, 250) && this.audio.state.audio === 'playing') {
+							this.scrollToElement(elem);
+						} else {
+							window.clearTimeout(this.focusInterval);
+						}
+					}.bind(this), 6000);
+
+					// Stop ticking
+					ticking = false;
+				};
+
+				if (!ticking) {
+					Helper.requestAnimFrame.call(window, requestTick.bind(this));
+					ticking = true;
 				}
 			},
 
+			throttleHoverStates: function ( ) {
+				c.elems.HTML.classList.add('scrolling');
+				window.clearTimeout(this.throttle);
+				this.throttle = window.setTimeout(function ( ) {
+					c.elems.HTML.classList.remove('scrolling');
+				}, 100);
+			},
+
 			resizeEvent: Helper.debounce(function ( ) {
-				console.log('Resizing window');
-				this.updateDOM();
+				this.storeViewportDimensions();
+
+				// Find overflowing elements and determine animation duration based on elem width
+				this.findOverflowingElements();
 
 				// Update position of collection top
 				c.collectionTop = Helper.getElemDistanceFromDoc(c.elems.collection).top;
-			}, 150),
+			}, 250),
 
-			updateDOM: function ( ) {
-				lastScrollY = window.pageYOffset;
-				ticking = false;
-
-				// Disable and enable hover events
-				c.elems.HTML.classList.add('scrolling');
-				window.clearInterval(scrollInterval);
-				scrollInterval = setTimeout(function ( ) {
-					c.elems.HTML.classList.remove('scrolling');
-
-					// TODO: Focus on the closest element when scrolling has stopped (ONLY AN ISSUE IN CHROME)
-					// var closestElement = document.elementFromPoint(c.mousePosition.x, c.mousePosition.y);
-					// Helper.simulateMouseEvent(closestElement, 'mouseover');
-					// closestElement.classList.add('hovered');
-				}, 100); // Debounces every 100 ms
-
-				// Re-focus on currently playing track
-				window.clearInterval(focusInterval);
-				focusInterval = window.setInterval(function ( ) {
-					var elem = c.elems.currentItem;
-					if (elem && !Helper.inViewport(elem, 250) && Cloudlist.audio.state.audio === 'playing') {
-						this.scrollToElement(elem);
-					} else {
-						window.clearInterval(focusInterval);
-					}
-				}.bind(this), 6000);
-
-				// Add sticky-header class
-				if (window.innerWidth > 600) {
-					if (lastScrollY > c.collectionTop) {
-						c.elems.HTML.classList.add('sticky-header');
-					} else {
-						c.elems.HTML.classList.remove('sticky-header');
-					}
+			updateParallax: function ( ) {
+				// Bail if we've reached the collection
+				if (lastScrollY > c.collectionTop) {
+					return;
 				}
+
+				var translateY3d = function (elem, value) {
+					var translate = 'translate3d(0px,' + value + 'px, 0px)';
+					elem.style['-webkit-transform'] = translate;
+					elem.style['-moz-transform'] = translate;
+					elem.style['-ms-transform'] = translate;
+					elem.style['-o-transform'] = translate;
+					elem.style.transform = translate;
+				};
+
+				var speedDivider = 10;
+				var translateValue = lastScrollY / speedDivider;
+
+				if (translateValue < 0) {
+					translateValue = 0;
+				}
+
+				translateY3d(c.elems.heroContent, translateValue);
+			},
+
+			findOverflowingElements: function ( ) {
+				var elems = c.elems.scrollableOverflowElems;
+				Helper.forEach(elems, function (index, item) {
+					if (Helper.isOverflowed(item)) {
+						// Calculate animation duration based on character count
+						var animDuration = item.textContent.length * 0.35;
+
+						Helper.forEach(item.children, function (index, span) {
+							Helper.requestAnimFrame.call(window, function ( ) {
+								span.style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
+							});
+						});
+
+						item.classList.add('overflow');
+					} else {
+						item.classList.remove('overflow');
+					}
+				});
 			},
 
 			toggleFullscreen: function ( ) {
@@ -449,6 +507,32 @@
 				}
 			},
 
+			scrollOverflowingText: function (target, reset) {
+				// Bounce – i.e. don't reset or retrigger any values – if current item is already playing/is paused
+				if (target.parentNode === c.elems.currentItem) {
+					return;
+				}
+
+				var items = target.children;
+				Helper.forEach(items, function (index, item) {
+					if (item.classList.contains('overflow')) {
+						if (!reset) {
+							item.classList.add('scroll-overflow');
+
+							// Clone and append span
+							this.clone = item.firstElementChild.cloneNode(true);
+							item.appendChild(this.clone);
+						} else {
+							item.classList.remove('scroll-overflow');
+
+							// Remove cloned span
+							this.clone && this.clone.remove();
+						}
+					}
+
+				}.bind(this));
+			},
+
 			scrollToPosition: function (destination, duration, callback) {
 				var start = lastScrollY;
 				var startTime = 0;
@@ -471,11 +555,11 @@
 					runTime = time - startTime;
 
 					if (duration > runTime) {
-						window.scrollTo(0, Math.floor(easing(runTime, start, delta, duration)));
 						Helper.requestAnimFrame.call(window, loop);
+						window.scrollTo(0, easing(runTime, start, delta, duration));
 					} else {
 						if (destination !== delta + start) {
-							window.scrollTo(0, Math.floor(delta + start));
+							window.scrollTo(0, delta + start);
 						}
 						if (typeof callback === 'function') {
 							callback(+new Date());
@@ -490,54 +574,16 @@
 				var rect = element.getBoundingClientRect();
 				var offsetTop = rect.top + lastScrollY;
 				var elementHeight = rect.height;
-				var offset = (window.innerHeight / 2) - (elementHeight / 2);
+				var offset = (this.viewportHeight / 2) - (elementHeight / 2);
 
 				this.scrollToPosition(offsetTop - offset, 500);
-			},
-
-			scrollOverflowingText: function (target, reset) {
-				var parentNode = target.parentNode;
-				var id = parentNode.getAttribute('data-id');
-				var cols = target.children;
-
-				// Skip if current item is already playing/is paused
-				if (parentNode === c.elems.currentItem) {
-					return;
-				}
-
-				// Scroll overflowing text
-				for (var i = 0, len = cols.length; i < len; i++) {
-					var text = cols[i];
-					var content = text.textContent;
-
-					if (text.classList.contains('title') || text.classList.contains('artist')) {
-						if (Helper.isOverflowed(text)) {
-							if (reset) {
-								var span = text.getElementsByTagName('span');
-								text.innerHTML = span && span[0] && span[0].textContent;
-
-								text.classList.remove('overflow');
-							} else if (!text.classList.contains('overflow')) {
-								text.innerHTML = '<span>' + content + '</span><span>' + content + '</span>';
-
-								var spans = text.getElementsByTagName('span');
-								var animDuration = content.length * 0.325; // Calculate animation duration based on character count
-
-								spans[0].style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
-								spans[1].style[Helper.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
-
-								text.classList.add('overflow');
-							}
-						}
-					}
-				}
 			},
 
 			loadItemCover: function (target) {
 				var parentNode = target.parentNode;
 				var id = parentNode.getAttribute('data-id');
 
-				if (window.innerWidth < 685) {
+				if (this.viewportWidth < 685) {
 					return;
 				}
 
@@ -563,10 +609,10 @@
 					cover.setAttribute('width', item.width);
 					cover.setAttribute('height', item.height);
 
-					this.randomCoverPosition(id, cover);
-
 					parentNode.appendChild(cover);
 					c.coversLoaded.push(id);
+
+					this.randomCoverPosition(id, cover);
 				} else if (!(parentNode.classList.contains('playing') || parentNode.classList.contains('paused'))) { // Reposition again if cover has already been loaded
 					this.randomCoverPosition(id);
 				}
@@ -577,11 +623,14 @@
 				var cover = cover || document.querySelector('[data-id="' + id + '"] .cover');
 
 				var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
-				var margin = (4 / 100) * window.innerWidth; // The number 3 here is the percentage
+				var margin = (4 / 100) * this.viewportWidth; // The number 3 here is the percentage
 				var leftMin = margin;
-				var leftMax = (window.innerWidth - item.width) - margin;
+				var leftMax = (this.viewportWidth - item.width) - margin;
 				var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
-				cover.style.cssText = 'top: ' + topPos +'px; left: ' + leftPos +'px';
+
+				Helper.requestAnimFrame.call(window, function ( ) {
+					cover.style.cssText = 'top: ' + topPos +'px; left: ' + leftPos +'px';
+				});
 			}
 
 		};

@@ -38,11 +38,8 @@ html(lang="en-US", class="no-js")
 		link(rel="stylesheet", href="https://static.cloudlist.io/assets/css/cloudlist-4c7da7a5.css")
 		//- endinject
 		- } else {
-		link(href="/assets/css/normalize.css", rel="stylesheet")
-		link(href="/assets/css/fonts.css", rel="stylesheet")
-		link(href="/assets/css/typography.css", rel="stylesheet")
-		link(href="/assets/css/animate.css", rel="stylesheet")
-		link(href="/assets/css/main.css", rel="stylesheet")
+		link(href="/assets/css/base.css", rel="stylesheet")
+		link(href="/assets/css/templates/#{collection.template}.css", rel="stylesheet")
 		- }
 	body
 		//- inject:svg
@@ -125,7 +122,12 @@ html(lang="en-US", class="no-js")
 		script(src="/assets/js/history.js")
 		script(src="/assets/js/animate.js")
 		script(src="/assets/js/audio.js")
+		script(src="/assets/js/templates/default.js")
 		script(src="/assets/js/init.js")
+		- if (collection.template === 'default') {
+		script.
+			Cloudlist.templateDefault.init();
+		- }
 		script.
 			// TEMP: Reset CDN so that we don't serve from S3 in development mode
 			Cloudlist.settings.cdn = '';

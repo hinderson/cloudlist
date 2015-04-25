@@ -3,26 +3,27 @@ extends ../layout
 block content
 	main(role="main")
 		section.hero.group
-			h1.collection-title
-				div(data-string="Best")
-					span B
-					span e
-					span s
-					span t
-				div(data-string="songs")
-					span s
-					span o
-					span n
-					span g
-					span s
-				div(data-string="of")
-					span o
-					span f
-				div(data-string="2014")
-					span 2
-					span 0
-					span 1
-					span 4
+			div.hero-inner
+				h1.collection-title
+					div(data-string="Best")
+						span B
+						span e
+						span s
+						span t
+					div(data-string="songs")
+						span s
+						span o
+						span n
+						span g
+						span s
+					div(data-string="of")
+						span o
+						span f
+					div(data-string="2014")
+						span 2
+						span 0
+						span 1
+						span 4
 		section.collection.group
 			header.collection-header.group
 				h3.collection-sub-title #{collection.title}
@@ -42,11 +43,13 @@ block content
 				each song, index in songs
 					- song = structureSong(song);
 
-					li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.artist}", data-title="#{song.title}")
+					li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
 						a(href="/#{path}/#{song.permalink}/")
 							div.col.index #{index+1}
-							div.col.title #{song.title}
-							div.col.artist #{song.artist}
+							div.col.title
+								span #{song.title}
+							div.col.artist
+								span #{song.combinedartist}
 							div.col.time #{song.duration}
 
 		footer.go-to-top

@@ -1,5 +1,7 @@
 var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
+var sourcemaps = require('gulp-sourcemaps');
+var prefix = require('gulp-autoprefixer');
 var imagemin = require('gulp-imagemin');
 var pngcrush = require('imagemin-pngcrush');
 var minifyCSS = require('gulp-minify-css');
@@ -21,10 +23,11 @@ var svgmin = require('gulp-svgmin');
 
 // Sass
 gulp.task('sass', function() {
-	return sass('./public/assets/_sass/')
+	return sass('./public/assets/_sass/', {sourcemap: true, style: 'compact'})
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
+		.pipe(prefix('last 2 versions', '> 1%'))
 		.pipe(gulp.dest('./public/assets/css/'));
 });
 

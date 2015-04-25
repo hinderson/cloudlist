@@ -72,11 +72,13 @@ module.exports = {
 	structureSong: function (song) {
 		var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
 		var featuredartist = Array.isArray(song.featuredartist) && song.featuredartist.length > 1 ? song.featuredartist.slice(0, -1).join(', ') + ' & ' + song.featuredartist[song.featuredartist.length -1] : song.featuredartist;
-		var combinedArtist = artist + (featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '');
+		var combinedartist = artist + (featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '');
 		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
 
 		song.id = song._id; // var id = hashids.encodeHex(song._id);
-		song.artist = combinedArtist;
+		song.artist = artist;
+		song.featuredartist = featuredartist;
+		song.combinedartist = combinedartist;
 		song.duration = duration;
 
 		return song;

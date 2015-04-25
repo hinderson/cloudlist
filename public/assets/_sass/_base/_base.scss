@@ -1,0 +1,50 @@
+/* GENERAL */
+* {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	width: 100%;
+	min-height: 100%;
+	background: #191818;
+	color: #fff;
+}
+
+html.scrolling {
+	pointer-events: none;
+}
+
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+svg {
+	max-height: 100%;
+}
+
+a,
+a:visited {
+	color: #fff;
+	text-decoration: none;
+	outline: 0;
+}
+
+.structural {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(1px,1px,1px,1px);
+}
+
+.group::after {
+	display: table;
+	clear: both;
+	content: "";
+}
