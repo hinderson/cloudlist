@@ -339,15 +339,11 @@
 /* States */
 .collection .playing a {
 	color: #000;
-	-webkit-font-smoothing: subpixel-antialiased;
-	-moz-osx-font-smoothing: auto;
 	-webkit-transition: background 0.65s;
 	transition: background 0.65s;
 }
 .collection .paused a {
 	color: #000;
-	-webkit-font-smoothing: subpixel-antialiased;
-	-moz-osx-font-smoothing: auto;
 	-webkit-transition: background 0.2s;
 	transition: background 0.2s;
 }
@@ -457,17 +453,24 @@
 /* Overflowing spans */
 .collection .scroll-overflow {
 	font-size: 0; /* Reset weird line-height bug for inline-block elements */
-}
-.collection .scroll-overflow span {
-	display: inline-block;
-	overflow: hidden;
-	white-space: nowrap;
-	padding-right: 50px;
-	font-size: 1.2rem;
-	-moz-animation: scroll-overflow 5s linear infinite;
-	-webkit-animation: scroll-overflow 5s linear infinite;
-	-ms-animation: scroll-overflow 5s linear infinite;
-	animation: scroll-overflow 5s linear infinite;
+
+	& span {
+		display: inline-block;
+		padding-right: 50px;
+		font-size: 1.2rem;
+		animation-name: scroll-overflow;
+		animation-duration: 15s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
+
+	// Control scoll speed based on character count
+	&[data-char-count^="2"] span { animation-duration: 13.5s; }
+	&[data-char-count^="3"] span { animation-duration: 14s; }
+	&[data-char-count^="4"] span { animation-duration: 15.5s; }
+	&[data-char-count^="5"] span { animation-duration: 16s; }
+	&[data-char-count^="6"] span { animation-duration: 16.5s; }
+	&[data-char-count^="6"] span { animation-duration: 17s; }
 }
 
 /* Progress indicator */

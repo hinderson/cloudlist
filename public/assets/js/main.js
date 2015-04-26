@@ -9,7 +9,7 @@
 
 	Cloudlist = (function () {
 		var s, c; // Private aliases: settings, cache
-		var ticking = false, lastScrollY = 0; // Private variables
+		var ticking = false, clonedSpan = null, lastScrollY = 0; // Private variables
 
 		// Private functions
 		var itemClickHandler = function (e) {
@@ -294,17 +294,10 @@
 				var elems = c.elems.scrollableOverflowElems;
 				utils.forEach(elems, function (index, item) {
 					if (utils.isOverflowed(item)) {
-						// Calculate animation duration based on character count
-						var animDuration = item.textContent.length * 0.35;
-
-						utils.requestAnimFrame.call(window, function ( ) {
-							utils.forEach(item.children, function (index, span) {
-								span.style[utils.vendorPrefix().js + 'AnimationDuration'] =   animDuration + 's';
-							});
-						});
-
+						item.setAttribute('data-char-count', item.firstChild.textContent.length);
 						item.classList.add('overflow');
 					} else {
+						item.removeAttribute('data-char-count');
 						item.classList.remove('overflow');
 					}
 				});
@@ -498,17 +491,17 @@
 				var items = target.children;
 				utils.forEach(items, function (index, item) {
 					if (item.classList.contains('overflow')) {
-						if (!reset) {
-							item.classList.add('scroll-overflow');
-
-							// Clone and append span
-							this.clone = item.firstElementChild.cloneNode(true);
-							item.appendChild(this.clone);
-						} else {
+						if (reset) {
 							item.classList.remove('scroll-overflow');
 
 							// Remove cloned span
-							this.clone && this.clone.remove();
+							clonedSpan && clonedSpan.remove();
+						} else if (!item.classList.contains('scroll-overflow')) {
+							item.classList.add('scroll-overflow');
+
+							// Clone and append span
+							clonedSpan = item.firstElementChild.cloneNode(true);
+							item.appendChild(clonedSpan);
 						}
 					}
 

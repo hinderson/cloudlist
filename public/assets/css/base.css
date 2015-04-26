@@ -273,9 +273,9 @@ a, a:visited { color: #fff; text-decoration: none; outline: 0; }
 .collection .unavailable a { color: #474646; pointer-events: none; }
 
 /* States */
-.collection .playing a { color: #000; -webkit-font-smoothing: subpixel-antialiased; -moz-osx-font-smoothing: auto; -webkit-transition: background 0.65s; transition: background 0.65s; }
+.collection .playing a { color: #000; -webkit-transition: background 0.65s; transition: background 0.65s; }
 
-.collection .paused a { color: #000; -webkit-font-smoothing: subpixel-antialiased; -moz-osx-font-smoothing: auto; -webkit-transition: background 0.2s; transition: background 0.2s; }
+.collection .paused a { color: #000; -webkit-transition: background 0.2s; transition: background 0.2s; }
 
 .collection svg.state-playing, .collection svg.state-paused { position: absolute; display: inline-block; height: 100%; width: 16px; z-index: 2; fill: #000; }
 
@@ -324,8 +324,13 @@ a, a:visited { color: #fff; text-decoration: none; outline: 0; }
 @media (max-width: 685px) { .collection .cover { display: none !important; } }
 /* Overflowing spans */
 .collection .scroll-overflow { font-size: 0; /* Reset weird line-height bug for inline-block elements */ }
-
-.collection .scroll-overflow span { display: inline-block; overflow: hidden; white-space: nowrap; padding-right: 50px; font-size: 1.2rem; -webkit-animation: scroll-overflow 5s linear infinite; animation: scroll-overflow 5s linear infinite; }
+.collection .scroll-overflow span { display: inline-block; padding-right: 50px; font-size: 1.2rem; -webkit-animation-name: scroll-overflow; animation-name: scroll-overflow; -webkit-animation-duration: 15s; animation-duration: 15s; -webkit-animation-iteration-count: infinite; animation-iteration-count: infinite; -webkit-animation-timing-function: linear; animation-timing-function: linear; }
+.collection .scroll-overflow[data-char-count^="2"] span { -webkit-animation-duration: 13.5s; animation-duration: 13.5s; }
+.collection .scroll-overflow[data-char-count^="3"] span { -webkit-animation-duration: 14s; animation-duration: 14s; }
+.collection .scroll-overflow[data-char-count^="4"] span { -webkit-animation-duration: 15.5s; animation-duration: 15.5s; }
+.collection .scroll-overflow[data-char-count^="5"] span { -webkit-animation-duration: 16s; animation-duration: 16s; }
+.collection .scroll-overflow[data-char-count^="6"] span { -webkit-animation-duration: 16.5s; animation-duration: 16.5s; }
+.collection .scroll-overflow[data-char-count^="6"] span { -webkit-animation-duration: 17s; animation-duration: 17s; }
 
 /* Progress indicator */
 .progress { display: none; position: absolute; top: 0; left: 0; z-index: 1; width: 0; height: 100%; background: rgba(0, 0, 0, 0.25); -webkit-backface-visibility: hidden; backface-visibility: hidden; }

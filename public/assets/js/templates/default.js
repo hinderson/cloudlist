@@ -42,9 +42,6 @@
 				var translateY3d = function (elem, value) {
 					var translate = 'translate3d(0px,' + value + 'px, 0px)';
 					elem.style['-webkit-transform'] = translate;
-					elem.style['-moz-transform'] = translate;
-					elem.style['-ms-transform'] = translate;
-					elem.style['-o-transform'] = translate;
 					elem.style.transform = translate;
 				};
 
