@@ -4,26 +4,24 @@ var sourcemaps = require('gulp-sourcemaps');
 var prefix = require('gulp-autoprefixer');
 var imagemin = require('gulp-imagemin');
 var pngcrush = require('imagemin-pngcrush');
-var minifyCSS = require('gulp-minify-css');
 var cache = require('gulp-cache');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
 var jshint = require('gulp-jshint');
 var notify = require('gulp-notify');
 var rename = require('gulp-rename');
 var newer = require('gulp-newer');
 var merge = require('merge-stream');
 var rev = require('gulp-rev');
+
 var awspublish = require('gulp-awspublish');
 var cloudfront = require("gulp-cloudfront");
-var inject = require("gulp-inject");
 var replace = require("gulp-replace");
+
 var svgstore = require('gulp-svgstore');
 var svgmin = require('gulp-svgmin');
 
 // Sass
 gulp.task('sass', function() {
-	return sass('./public/assets/_sass/', {sourcemap: true, style: 'compact'})
+	return sass('./source/sass/', {sourcemap: true, style: 'compact'})
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
@@ -32,7 +30,7 @@ gulp.task('sass', function() {
 });
 
 // Watcher for Sass
-var watcher = gulp.watch('./public/assets/_sass/**/*.scss', ['sass']);
+var watcher = gulp.watch('./source/sass/**/*.scss', ['sass']);
 watcher.on('change', function (event) {
 	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 });
@@ -64,48 +62,6 @@ gulp.task('jshint', function ( ) {
 	return gulp.src(['public/assets/js/admin/*.js', 'public/assets/js/*.js'])
 		.pipe(jshint())
 		.pipe(jshint.reporter( 'default' ))
-});
-
-// Concat and minify styles
-gulp.task('styles', function ( ) {
-	return gulp.src([
-			'public/assets/css/normalize.css',
-			'public/assets/css/fonts.css',
-			'public/assets/css/typography.css',
-			'public/assets/css/animate.css',
-			'public/assets/css/main.css'
-		])
-		.pipe(minifyCSS({ keepSpecialComments: 0 }))
-		.pipe(concat( 'cloudlist.css' ))
-		.pipe(rev())
-		.pipe(gulp.dest( './cdn/assets/css/' ))
-		.pipe(rev.manifest())
-		.pipe(gulp.dest( './cdn/assets/css/' ))
-		.pipe(notify({ message: 'Styles task complete' }));
-});
-
-// Concat and minify scripts
-gulp.task('scripts', function ( ) {
-	return gulp.src([
-			'public/assets/js/libs/*.js',
-			'public/assets/js/utils.js',
-			'public/assets/js/main.js',
-			'public/assets/js/history.js',
-			'public/assets/js/animate.js',
-			'public/assets/js/audio.js',
-			'public/assets/js/init.js'
-		])
-		.pipe(concat( 'global.js' ))
-		.pipe(rev())
-		.pipe(uglify({
-			compress:{
-				pure_funcs: [ 'console.log' ] // Removes console.log
-			}
-		}))
-		.pipe(gulp.dest( './cdn/assets/js/' ))
-		.pipe(rev.manifest())
-		.pipe(gulp.dest( './cdn/assets/js/' ))
-		.pipe(notify({ message: 'Scripts has been concated and minified' }));
 });
 
 // Compress and move images
@@ -172,21 +128,8 @@ gulp.task('publish-media', function ( ) {
 		.pipe(cloudfront(aws));
 });
 
-gulp.task('inject', function ( ) {
-	var cdn = 'https://static.cloudlist.io';
-	var css = require('./cdn/assets/css/rev-manifest.json');
-	css = css[Object.keys(css)[0]];
-	var js = require('./cdn/assets/js/rev-manifest.json');
-	js = js[Object.keys(js)[0]];
-
-	return gulp.src('./views/layout.jade')
-		.pipe(inject(gulp.src(['./cdn/**/' + css, './cdn/**/' + js], {read: false}),
-			{ignorePath: 'cdn', addPrefix: cdn, addRootSlash: false}))
-		.pipe(gulp.dest('./views'));
-});
-
 gulp.task('default', function ( ) {
-	gulp.start('jshint', 'sass');
+	gulp.start('sass');
 });
 
 // Run deploy task for media folder
@@ -196,5 +139,5 @@ gulp.task('deploy-media', function ( ) {
 
 // Run deploy task for assets and inject versioned file paths in relevant documents
 gulp.task('deploy', function ( ) {
-	gulp.start('styles', 'scripts', 'images-assets', 'publish', 'inject');
+	gulp.start('styles', 'scripts', 'images-assets', 'publish');
 });

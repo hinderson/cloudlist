@@ -62,6 +62,9 @@ app.locals.structureSong = utils.structureSong;
 app.locals.rootTitle = 'Cloudlist.io';
 app.locals.rootHost = 'production' === env ? 'https:://www.cloudlist.io' : 'http://localhost:3000'
 
+// Expose webpack assets to all views
+app.locals.scripts = require('./webpack-assets.json');
+
 app.use(logger('dev'));
 app.use(compression());
 app.use(bodyParser.json());
