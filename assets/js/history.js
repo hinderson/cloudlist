@@ -35,9 +35,9 @@ module.exports = {
 	},
 
 	updateDocumentTitle: function (title, removeBaseTitle) {
-		var updatedTitle = document.title = title + (!removeBaseTitle ? (' – ' + config.settings.documentTitle) : '');
+		document.title = title + (!removeBaseTitle ? (' – ' + config.settings.documentTitle) : '');
 		if (window.history.state && window.history.state.id) {
-			window.history.state.title = updatedTitle;
+			window.history.state.title = title;
 		}
 	},
 

@@ -151,16 +151,12 @@ module.exports = {
 		soundManager.pause(id);
 		state.audio = 'paused';
 		console.log('Pausing', id);
-
-		pubsub.publish('audioPaused', state.currentId);
 	},
 
 	resume: function (id) {
 		soundManager.resume(id);
 		state.audio = 'playing';
 		console.log('Resuming', id);
-
-		pubsub.publish('audioResumed', state.currentId);
 	},
 
 	next: function ( ) {
