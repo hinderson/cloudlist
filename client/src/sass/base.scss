@@ -229,22 +229,6 @@
 	margin: 0;
 }
 
-/* Collection title */
-.collection-title {
-	font-family: "GT Walsheim Regular", "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 5em;
-	margin: 4rem 0 5rem 0;
-}
-@media (max-width: 900px) {
-	.collection-title { font-size: 4em; }
-}
-@media (max-width: 700px) {
-	.collection-title { font-size: 3em; margin-top: 5rem; }
-}
-@media (max-width: 600px) {
-	.collection-title { font-size: 2em; margin-top: 6rem; }
-}
-
 /* Collection header */
 .collection-header {
 	position: absolute;

@@ -7,7 +7,6 @@
 -		var featuredartist = Array.isArray(single.featuredartist) && single.featuredartist.length > 1 ? single.featuredartist.slice(0, -1).join(', ') + ' & ' + single.featuredartist[single.featuredartist.length -1] : single.featuredartist;
 -		var combinedArtist = artist + (featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '');
 -	}
--	console.log(collection.template);
 
 doctype html
 html(lang="en-US", class="no-js")
@@ -16,32 +15,27 @@ html(lang="en-US", class="no-js")
 		title= (single ? combinedArtist + ', "' + single.title + '"' : collection.title) + ' – ' + rootTitle
 		<script>document.documentElement.className = document.documentElement.className.replace(/(^|\\\b)no-js(\b|$)/, 'js');if (!("ontouchstart" in document.documentElement)) {document.documentElement.className += " no-touch";}</script>
 
-		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-		<meta name="keywords" content="music, best of the year, playlist, best tracks of 2014, songs, tracks, electronica, hiphop, hip-hop, pop, rock, indie, 2014, soundcloud, stream, mp3" />
-		<meta name="description" content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud." />
+		meta(name="viewport", content="width=device-width,initial-scale=1.0")
+		meta(name="keywords", content="music, best of the year, playlist, best tracks of 2014, songs, tracks, electronica, hiphop, hip-hop, pop, rock, indie, 2014, soundcloud, stream, mp3")
+		meta(name="description", content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud.")
 
-		<meta property="og:site_name" content="Cloudlist" />
-		<meta property="og:url" content="https://cloudlist.io/#{path}/#{single ? single.permalink : ''}" />
+		meta(property="og:site_name", content="Cloudlist")
+		meta(property="og:url", content="https://cloudlist.io/#{path}/#{single ? single.permalink : ''}")
 
-		- if (single) {
-		<meta property="og:title" content="#{single.title} by #{single.artist}" />
-		//- Determine if it's a screenshot of a moving mp4, or just a regular image
-		- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
-		<meta property="og:image" content="https://static.cloudlist.io/media/img/#{cover}" />
-		<meta property="og:description" content="At position no. #{index} in the list Best Songs of 2014: &quot;#{single.title}&quot; by #{combinedArtist}." />
-		- } else {
-		<meta property="og:image" content="https://static.cloudlist.io/media/img/cloudlist-splash.jpg" />
-		<meta property="og:description" content="#{collection.description}" />
-		- }
+		if single
+			meta(property="og:title", content="#{single.title} by #{single.artist}")
+			//- Determine if it's a screenshot of a moving mp4, or just a regular image
+			- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
+			meta(property="og:image", content="https://static.cloudlist.io/media/img/#{cover}")
+			meta(property="og:description", content="At position no. #{index} in the list Best Songs of 2014: &quot;#{single.title}&quot; by #{combinedArtist}.")
+		else
+			meta(property="og:image", content="https://static.cloudlist.io/media/img/cloudlist-splash.jpg")
+			meta(property="og:description", content="#{collection.description}")
 
-		- if (env === 'production') {
-		//- inject:css
-		link(rel="stylesheet", href="https://static.cloudlist.io/assets/css/cloudlist-4c7da7a5.css")
-		//- endinject
-		- } else {
-		link(href="/assets/css/base.css", rel="stylesheet")
-		link(href="/assets/css/templates/#{collection.template}.css", rel="stylesheet")
-		- }
+		if prod
+			link(href="https://static.cloudlist.io/#{manifest['assets/css/templates/' + collection.template + '.css']}", rel="stylesheet")
+		else
+			link(href="#{rootHost}/assets/css/templates/#{collection.template}.css", rel="stylesheet")
 	body
 		//- inject:svg
 		<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="cloudlist-logo" viewBox="0 0 371.83 54.684"><path d="M135.478 37.263c-.643 2.422-1.693 4.682-3.15 6.78-1.458 2.103-3.237 3.917-5.336 5.448-2.1 1.534-4.484 2.743-7.152 3.633-2.668.89-5.56 1.335-8.67 1.335-4.25 0-8.055-.742-11.415-2.225-3.36-1.482-6.214-3.457-8.56-5.93-2.348-2.47-4.14-5.348-5.374-8.634-1.235-3.286-1.852-6.757-1.852-10.414 0-3.508.604-6.893 1.816-10.154 1.21-3.26 2.952-6.14 5.225-8.634 2.27-2.495 5.026-4.496 8.263-6.003 3.235-1.507 6.88-2.26 10.932-2.26 3.754 0 7.09.506 10.005 1.52 2.915 1.012 5.422 2.383 7.523 4.112 2.1 1.73 3.792 3.77 5.077 6.115 1.284 2.347 2.174 4.88 2.668 7.597h-7.115c-.396-1.878-1.063-3.633-2-5.263-.94-1.63-2.15-3.04-3.633-4.225-1.482-1.186-3.2-2.112-5.15-2.78-1.954-.666-4.14-1-6.56-1-3.213 0-6.067.582-8.56 1.743-2.497 1.162-4.596 2.718-6.3 4.67-1.706 1.95-3.016 4.187-3.93 6.707-.914 2.52-1.37 5.14-1.37 7.856 0 2.866.47 5.57 1.408 8.115.938 2.546 2.31 4.78 4.113 6.708 1.804 1.928 4.015 3.46 6.634 4.596 2.618 1.138 5.607 1.705 8.968 1.705 1.778 0 3.52-.27 5.225-.814 1.705-.543 3.272-1.31 4.706-2.298 1.433-.987 2.68-2.16 3.743-3.52 1.062-1.36 1.864-2.854 2.41-4.484h7.412zm8.67-35.872h6.45v51.882h-6.45V1.392zm31.426 52.697c-2.67 0-5.09-.47-7.264-1.408-2.175-.94-4.028-2.225-5.56-3.855-1.53-1.63-2.717-3.508-3.557-5.633-.84-2.125-1.26-4.373-1.26-6.745s.42-4.632 1.26-6.782c.84-2.15 2.025-4.04 3.558-5.67 1.532-1.63 3.385-2.914 5.56-3.853 2.173-.938 4.595-1.408 7.264-1.408 2.717 0 5.162.47 7.337 1.408 2.175.94 4.04 2.224 5.597 3.854 1.557 1.63 2.754 3.52 3.595 5.67.84 2.15 1.26 4.41 1.26 6.78s-.42 4.62-1.26 6.746c-.84 2.125-2.038 4.002-3.595 5.633-1.557 1.63-3.422 2.916-5.596 3.854-2.174.937-4.62 1.407-7.336 1.407zm0-5.78c1.73 0 3.298-.32 4.706-.964s2.605-1.494 3.595-2.558c.987-1.062 1.753-2.31 2.297-3.743.544-1.432.815-2.965.815-4.595s-.27-3.16-.815-4.595-1.31-2.693-2.297-3.78c-.99-1.086-2.187-1.952-3.595-2.594-1.408-.642-2.978-.963-4.706-.963-1.73 0-3.287.322-4.67.963-1.384.643-2.557 1.508-3.52 2.594-.964 1.087-1.718 2.347-2.26 3.78-.545 1.434-.816 2.965-.816 4.595s.27 3.163.815 4.595c.543 1.434 1.297 2.682 2.26 3.743.964 1.063 2.137 1.915 3.52 2.558 1.384.643 2.94.963 4.67.963zm55.44-28.683v33.648h-6.45V47.27c-.988 2.073-2.508 3.73-4.558 4.964-2.05 1.234-4.483 1.854-7.3 1.854-2.372 0-4.41-.383-6.115-1.148-1.703-.766-3.05-1.84-4.038-3.225-.94-1.284-1.594-2.717-1.964-4.3-.37-1.58-.556-3.556-.556-5.93v-19.86h6.448V37.41c0 1.582.147 3.04.444 4.373.296 1.334.778 2.482 1.445 3.445.666.964 1.53 1.73 2.593 2.298 1.062.57 2.384.853 3.965.853 1.63 0 3.05-.308 4.262-.925 1.21-.618 2.21-1.457 3.002-2.52.79-1.063 1.383-2.286 1.78-3.67.394-1.383.592-2.84.592-4.373V19.624h6.45zM267.4 47.417c-1.086 2.074-2.704 3.705-4.853 4.89s-4.46 1.78-6.93 1.78c-2.57 0-4.917-.47-7.04-1.408-2.126-.94-3.94-2.225-5.448-3.855-1.51-1.63-2.682-3.508-3.522-5.633-.84-2.125-1.26-4.373-1.26-6.745s.42-4.632 1.26-6.782c.84-2.15 2.013-4.04 3.52-5.67 1.508-1.63 3.323-2.914 5.448-3.853 2.124-.938 4.472-1.408 7.04-1.408 2.47 0 4.78.593 6.93 1.78 2.15 1.185 3.77 2.815 4.855 4.89V1.392h6.375v51.882H267.4v-5.855zm-11.412.89c1.73 0 3.298-.32 4.706-.964s2.605-1.494 3.595-2.558c.986-1.062 1.752-2.31 2.296-3.743.544-1.432.815-2.965.815-4.595s-.27-3.16-.814-4.595-1.31-2.693-2.297-3.78c-.99-1.086-2.188-1.952-3.596-2.594-1.408-.642-2.978-.963-4.706-.963-1.73 0-3.287.322-4.67.963-1.384.643-2.557 1.508-3.52 2.594-.964 1.087-1.718 2.347-2.262 3.78s-.814 2.965-.814 4.595.27 3.163.814 4.595c.544 1.434 1.298 2.682 2.26 3.743.965 1.063 2.138 1.915 3.522 2.558 1.383.643 2.94.963 4.67.963zm29.35-46.916h6.447v51.882h-6.448V1.392zm16.082 5.485c0-1.433.493-2.668 1.48-3.706s2.2-1.558 3.633-1.558c1.433 0 2.668.52 3.706 1.557 1.036 1.037 1.556 2.272 1.556 3.705 0 1.434-.52 2.644-1.557 3.632-1.04.99-2.274 1.482-3.707 1.482-1.434 0-2.644-.495-3.632-1.483-.987-.987-1.48-2.198-1.48-3.632zm1.927 12.75h6.448V53.27h-6.448V19.624zm32.24 14.896c1.284.397 2.53.815 3.742 1.26 1.21.446 2.284 1.015 3.224 1.706.938.69 1.69 1.557 2.26 2.594.567 1.037.853 2.348.853 3.928 0 1.68-.333 3.15-1 4.41s-1.594 2.31-2.78 3.15c-1.186.84-2.582 1.47-4.187 1.89-1.605.42-3.348.63-5.225.63-1.88 0-3.657-.248-5.336-.74-1.682-.494-3.15-1.248-4.41-2.262-1.26-1.012-2.274-2.285-3.04-3.816-.767-1.53-1.148-3.31-1.148-5.337h6.3c0 2.57.753 4.386 2.26 5.448 1.507 1.063 3.397 1.594 5.67 1.594 2.076 0 3.718-.382 4.93-1.148 1.21-.766 1.815-1.99 1.815-3.67 0-.937-.248-1.69-.74-2.26-.495-.567-1.2-1.075-2.113-1.52-.915-.444-2.038-.853-3.372-1.223s-2.842-.853-4.52-1.445c-1.286-.395-2.483-.815-3.596-1.26-1.11-.444-2.075-1.013-2.89-1.704-.815-.69-1.46-1.53-1.928-2.52-.47-.988-.704-2.248-.704-3.78 0-1.582.32-2.978.964-4.19.642-1.21 1.53-2.223 2.668-3.038 1.136-.815 2.47-1.432 4.002-1.853 1.53-.42 3.162-.63 4.892-.63 1.828 0 3.532.272 5.114.815 1.58.544 2.952 1.323 4.113 2.334 1.16 1.014 2.075 2.212 2.742 3.595.666 1.384 1 2.916 1 4.595h-6.226c0-1.976-.582-3.495-1.742-4.558-1.16-1.062-2.854-1.593-5.077-1.593-1.778 0-3.26.397-4.446 1.187-1.188.79-1.78 1.953-1.78 3.483 0 .84.21 1.532.63 2.075.42.544 1.05 1.014 1.89 1.408.84.396 1.854.778 3.04 1.15l4.146 1.298zm36.243 18.752c-.643.1-1.495.196-2.558.296s-2.138.148-3.224.148c-1.038 0-2.175-.1-3.41-.296-1.235-.197-2.384-.68-3.445-1.445-1.063-.766-1.953-1.938-2.67-3.52-.716-1.582-1.073-3.755-1.073-6.523V25.034h-6.226v-5.41h6.226V8.284h6.448v11.34h8.745v5.41h-8.745v15.44c0 1.626.136 2.918.407 3.88s.654 1.698 1.15 2.216c.492.516 1.073.848 1.74.996s1.42.222 2.26.222h2.336c.864 0 1.544-.074 2.04-.223v5.707zM15.635 0h54.683v7.532H15.635zM0 0h7.367v7.532H0zm0 23.576h7.367v7.53H0zm0 23.577h7.367v7.53H0zm15.635-23.577h43.55v7.53h-43.55zm0 23.577h54.683v7.53H15.635z"/></symbol><symbol id="icon-audio-paused" viewBox="0 0 73.784 58.753"><path d="M0 41.23h15.62l16.973 15.708V1.815l-16.655 15.71H0z"/></symbol><symbol id="icon-audio-playing" viewBox="0 0 73.784 58.753"><path d="M44.848 16.743l-4.213 4.212c2.17 2.148 3.514 5.127 3.514 8.42s-1.345 6.274-3.515 8.422l4.213 4.213c3.23-3.235 5.23-7.7 5.23-12.634 0-4.932-2-9.397-5.23-12.633zM61.93 29.377c0-8.204-3.334-15.63-8.72-20.995l-4.17 4.17C53.34 16.86 56 22.807 56 29.376S53.342 41.893 49.04 46.2l4.17 4.17c5.386-5.364 8.72-12.79 8.72-20.993zm11.854 0C73.784 17.9 69.122 7.51 61.592 0L57.4 4.19c6.46 6.44 10.456 15.346 10.456 25.187 0 9.84-3.996 18.747-10.456 25.186l4.19 4.19c7.532-7.51 12.194-17.9 12.194-29.376zM0 41.23h15.62l16.973 15.708V1.815l-16.655 15.71H0z"/></symbol><symbol id="icon-caret-asc" viewBox="0 0 612 306"><path d="M306 306L612 0H0l306 306z"/></symbol><symbol id="icon-caret-desc" viewBox="0 0 586.666 293.333"><path d="M293.333 0L0 293.333h586.666L293.333 0z"/></symbol><symbol id="icon-close" viewBox="0 0 23.746 23.746"><path d="M23.746 3.145L20.602.003 11.874 8.73 3.142 0 0 3.144l8.73 8.73L0 20.605l3.142 3.142 8.73-8.73 8.73 8.73 3.144-3.143-8.73-8.73z"/></symbol><symbol id="icon-fullscreen" viewBox="0 0 23.997 19.49"><path d="M0 0v7.18h2V2.053h5V0H2zm2 12.31H0v7.18h7v-2.052H2zm19.997 0v5.128h-5v2.052h7v-7.18zm0-5.13h2V0h-7v2.052h5z"/></symbol><symbol id="icon-info" viewBox="0 0 5.245 8.712"><path d="M1.908 6.288c0-.288.018-.542.054-.762.036-.22.096-.42.18-.6.084-.18.192-.345.324-.493.132-.148.298-.29.498-.426l.384-.282c.136-.108.264-.23.384-.366.12-.137.22-.29.3-.463.08-.172.12-.366.12-.582 0-.44-.136-.772-.407-.996-.273-.224-.637-.336-1.093-.336-.448 0-.82.14-1.116.42-.296.28-.444.688-.444 1.224H0c0-.408.07-.776.21-1.104S.54.92.78.696C1.02.472 1.3.3 1.62.18 1.94.06 2.284 0 2.652 0s.712.054 1.032.162c.32.108.594.262.822.462.228.2.408.442.54.726.132.284.198.606.198.966 0 .296-.047.556-.14.78-.09.224-.2.422-.334.594-.132.172-.273.318-.426.438l-.408.312c-.19.144-.35.272-.474.384-.124.112-.224.232-.3.36s-.128.278-.156.45c-.028.172-.042.39-.042.654H1.908zm-.336 1.535c0-.24.082-.443.246-.61.164-.17.37-.253.618-.253s.458.084.63.252c.172.168.258.372.258.61 0 .24-.086.45-.258.626-.172.176-.382.264-.63.264s-.454-.088-.618-.264c-.164-.176-.246-.385-.246-.625z"/></symbol><symbol id="icon-spinner" viewBox="0 0 100 100"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1="30" y1="100" x2="50"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-opacity=".2"/></linearGradient><path fill="url(#a)" d="M50.07.078C22.473.078.102 22.448.102 50.044c0 27.595 22.37 49.966 49.966 49.966s49.965-22.37 49.965-49.966S77.665.078 50.07.078zm-.06 84.984c-19.316 0-34.976-15.66-34.976-34.976 0-19.317 15.66-34.976 34.976-34.976s34.977 15.66 34.977 34.976c0 19.315-15.66 34.976-34.977 34.976z"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 50 50" to="360 50 50" begin="0s" dur="1s" repeatCount="indefinite"/></path></symbol></svg>
@@ -112,5 +106,10 @@ html(lang="en-US", class="no-js")
 		if single
 			script.
 				autostart = '#{single._id}';
-		script(src="#{scripts['common.js']}")
-		script(src="#{scripts[collection.template]}")
+
+		if prod
+			script(src="https://static.cloudlist.io/#{manifest['assets/js/common.js']}")
+			script(src="https://static.cloudlist.io/#{manifest['assets/js/' + collection.template + '.js']}")
+		else
+			script(src="#{rootHost}/assets/js/common.js")
+			script(src="#{rootHost}/assets/js/#{collection.template}.js")

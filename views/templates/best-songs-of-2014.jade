@@ -44,7 +44,7 @@ block content
 					- song = structureSong(song);
 
 					li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
-						a(href="/#{path}/#{song.permalink}/")
+						a(href="#{rootHost}/#{path}/#{song.permalink}/")
 							div.col.index #{index+1}
 							div.col.title
 								span #{song.title}

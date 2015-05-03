@@ -17,27 +17,29 @@ var db = mongo.db('mongodb://localhost:27017/cloudlist', { native_parser:true })
 exports.db = db;
 
 var app = express();
+var env = process.env.NODE_ENV;
 
 // Favicon
-app.use(favicon('./public/favicon.ico'));
+if (env === 'production') {
+	app.use(favicon('./client/dev/favicon.ico'));
+} else {
+	app.use(favicon('https://static.cloudlist.io/favicon.ico'));
+}
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-var env = process.env.NODE_ENV;
-if ('production' === env) {
+if (env === 'production') {
 	console.log('Server started and listening on port 443 in production mode');
 
 	app.use(forceSSL);
-	app.locals.CDN = function(path) { return CDN(path, 'https://static.cloudlist.io') };
-	app.locals.env = 'production';
+	app.locals.manifest = require('./client/dist/assets/rev-manifest.json');
+	app.locals.prod = true;
 } else {
 	console.log('Server started and listening on port 3000 in development mode');
 
 	app.locals.pretty = true;
-	app.locals.env = 'development';
-	app.locals.CDN = function(path) { return CDN(path) };
 
 	// Change error handling
 	app.use(function (err, req, res, next) {
@@ -49,6 +51,10 @@ if ('production' === env) {
 	});
 }
 
+// Send globals
+app.locals.rootTitle = 'Cloudlist.io';
+app.locals.rootHost = env === 'production' ? 'https://www.cloudlist.io' : 'http://localhost:3000'
+
 // Expose ID encryption util globally
 var Hashids = require('hashids');
 var secret = require('./config/private/secret.js');
@@ -58,13 +64,6 @@ app.locals.hashids = hashids;
 // Expose structure song util globally
 app.locals.structureSong = utils.structureSong;
 
-// Send globals
-app.locals.rootTitle = 'Cloudlist.io';
-app.locals.rootHost = 'production' === env ? 'https:://www.cloudlist.io' : 'http://localhost:3000'
-
-// Expose webpack assets to all views
-app.locals.scripts = require('./webpack-assets.json');
-
 app.use(logger('dev'));
 app.use(compression());
 app.use(bodyParser.json());
@@ -72,7 +71,7 @@ app.use(bodyParser.urlencoded());
 app.use(multer({ dest: './tmp/' }));
 app.use(cookieParser());
 
-if ('production' === env) {
+if (env === 'production') {
 	app.use(function (req, res, next) {
 		if (!req.secure) {
 			return res.redirect(['https://', req.get('Host'), req.url].join(''));
@@ -80,7 +79,7 @@ if ('production' === env) {
 		next();
 	});
 } else {
-	app.use(express.static(path.join(__dirname, 'public')));
+	app.use(express.static(path.join(__dirname, 'client/dev')));
 }
 
 // Make our db accessible to our router
@@ -99,11 +98,8 @@ app.use(function (req, res) {
 });
 
 // Handle 500
-/*
-app.use(function(error, req, res, next) {
+app.use(function (err, req, res, next) {
 	res.status(500);
-	res.render('500.jade', {title:'500: Internal Server Error', error: error});
 });
-*/
 
 module.exports = app;

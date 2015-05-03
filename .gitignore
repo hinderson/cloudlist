@@ -35,6 +35,7 @@ gulp-cache
 .sass-cache
 dump
 cdn
-public/media
+client/dist
+client/dev
 .awspublish-cloudlist
 tmp

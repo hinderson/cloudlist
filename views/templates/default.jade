@@ -7,8 +7,8 @@ block content
 				h1.collection-title #{collection.title}
 				button Start playlist
 			picture
-				source(srcset="/media/img/test-768x1020.jpg", media="(max-width: 767px)")
-				img(src="/media/img/test-768x1020.jpg", width="1020", height="768", alt="", title="")
+				source(srcset="#{rootHost}/media/img/test-768x1020.jpg", media="(max-width: 767px)")
+				img(src="#{rootHost}/media/img/test-768x1020.jpg", width="1020", height="768", alt="", title="")
 
 		section.collection.group
 			header.collection-header.group
@@ -30,7 +30,7 @@ block content
 					- song = structureSong(song);
 
 					li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
-						a(href="/#{path}/#{song.permalink}/")
+						a(href="#{rootHost}/#{path}/#{song.permalink}/")
 							div.col.index #{index+1}
 							div.col.title
 								span #{song.title}

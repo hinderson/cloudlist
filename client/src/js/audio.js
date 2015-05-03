@@ -120,9 +120,9 @@ module.exports = {
 				this.destroy(id);
 			}.bind(this),
 			onfinish: function ( ) {
-				// TEMP: CALL this.stop() here
-
 				state.audio = 'stopped';
+				pubsub.publish('audioStopped', id);
+
 				this.destroy(id);
 				this.next();
 			}.bind(this),
