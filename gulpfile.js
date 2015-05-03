@@ -1,13 +1,11 @@
 var gulp = require('gulp');
-var path = require('path');
 var gutil = require('gulp-util');
+var path = require('path');
 var sass = require('gulp-ruby-sass');
 var prefix = require('gulp-autoprefixer');
 var imagemin = require('gulp-imagemin');
 var pngcrush = require('imagemin-pngcrush');
 var cache = require('gulp-cache');
-var notify = require('gulp-notify');
-var rename = require('gulp-rename');
 var newer = require('gulp-newer');
 var merge = require('merge-stream');
 var inject = require('gulp-inject');
@@ -16,10 +14,8 @@ var RevAll = require('gulp-rev-all');
 
 var awspublish = require('gulp-awspublish');
 var cloudfront = require('gulp-cloudfront');
-var replace = require('gulp-replace');
 
 var webpack = require('webpack');
-var SaveAssetsJson = require('assets-webpack-plugin');
 
 var svgstore = require('gulp-svgstore');
 var svgmin = require('gulp-svgmin');
