@@ -627,11 +627,13 @@ module.exports = {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
 
 			// Add loading class
+			c.elems.HTML.classList.add('loading-song');
 			elem.classList.add('loading');
 		};
 
 		var failed = function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
+			c.elems.HTML.classList.remove('loading-song');
 			elem.classList.remove('loading');
 			elem.classList.remove(color);
 			elem.classList.add('unavailable');
@@ -646,6 +648,7 @@ module.exports = {
 			var documentTitle = '▶ ' + utils.makeDocumentTitle([utils.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
 			history.update(id, href, documentTitle);
 
+			c.elems.HTML.classList.remove('loading-song');
 			elem.classList.remove('loading');
 			elem.classList.add('playing');
 

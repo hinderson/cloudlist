@@ -36,7 +36,7 @@
     "echojs": "~0.1.4"
   },
   "devDependencies": {
-    "gulp": "~3.8.10",
+    "gulp": "~3.8.11",
     "gulp-imagemin": "~1.0.1",
     "gulp-cache": "~0.2.4",
     "gulp-notify": "~2.0.0",
@@ -64,7 +64,7 @@
     "gulp-sourcemaps": "~1.5.2",
     "webpack": "~1.8.10",
     "gulp-util": "~3.0.4",
-    "assets-webpack-plugin": "~0.3.0",
-    "gulp-rev-all": "~0.8.18"
+    "gulp-rev-all": "~0.8.18",
+    "del": "~1.1.1"
   }
 }

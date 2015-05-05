@@ -1,3 +1,5 @@
+'use strict';
+
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var path = require('path');
@@ -9,16 +11,17 @@ var cache = require('gulp-cache');
 var newer = require('gulp-newer');
 var merge = require('merge-stream');
 var inject = require('gulp-inject');
+var del = require('del');
 
 var RevAll = require('gulp-rev-all');
 
 var awspublish = require('gulp-awspublish');
 var cloudfront = require('gulp-cloudfront');
 
-var webpack = require('webpack');
-
 var svgstore = require('gulp-svgstore');
 var svgmin = require('gulp-svgmin');
+
+var webpack = require('webpack');
 
 // Webpack task for use in deployment
 gulp.task('webpack:prod', function (callback) {
@@ -29,20 +32,13 @@ gulp.task('webpack:prod', function (callback) {
 
 	prodConfig.output = {
 		filename: '[name].js',
-		path: path.join(__dirname, 'client/dist/assets', 'js'),
+		path: path.join(__dirname, './tmp/assets', 'js'),
 		publicPath: '/assets/js/'
 	};
 
 	prodConfig.plugins = prodConfig.plugins.concat(
-		new webpack.DefinePlugin({
-			'process.env': {
-				// This has effect on the react lib size
-				'NODE_ENV': JSON.stringify('production')
-			}
-		}),
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.UglifyJsPlugin(),
-		new webpack.optimize.CommonsChunkPlugin('common.js'),
 		new webpack.optimize.OccurenceOrderPlugin()
 	);
 
@@ -51,6 +47,21 @@ gulp.task('webpack:prod', function (callback) {
 		gutil.log('[webpack]', stats.toString({
 			colors: true
 		}));
+
+		var revAll = new RevAll({
+			transformFilename: function (file, hash) {
+				var ext = path.extname(file.path);
+				return path.basename(file.path, ext) + '-' + hash.substr(0, 8) + ext;
+			}
+		});
+
+		// Rev the files and create a manifest with references to them
+		gulp.src('./tmp/**/*')
+			.pipe(revAll.revision())
+			.pipe(gulp.dest('./client/dist/'))
+			.pipe(revAll.manifestFile())
+			.pipe(gulp.dest('./client/dist/assets/js/'));
+
 		callback();
 	});
 });
@@ -67,13 +78,20 @@ gulp.task('sass:dev', function ( ) {
 
 // Sass for production
 gulp.task('sass:prod', function ( ) {
-	var revAll = new RevAll();
+	var revAll = new RevAll({
+		transformFilename: function (file, hash) {
+			var ext = path.extname(file.path);
+			return path.basename(file.path, ext) + '-' + hash.substr(0, 8) + ext;
+		}
+	});
 
 	return sass('./client/src/sass/', { sourcemap: false, style: 'compact' })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
 		.pipe(prefix('last 2 versions', '> 1%'))
+		.pipe(revAll.revision())
+		.pipe(revAll.manifestFile())
 		.pipe(gulp.dest('./client/dist/assets/css/'));
 });
 
@@ -135,38 +153,24 @@ gulp.task('audio', function ( ) {
 		.pipe(gulp.dest('./client/dist/media/audio/'));
 });
 
-// Amazon S3
+// Publish to Amazon S3
 gulp.task('publish', function ( ) {
 	var headers = {'Cache-Control': 'max-age=315360000, no-transform, public'};
 	var aws = require('./config/private/aws.json');
 	var publisher = awspublish.create(aws);
-	var revAll = new RevAll({
-		transformFilename: function (file, hash) {
-			var ext = path.extname(file.path);
-			return path.basename(file.path, ext) + '-' + hash.substr(0, 8) + ext;
-		}
-	});
 
-	// Regular content: mainly media
-	var regular = gulp.src(['./client/dist/**/*', '!./client/dist/**/*.{css,js,woff}'])
-		.pipe(publisher.publish(headers))
-		.pipe(publisher.cache())
-		.pipe(awspublish.reporter())
-		.pipe(cloudfront(aws));
+	return merge([
+		// Regular content: mainly media
+		gulp.src(['./client/dist/**/*', '!./client/dist/**/*.{css,js,woff}']),
+		// Gzipped content: mainly assets
+		gulp.src('./client/dist/**/*.{css,js,woff}')
+			.pipe(awspublish.gzip())
+	])
+	.pipe(publisher.publish(headers))
+	.pipe(publisher.cache())
+	.pipe(awspublish.reporter())
+	.pipe(cloudfront(aws));
 
-	// Gzipped content: asset files
-	var gzip = gulp.src('./client/dist/**/*.{css,js,woff}')
-		.pipe(revAll.revision())
-		.pipe(gulp.dest('./client/dist/'))
-		.pipe(revAll.manifestFile())
-		.pipe(gulp.dest('./client/dist/assets/'))
-		.pipe(awspublish.gzip())
-		.pipe(publisher.publish(headers))
-		.pipe(publisher.cache())
-		.pipe(awspublish.reporter())
-		.pipe(cloudfront(aws));
-
-	return merge(regular, gzip);
 });
 
 gulp.task('publish-media', function ( ) {
@@ -181,6 +185,10 @@ gulp.task('publish-media', function ( ) {
 		.pipe(cloudfront(aws));
 });
 
+gulp.task('clean-up', function (callback) {
+	del('./tmp/**/*', callback);
+});
+
 gulp.task('default', function ( ) {
 	gulp.start('sass:dev');
 });
@@ -192,5 +200,5 @@ gulp.task('deploy-media', function ( ) {
 
 // Run deploy task for assets
 gulp.task('deploy', function ( ) {
-	gulp.start('webpack:prod', 'sass:prod', 'images-assets', 'publish');
+	gulp.start('webpack:prod', 'sass:prod', 'images-assets', 'clean-up', 'publish');
 });
