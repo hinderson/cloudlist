@@ -56,9 +56,9 @@ gulp.task('webpack:prod', function (callback) {
 		});
 
 		// Rev the files and create a manifest with references to them
-		gulp.src('./tmp/**/*')
+		gulp.src('./tmp/assets/js/*')
 			.pipe(revAll.revision())
-			.pipe(gulp.dest('./client/dist/'))
+			.pipe(gulp.dest('./client/dist/assets/js/'))
 			.pipe(revAll.manifestFile())
 			.pipe(gulp.dest('./client/dist/assets/js/'));
 
@@ -68,7 +68,7 @@ gulp.task('webpack:prod', function (callback) {
 
 // Sass for development
 gulp.task('sass:dev', function ( ) {
-	return sass('./client/src/sass/', { sourcemap: true })
+	return sass('./client/src/sass', { sourcemap: true })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
@@ -85,12 +85,13 @@ gulp.task('sass:prod', function ( ) {
 		}
 	});
 
-	return sass('./client/src/sass/', { sourcemap: false, style: 'compact' })
+	return sass('./client/src/sass', { sourcemap: false, style: 'compact' })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
 		.pipe(prefix('last 2 versions', '> 1%'))
 		.pipe(revAll.revision())
+		.pipe(gulp.dest('./client/dist/assets/css/'))
 		.pipe(revAll.manifestFile())
 		.pipe(gulp.dest('./client/dist/assets/css/'));
 });
@@ -185,7 +186,7 @@ gulp.task('publish-media', function ( ) {
 		.pipe(cloudfront(aws));
 });
 
-gulp.task('clean-up', function (callback) {
+gulp.task('clean-tmp', function (callback) {
 	del('./tmp/**/*', callback);
 });
 
@@ -200,5 +201,5 @@ gulp.task('deploy-media', function ( ) {
 
 // Run deploy task for assets
 gulp.task('deploy', function ( ) {
-	gulp.start('webpack:prod', 'sass:prod', 'images-assets', 'clean-up', 'publish');
+	gulp.start('webpack:prod', 'sass:prod', 'images-assets', 'clean-tmp', 'publish');
 });

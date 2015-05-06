@@ -21,9 +21,9 @@ var env = process.env.NODE_ENV;
 
 // Favicon
 if (env === 'production') {
-	app.use(favicon('./client/dev/favicon.ico'));
-} else {
 	app.use(favicon('https://static.cloudlist.io/favicon.ico'));
+} else {
+	app.use(favicon('./client/dev/favicon.ico'));
 }
 
 // View engine setup
@@ -34,7 +34,12 @@ if (env === 'production') {
 	console.log('Server started and listening on port 443 in production mode');
 
 	app.use(forceSSL);
-	app.locals.manifest = require('./client/dist/assets/rev-manifest.json');
+
+	var assets = {
+		'styles': require('./client/dist/assets/css/rev-manifest.json'),
+		'scripts': require('./client/dist/assets/js/rev-manifest.json')
+	};
+	app.locals.assets = assets;
 	app.locals.prod = true;
 } else {
 	console.log('Server started and listening on port 3000 in development mode');
@@ -98,8 +103,10 @@ app.use(function (req, res) {
 });
 
 // Handle 500
-app.use(function (err, req, res, next) {
-	res.status(500);
-});
+if (env === 'production') {
+	app.use(function (err, req, res, next) {
+		res.status(500);
+	});
+}
 
 module.exports = app;
