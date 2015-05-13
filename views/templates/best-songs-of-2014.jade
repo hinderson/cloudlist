@@ -1,56 +1,55 @@
 extends ../layout
 
 block content
-	main(role="main")
-		section.hero.group
-			div.hero-inner
-				h1.collection-title
-					div(data-string="Best")
-						span B
-						span e
-						span s
-						span t
-					div(data-string="songs")
-						span s
-						span o
-						span n
-						span g
-						span s
-					div(data-string="of")
-						span o
-						span f
-					div(data-string="2014")
-						span 2
-						span 0
-						span 1
-						span 4
-		section.collection.group
-			header.collection-header.group
-				h3.collection-sub-title #{collection.title}
-				h4.structural Sort tracks:
-				ul(class="sort group")
-					li.col.index(data-sort-type="index")
-						strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
-					li.col.title(data-sort-type="title")
-						span Title
-					li.col.artist(data-sort-type="artist")
-						span Artist
-					li.col.time(data-sort-type="time")
-						span Time
-			h3.structural.
-				Song list
-			ol
-				each song, index in songs
-					- song = structureSong(song);
+	section.hero.group
+		div.hero-inner
+			h1.collection-title
+				div(data-string="Best")
+					span B
+					span e
+					span s
+					span t
+				div(data-string="songs")
+					span s
+					span o
+					span n
+					span g
+					span s
+				div(data-string="of")
+					span o
+					span f
+				div(data-string="2014")
+					span 2
+					span 0
+					span 1
+					span 4
+	section.collection.group(data-id="#{collection._id}")
+		header.collection-header.group
+			h3.collection-sub-title #{collection.title}
+			h4.structural Sort tracks:
+			ul(class="sort group")
+				li.col.index(data-sort-type="index")
+					strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
+				li.col.title(data-sort-type="title")
+					span Title
+				li.col.artist(data-sort-type="artist")
+					span Artist
+				li.col.time(data-sort-type="time")
+					span Time
+		h3.structural.
+			Song list
+		ol
+			each song, index in songs
+				- song = structureSong(song);
 
-					li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
-						a(href="#{rootHost}/#{path}/#{song.permalink}/")
-							div.col.index #{index+1}
-							div.col.title
-								span #{song.title}
-							div.col.artist
-								span #{song.combinedartist}
-							div.col.time #{song.duration}
+				li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
+					a(href="#{rootHost}/#{path}/#{song.permalink}/")
+						div.col.index #{index+1}
+						div.col.title
+							span #{song.title}
+						div.col.artist
+							span #{song.combinedartist}
+						div.col.time #{song.duration}
 
-		footer.go-to-top
-			a(href="#top") Top ↑
+	footer.go-to-top
+		a(href="#top") Top ↑

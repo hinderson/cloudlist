@@ -462,22 +462,28 @@
 
 /* Progress indicator */
 .progress {
-	display: none;
 	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 1;
-	width: 0;
+	width: 100%;
 	height: 100%;
 	background: rgba(0, 0, 0, 0.25);
-	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	transform: translate3d(-100%, 0, 0);
+
+	animation-name: progress-bar;
+	animation-timing-function: linear;
+	animation-fill-mode: forwards;
 }
-.playing .progress,
-.paused .progress {
-	display: block;
+
+.playing .progress {
+	animation-play-state: running;
 }
+
 .paused .progress {
+	animation-play-state: paused;
 	background: rgba(255, 255, 255, 0.05);
 }
 
@@ -485,14 +491,17 @@
 	text-align: center;
 	margin-bottom: 60px;
 }
+
 .go-to-top a {
 	color: #fff;
 	text-decoration: none;
 }
+
 .go-to-top a:hover,
 .go-to-top a:focus {
 	opacity: 0.8;
 }
+
 .go-to-top svg {
 	width: 7px;
 	fill: #fff;

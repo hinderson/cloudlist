@@ -1,16 +1,10 @@
-@-ms-keyframes scroll-overflow {
-	0% { -ms-transform: translate3d(0, 0, 0); }
-	100% { -ms-transform: translate3d(-100%, 0, 0); }
-}
-@-moz-keyframes scroll-overflow {
-	0% { -moz-transform: translate3d(0, 0, 0); }
-	100% { -moz-transform: translate3d(-100%, 0, 0); }
-}
-@-webkit-keyframes scroll-overflow {
-	0% { -webkit-transform: translate3d(0, 0, 0); }
-	100% { -webkit-transform: translate3d(-100%, 0, 0); }
-}
 @keyframes scroll-overflow {
 	0% { transform: translate3d(0%, 0, 0); }
 	100% { transform: translate3d(-100%, 0, 0); }
+}
+
+@keyframes progress-bar {
+	to {
+		transform: translate3d(0, 0, 0);
+	}
 }

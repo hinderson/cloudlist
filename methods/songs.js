@@ -76,7 +76,7 @@ module.exports = {
 
 					// Analyze audio duration and move the file
 					var tempAudioPath = files.audio.path;
-					var targetAudioPath = './public/media/audio/' + files.audio.name;
+					var targetAudioPath = './client/dev/media/audio/' + files.audio.name;
 
 					fs.rename(tempAudioPath, targetAudioPath, function (err) {
 						if (err) throw err;
@@ -140,7 +140,7 @@ module.exports = {
 				var ext = path.extname(tempCoverPath);
 				if (ext !== '.mp4') {
 					var filename = ext ? tempFilename.replace(ext, '.jpg') : (tempFilename + '.jpg'); // If there is no extension
-					targetCoverPath = './public/media/img/' + filename;
+					targetCoverPath = './client/dev/media/img/' + filename;
 
 					// Resize img
 					gm(tempCoverPath).size(function (err, sizes) {
@@ -180,8 +180,8 @@ module.exports = {
 							});
 					});
 				} else { // Upload mp4
-					targetCoverPath = './public/media/video/' + files.image.name;
-					var screenshotFolder = './public/media/img/';
+					targetCoverPath = './client/dev/media/video/' + files.image.name;
+					var screenshotFolder = './client/dev/media/img/';
 
 					// Take screenshot
 					var screenshot;
@@ -245,6 +245,7 @@ module.exports = {
 					return callback(null);
 				}
 
+				console.log(tempCoverPath, targetCoverPath);
 				fs.rename(tempCoverPath, targetCoverPath, function (err) {
 					if (err) throw err;
 
@@ -367,11 +368,11 @@ module.exports = {
 				if (song.covers) {
 					var source = song.covers[0].filename;
 					var ext = path.extname(source).slice(1);
-					fs.unlink('./public/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song.covers[0].filename);
+					fs.unlink('./client/dev/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song.covers[0].filename);
 				}
 
 				if (song.audio && song.audio.url && song.audio.source !== 'soundcloud') {
-					fs.unlink('./public/media/audio/' + song.audio.url);
+					fs.unlink('./client/dev/media/audio/' + song.audio.url);
 				}
 
 				callback();

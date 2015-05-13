@@ -35,9 +35,11 @@ var users = require('../../methods/users.js');
 module.exports = function (router) {
 
 	// Return all songs in JSON format (based on sent cookie)
-	router.get('/song-collection', function (req, res, next) {
+	router.get('/song-collection/:id', function (req, res, next) {
+		var collectionId = req.params.id;
 
-		var collectionId = hashids.decodeHex(req.cookies.cl_collection);
+		if (!collectionId) return;
+
 		collections.getOne(collectionId, null, function (result) {
 			if ('production' === process.env.NODE_ENV) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year

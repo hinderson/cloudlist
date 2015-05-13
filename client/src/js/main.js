@@ -11,7 +11,6 @@ var audio = require('./audio.js');
 var s, c;
 
 // Private variables
-var audio;
 var ticking = false;
 var clonedSpan = null;
 var lastScrollY = 0;
@@ -84,11 +83,13 @@ var sortClickHandler = function (e) {
 	target.parentNode.removeChild(target);
 };
 
-var getCollection = function (callback) {
+var getCollection = function (id, callback) {
+	if (!id) return;
+
 	// Store GET request, structure and store it in global array
 	var XMLHttp = new XMLHttpRequest();
 
-	XMLHttp.open('GET', '/song-collection/', true);
+	XMLHttp.open('GET', '/song-collection/' + id, true);
 	XMLHttp.onreadystatechange = function ( ) {
 		if (XMLHttp.readyState === 4) {
 			if (XMLHttp.status === 200) {
@@ -140,7 +141,8 @@ module.exports = {
 		s = config.settings;
 
 		// Get collection
-		getCollection(function (res) {
+		var id = c.elems.collection.getAttribute('data-id');
+		getCollection(id, function (res) {
 			// Set document title
 			s.documentTitle = res.collection.title + ' – Cloudlist.io';
 
@@ -213,6 +215,10 @@ module.exports = {
 		window.addEventListener('resize', function (e) {
 			this.resizeEvent();
 		}.bind(this), false);
+
+		// Window focus
+		var visibilityChange = utils.getVisibilityVendor().visibilityChange;
+		document.addEventListener(visibilityChange, this.handleVisibilityChange, false);
 	},
 
 	detachEvents: function (e) {
@@ -621,7 +627,7 @@ module.exports = {
 		c.elems.volume.value = audio.settings.volume;
 
 		// Private variables
-		var elem, currentProgress, progressBar, iconState, color;
+		var elem, currentProgress, progressBar, iconState, color, position, percent;
 
 		var loading = function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
@@ -661,9 +667,12 @@ module.exports = {
 				time.insertBefore(currentProgress, firstChild);
 			});
 
-			// Insert progress element
+			// Insert progress element and add duration
 			progressBar = document.createElement('div');
 			progressBar.className = 'progress';
+			progressBar.style.webkitAnimationDuration = song.audio.duration + 'ms';
+			progressBar.style.mozAnimationDuration = song.audio.duration + 'ms';
+			progressBar.style.animationDuration = song.audio.duration + 'ms';
 			utils.requestAnimFrame.call(window, function ( ) {
 				elemLink.appendChild(progressBar);
 			});
@@ -681,6 +690,7 @@ module.exports = {
 
 			// Unfocus previous item
 			var prevElem = c.elems.currentItem;
+			console.log(prevElem);
 			if (prevElem) {
 				c.elems.currentItem = null;
 				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
@@ -742,12 +752,11 @@ module.exports = {
 		};
 
 		var updating = function (args) {
-			var position = args[0];
-			var percent = args[1];
+			position = args[0];
+			percent = args[1];
 
 			utils.requestAnimFrame.call(window, function ( ) {
 				currentProgress.innerHTML = utils.convertToReadableTime(position + 500) + ' / ';
-				progressBar.style.width = percent + '%';
 			});
 		};
 
@@ -763,6 +772,24 @@ module.exports = {
 			if (id) audio.play(id);
 		};
 
+		var forceProgressRepaint = function ( ) {
+			if (audio.state.audio !== 'playing') return;
+
+			// Since Safari 8 pauses all animation when switching to another tab,
+			// we have to retrigger the animation when this tab retains focus
+			var currentSong = c.collection.items[audio.state.currentId];
+			var currentPercent = percent - 100;
+			var timeLeft = currentSong.audio.duration - position;
+
+			var clone = progressBar.cloneNode(true);
+			progressBar.parentNode.replaceChild(clone, progressBar);
+
+			clone.style.webkitTransform = 'translate3d(' + currentPercent +'%, 0, 0)';
+			clone.style.webkitAnimation = 'progress-bar ' + timeLeft + 'ms linear both';
+
+			progressBar = clone;
+		};
+
 		pubsub.subscribe('audioLoading', loading);
 		pubsub.subscribe('audioFailedLoading', failed);
 		pubsub.subscribe('audioPlaying', playing);
@@ -773,6 +800,14 @@ module.exports = {
 		pubsub.subscribe('audioMuted', muted);
 		pubsub.subscribe('audioUnmuted', unmuted);
 		pubsub.subscribe('historyChanged', historyChanged);
+		pubsub.subscribe('windowFocused', forceProgressRepaint);
 	},
+
+	handleVisibilityChange: function ( ) {
+		var hidden = utils.getVisibilityVendor().hidden;
+		if (!document[hidden]) {
+			pubsub.publish('windowFocused');
+		}
+	}
 
 };

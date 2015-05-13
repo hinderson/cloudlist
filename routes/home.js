@@ -19,10 +19,6 @@ module.exports = function (router) {
 		collections.getOne(null, req.params.collection, function (result) {
 			if (!result) return next();
 
-			// Set view state cookie
-			var collectionId = hashids.encodeHex(result.collection._id);
-			res.cookie('cl_collection', collectionId, { maxAge: 900000 });
-
 			// Render template
 			var template = result.collection.template;
 			res.render('templates/' + template, {
@@ -37,10 +33,6 @@ module.exports = function (router) {
 	router.get('/:user/:collection/:permalink', function (req, res, next) {
 		collections.getOne(null, req.params.collection, function (result) {
 			if (!result) return next();
-
-			// Set view state cookie
-			var collectionId = hashids.encodeHex(result.collection._id);
-			res.cookie('cl_collection', collectionId, { maxAge: 900000 });
 
 			// Render template
 			var single = utils.findByKey(result.songs, 'permalink', req.params.permalink);
