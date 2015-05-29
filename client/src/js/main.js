@@ -690,7 +690,6 @@ module.exports = {
 
 			// Unfocus previous item
 			var prevElem = c.elems.currentItem;
-			console.log(prevElem);
 			if (prevElem) {
 				c.elems.currentItem = null;
 				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
@@ -777,17 +776,21 @@ module.exports = {
 
 			// Since Safari 8 pauses all animation when switching to another tab,
 			// we have to retrigger the animation when this tab retains focus
-			var currentSong = c.collection.items[audio.state.currentId];
-			var currentPercent = percent - 100;
-			var timeLeft = currentSong.audio.duration - position;
 
-			var clone = progressBar.cloneNode(true);
-			progressBar.parentNode.replaceChild(clone, progressBar);
+			// Give the browser some time catch up
+			setTimeout(function ( ) {
+				var currentSong = c.collection.items[audio.state.currentId];
+				var currentPercent = percent - 100;
+				var timeLeft = currentSong.audio.duration - position;
 
-			clone.style.webkitTransform = 'translate3d(' + currentPercent +'%, 0, 0)';
-			clone.style.webkitAnimation = 'progress-bar ' + timeLeft + 'ms linear both';
+				var clone = progressBar.cloneNode(true);
+				progressBar.parentNode.replaceChild(clone, progressBar);
 
-			progressBar = clone;
+				clone.style.webkitTransform = 'translate3d(' + currentPercent +'%, 0, 0)';
+				clone.style.webkitAnimation = 'progress-bar ' + timeLeft + 'ms linear both';
+
+				progressBar = clone;
+			}, 300);
 		};
 
 		pubsub.subscribe('audioLoading', loading);
