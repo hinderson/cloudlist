@@ -207,8 +207,7 @@ utils = {
 			});
 
 			node.dispatchEvent(event);
-		}
-		catch (err) {
+		} catch (err) {
 			if (document.createEvent) {
 				// DOM Level 2
 				event = document.createEvent('MouseEvents');

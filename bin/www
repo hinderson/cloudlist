@@ -2,7 +2,6 @@
 var debug = require('debug')('cloudlist');
 var app = require('../server');
 var fs = require('fs');
-var forceSSL = require('express-force-ssl');
 var http = require('http');
 var https = require('https');
 

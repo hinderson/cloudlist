@@ -24,7 +24,6 @@
     "http-auth": "~2.2.0",
     "compression": "~1.2.1",
     "express-simple-cdn": "~1.0.1",
-    "express-force-ssl": "~0.2.9",
     "serve-favicon": "~2.2.0",
     "gm": "~1.17.0",
     "fluent-ffmpeg": "~2.0.0-rc3",
@@ -33,7 +32,8 @@
     "spotify-web-api-node": "~2.0.1",
     "lastfmapi": "0.0.6",
     "request": "~2.55.0",
-    "echojs": "~0.1.4"
+    "echojs": "~0.1.4",
+    "forcedomain": "~0.4.0"
   },
   "devDependencies": {
     "gulp": "~3.8.11",

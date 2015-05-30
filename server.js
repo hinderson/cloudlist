@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var compression = require('compression');
 var CDN = require('express-simple-cdn');
-var forceSSL = require('express-force-ssl');
+var forceDomain = require('forcedomain');
 var utils = require('./utils/utils');
 
 var mongo = require('mongoskin');
@@ -33,7 +33,11 @@ app.set('view engine', 'jade');
 if (env === 'production') {
 	console.log('Server started and listening on port 443 in production mode');
 
-	app.use(forceSSL);
+	// Force browser to www
+	app.use(forceDomain({
+		hostname: 'www.cloudlist.io',
+		protocol: 'https'
+	}));
 
 	var assets = {
 		'styles': require('./client/dist/assets/css/rev-manifest.json'),
