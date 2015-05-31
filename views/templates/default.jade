@@ -27,9 +27,10 @@ block content
 			Song list
 		ol
 			each song, index in songs
+				- var obfuscatedId = hashids.encodeHex(song._id);
 				- song = structureSong(song);
 
-				li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
+				li(class=song.available === true ? undefined : "unavailable", data-id="#{obfuscatedId}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
 					a(href="#{rootHost}/#{path}/#{song.permalink}/")
 						div.col.index #{index+1}
 						div.col.title

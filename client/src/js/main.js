@@ -27,7 +27,6 @@ var getCollection = function (id, callback) {
 		if (XMLHttp.readyState === 4) {
 			if (XMLHttp.status === 200) {
 				var response = JSON.parse(XMLHttp.responseText);
-				console.log(response);
 				return callback(response);
 			}
 		}
