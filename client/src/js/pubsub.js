@@ -16,7 +16,7 @@ var subscribe = function (name, listener) {
 };
 
 var publish = function (name, data) {
-	if (!topic[name] || topic[name].queue.length == 0) {
+	if (!topic[name] || topic[name].queue.length === 0) {
 		return;
 	}
 

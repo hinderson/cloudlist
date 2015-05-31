@@ -126,6 +126,10 @@ utils = {
 		}
 	),
 
+	isInDOM: function (node) {
+		return (node === document.body) ? false : document.body.contains(node);
+	},
+
 	convertToReadableTime: function (position) {
 		var seconds = Math.floor((position / 1000) % 60),
 			minutes = Math.floor((position / (60 * 1000)) % 60);

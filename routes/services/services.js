@@ -36,21 +36,32 @@ module.exports = function (router) {
 
 	// Return all songs in JSON format (based on sent cookie)
 	router.get('/song-collection/:id', function (req, res, next) {
-		var collectionId = req.params.id;
+		if (!req.params.id) return;
 
-		if (!collectionId) return;
+		var collectionId = hashids.decodeHex(req.params.id);
 
 		collections.getOne(collectionId, null, function (result) {
 			if ('production' === process.env.NODE_ENV) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}
 
+			// Convert sort array to decoded id's
+			utils.forEach(result.collection.items, function (index, item) {
+				result.collection.items[index] = hashids.encodeHex(item);
+			});
+
+			// Structure all songs
+			utils.forEach(result.songs, function (index, item) {
+				item.id = hashids.encodeHex(item._id);
+				delete item._id;
+			});
+
 			// Make songs into hashmap
 			var items = utils.generateHashmap(result.songs);
 
 			res.json({
 				collection: {
-					id: result.collection._id,
+					id: hashids.encodeHex(result.collection._id),
 					title: result.collection.title,
 					owner: result.collection.owner
 				},

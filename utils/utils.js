@@ -1,5 +1,10 @@
 'use strict';
 
+// Hashid
+var Hashids = require('hashids');
+var secret = require('../config/private/secret.js');
+var hashids = new Hashids(secret);
+
 module.exports = {
 
 	forEach: function (array, callback, scope) {
@@ -56,7 +61,7 @@ module.exports = {
 		var len = obj.length;
 
 		for (var i = 0; i < len; i++) {
-			var id = obj[i]._id;
+			var id = obj[i].id;
 			generatedObjects[id] = obj[i];
 		}
 
@@ -75,7 +80,8 @@ module.exports = {
 		var combinedartist = artist + (featuredartist && featuredartist.length > 0 ? (' feat. ' + featuredartist) : '');
 		var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
 
-		song.id = song._id; // var id = hashids.encodeHex(song._id);
+		song.id = hashids.encodeHex(song._id);
+		delete song._id;
 		song.artist = artist;
 		song.featuredartist = featuredartist;
 		song.combinedartist = combinedartist;

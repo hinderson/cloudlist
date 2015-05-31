@@ -16,6 +16,93 @@ var clonedSpan = null;
 var lastScrollY = 0;
 
 // Private functions
+var getCollection = function (id, callback) {
+	if (!id) return;
+
+	// Store GET request, structure and store it in global array
+	var XMLHttp = new XMLHttpRequest();
+
+	XMLHttp.open('GET', '/song-collection/' + id, true);
+	XMLHttp.onreadystatechange = function ( ) {
+		if (XMLHttp.readyState === 4) {
+			if (XMLHttp.status === 200) {
+				var response = JSON.parse(XMLHttp.responseText);
+				console.log(response);
+				return callback(response);
+			}
+		}
+	};
+	XMLHttp.send(null);
+};
+
+var sortCollection = function (options) {
+	var items = []; // Store all items that need to be sorted here
+	var order = c.collection.order;
+	var songs = c.collection.items;
+	var collection = c.elems.collection.children[2];
+	var collectionItems = collection.querySelectorAll('li');
+
+	var sortNum = function (a, b) {
+		return a.sortBy - b.sortBy;
+	};
+	var sortKey = function (a, b) {
+		if (a.sortBy > b.sortBy) {
+			return 1;
+		}
+		if (a.sortBy < b.sortBy) {
+			return -1;
+		}
+
+		return 0;
+	};
+
+	for (var i = 0, len = order.length; i < len; i++) {
+		var id = order[i];
+
+		switch (options.sortBy) {
+			case 'index':
+			items.push({index: i, id: id, sortBy: c.collection.index.indexOf(id)});
+			break;
+
+			case 'title':
+			items.push({index: i, id: id, sortBy: songs[id].title});
+			break;
+
+			case 'artist':
+			items.push({index: i, id: id, sortBy: songs[id].artist});
+			break;
+
+			case 'time':
+			items.push({index: i, id: id, sortBy: Math.round(songs[id].audio.duration)});
+			break;
+		}
+
+		collection.removeChild(collectionItems[i]);
+	}
+
+	if (options.isNum) {
+		items.sort(sortNum);
+	} else {
+		items.sort(sortKey);
+	}
+
+	if (options.order === 'desc') {
+		if (options.isNum) {
+			items.reverse(sortNum);
+		} else {
+			items.reverse(sortKey);
+		}
+	}
+
+	order.length = 0;
+	for (var i = 0, len = items.length; i < len; i++) {
+		var id = items[i].id;
+		var index = items[i].index;
+		order.push(id);
+		collection.appendChild(collectionItems[index]);
+	}
+};
+
 var itemClickHandler = function (e) {
 	e.preventDefault();
 
@@ -81,24 +168,6 @@ var sortClickHandler = function (e) {
 
 	target.parentNode.appendChild(newStrong);
 	target.parentNode.removeChild(target);
-};
-
-var getCollection = function (id, callback) {
-	if (!id) return;
-
-	// Store GET request, structure and store it in global array
-	var XMLHttp = new XMLHttpRequest();
-
-	XMLHttp.open('GET', '/song-collection/' + id, true);
-	XMLHttp.onreadystatechange = function ( ) {
-		if (XMLHttp.readyState === 4) {
-			if (XMLHttp.status === 200) {
-				var response = JSON.parse(XMLHttp.responseText);
-				return callback(response);
-			}
-		}
-	};
-	XMLHttp.send(null);
 };
 
 module.exports = {
@@ -429,74 +498,6 @@ module.exports = {
 		window.addEventListener('keyup', keysReleased, false);
 	},
 
-	sortCollection: function (options) {
-		var items = []; // Store all items that need to be sorted here
-		var order = c.collection.order;
-		var songs = c.collection.items;
-		var collection = c.elems.collection.children[2];
-		var collectionItems = collection.querySelectorAll('li');
-
-		var sortNum = function (a, b) {
-			return a.sortBy - b.sortBy;
-		};
-		var sortKey = function (a, b) {
-			if (a.sortBy > b.sortBy) {
-				return 1;
-			}
-			if (a.sortBy < b.sortBy) {
-				return -1;
-			}
-
-			return 0;
-		};
-
-		for (var i = 0, len = order.length; i < len; i++) {
-			var id = order[i];
-
-			switch (options.sortBy) {
-				case 'index':
-				items.push({index: i, id: id, sortBy: c.collection.index.indexOf(id)});
-				break;
-
-				case 'title':
-				items.push({index: i, id: id, sortBy: songs[id].title});
-				break;
-
-				case 'artist':
-				items.push({index: i, id: id, sortBy: songs[id].artist});
-				break;
-
-				case 'time':
-				items.push({index: i, id: id, sortBy: Math.round(songs[id].audio.duration)});
-				break;
-			}
-
-			collection.removeChild(collectionItems[i]);
-		}
-
-		if (options.isNum) {
-			items.sort(sortNum);
-		} else {
-			items.sort(sortKey);
-		}
-
-		if (options.order === 'desc') {
-			if (options.isNum) {
-				items.reverse(sortNum);
-			} else {
-				items.reverse(sortKey);
-			}
-		}
-
-		order.length = 0;
-		for (var i = 0, len = items.length; i < len; i++) {
-			var id = items[i].id;
-			var index = items[i].index;
-			order.push(id);
-			collection.appendChild(collectionItems[index]);
-		}
-	},
-
 	scrollOverflowingText: function (target, reset) {
 		// Bounce – i.e. don't reset or retrigger any values – if current item is already playing/is paused
 		if (target.parentNode === c.elems.currentItem) {
@@ -744,10 +745,12 @@ module.exports = {
 			elem.classList.remove('paused');
 			elem.classList.remove('playing');
 
-			// Remove DOM elements
-			iconState.parentNode.removeChild(iconState);
-			currentProgress.parentNode.removeChild(currentProgress);
-			progressBar.parentNode.removeChild(progressBar);
+			// Remove DOM elements but first check if they are actually in the DOM, just in case
+			if (utils.isInDOM(iconState)) {
+				iconState.parentNode.removeChild(iconState);
+				currentProgress.parentNode.removeChild(currentProgress);
+				progressBar.parentNode.removeChild(progressBar);
+			}
 		};
 
 		var updating = function (args) {
