@@ -46,7 +46,7 @@ collections = {
 		}
 
 		db.collection('collections').find(query).toArray(function (err, collection) {
-			if (collection === undefined || collection.length === 0) return result(false);
+			if (err || collection === undefined || collection.length === 0) return result(false);
 
 			// Turn items into ObjectId's
 			var collection = collection[0];

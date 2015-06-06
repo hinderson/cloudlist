@@ -41,6 +41,8 @@ module.exports = function (router) {
 		var collectionId = hashids.decodeHex(req.params.id);
 
 		collections.getOne(collectionId, null, function (result) {
+			if (!result) return false;
+
 			if ('production' === process.env.NODE_ENV) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}
