@@ -197,20 +197,9 @@ collections = {
 					tempPath + covers[3],
 					'-tile', '2x2',
 					'-geometry', '+0+0',
-					targetPath + generatedFilename
+					tempPath + generatedFilename
 				], function (err, stdout) {
 					if (err) return console.log(err);
-
-					console.log('Montage created', generatedFilename);
-
-					var montage = {
-						format: 'JPEG',
-						filename: generatedFilename,
-						width: 500,
-						height: 500
-					};
-
-					collections.update(id, { 'thumbnails.montage':  montage });
 
 					// Delete temporarily created thumbnails
 					utils.forEach(covers, function (index, file) {
@@ -219,6 +208,33 @@ collections = {
 
 							console.log('Deleting ' + file);
 						});
+					});
+
+					// Add watermark
+					im.composite([
+						'-gravity', 'center',
+						'./client/dev/assets/img/cloudlist-watermark.png', tempPath + generatedFilename,
+						targetPath + generatedFilename
+					], function (err) {
+						if (err) return console.log(err);
+
+						console.log('Montage created', generatedFilename);
+
+						var montage = {
+							format: 'JPEG',
+							filename: generatedFilename,
+							width: 500,
+							height: 500
+						};
+
+						collections.update(id, { 'thumbnails.montage':  montage });
+
+						// Delete temporarily created montage without watermark
+						fs.unlink(tempPath + generatedFilename, function (err) {
+							if (err) throw err;
+
+							console.log('Deleting temp ' + generatedFilename);
+						})
 					});
 				});
 			});
