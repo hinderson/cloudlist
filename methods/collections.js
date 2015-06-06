@@ -1,25 +1,35 @@
 'use strict';
 
+var fs = require('fs');
 var db = require('../server').db;
 var slugify = require('../utils/slugify.js');
 var async = require('async');
 var ObjectId = require('mongoskin').ObjectID;
 var utils = require('../utils/utils');
+var crypto = require('crypto');
+
+// Imagemagick
+var im = require('simple-imagemagick');
 
 // Database methods
 var users = require('../methods/users.js');
 
-module.exports = {
+// Constructor
+var collections = {};
+
+collections = {
 
 	getAll: function (user, result) {
 		users.getOne(user, null, function (user) {
 			db.collection('collections').find( ).toArray(function (err, collections) {
 				if (err) throw err;
 
-				return result({
-					collections: collections,
-					sortorder: user.collections
-				});
+				if (typeof(result) === 'function') {
+					return result({
+						collections: collections,
+						sortorder: user.collections
+					});
+				}
 			});
 		});
 	},
@@ -52,10 +62,12 @@ module.exports = {
 
 				var sortedSongs = utils.sortObj(items, '_id', collection.items);
 
-				return result({
-					collection: collection,
-					songs: sortedSongs
-				});
+				if (typeof(result) === 'function') {
+					return result({
+						collection: collection,
+						songs: sortedSongs
+					});
+				}
 			});
 		});
 	},
@@ -92,34 +104,33 @@ module.exports = {
 		], function (err) {
 			if (err) throw err;
 
-			return result(collection);
+			if (typeof(result) === 'function') {
+				return result(collection);
+			}
 		});
 	},
 
-	update: function (id, args, result) {
+	update: function (id, query, result) {
 		if (!id) { return false; }
 
-		var query = {};
-
-		// Update collection title
-		if (args.title) {
-			query.title = args.title;
-		}
-
-		// Update items
-		if (args.items) {
-			query.items = args.items;
-		}
-
-		// Update template
-		if (args.template) {
-			query.template = args.template;
+		// Generate covers montage if the order changes for the first 4 songs
+		if (query.hasOwnProperty('items')) {
+			collections.getOne(id, null, function (data) {
+				// Look through the first 4 items in the old and new array to detect changes
+				var items = data.collection.items.splice(0, 4);
+				var isSame = items.every(function (element, index) {
+					return element === query.items[index];
+				});
+				isSame || collections.createCoversMontage(id);
+			});
 		}
 
 		db.collection('collections').update( { _id: ObjectId(id) }, { '$set': query }, function (err) {
 			if (err) throw err;
 
-			return result(true);
+			if (typeof(result) === 'function') {
+				return result(true);
+			}
 		});
 	},
 
@@ -140,8 +151,80 @@ module.exports = {
 		], function (err) {
 			if (err) throw err;
 
-			return result(true);
+			if (typeof(result) === 'function') {
+				return result(true);
+			}
 		});
-	}
+	},
+
+	createCoversMontage: function (id, result) {
+		if (!id) { return false; }
+
+		collections.getOne(id, null, function (result) {
+			var path = './client/dev/media/img/';
+			var tempPath = './tmp/';
+			var targetPath = './client/dev/media/img/';
+			var covers = [];
+
+			var slicedArray = result.songs.slice(0, 4);
+			async.eachSeries(slicedArray, function (song, callback) {
+				var cover = song.covers[0].filename;
+				var index = result.songs.indexOf(song);
+
+				// Create thumbnails of the first 4 images
+				im.convert([
+					path + cover,
+					'-thumbnail', '250x250^',
+					'-gravity', 'center',
+					'-extent', '250x250',
+					tempPath + 'temp-crop-img-' + index + '.jpg'
+				], function (err, stdout) {
+					if (err) return console.log(err);
+
+					covers.push('temp-crop-img-' + index + '.jpg');
+					callback();
+				});
+			}, function (err) {
+				if (err) return console.log(err);
+
+				var generatedFilename = crypto.randomBytes(12).toString('hex') + '.jpg';
+
+				// Create a montage/grid of all 4 temporarily created thumbnails
+				im.montage([
+					tempPath + covers[0],
+					tempPath + covers[1],
+					tempPath + covers[2],
+					tempPath + covers[3],
+					'-tile', '2x2',
+					'-geometry', '+0+0',
+					targetPath + generatedFilename
+				], function (err, stdout) {
+					if (err) return console.log(err);
+
+					console.log('Montage created', generatedFilename);
+
+					var montage = {
+						format: 'JPEG',
+						filename: generatedFilename,
+						width: 500,
+						height: 500
+					};
+
+					collections.update(id, { 'thumbnails.montage':  montage });
+
+					// Delete temporarily created thumbnails
+					utils.forEach(covers, function (index, file) {
+						fs.unlink('./tmp/' + file, function (err) {
+							if (err) throw err;
+
+							console.log('Deleting ' + file);
+						});
+					});
+				});
+			});
+		});
+	},
 
 };
+
+module.exports = collections;

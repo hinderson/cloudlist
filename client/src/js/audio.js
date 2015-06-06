@@ -91,6 +91,7 @@ module.exports = {
 			autoPlay: false,
 			url: url,
 			stream: false,
+			useFlashBlock : true,
 			onload: function (success) {
 				if (!success) {
 					console.log(url, 'has failed loading');

@@ -17,7 +17,13 @@ var gm = require('gm');
 var ffmpeg = require('fluent-ffmpeg');
 var probe = require('node-ffprobe');
 
-module.exports = {
+// Methods
+var collections = require('./collections.js');
+
+// Constructor
+var songs = {};
+
+songs = {
 
 	getAll: function (id, result) {
 
@@ -275,60 +281,64 @@ module.exports = {
 		}, function (err) {
 			if (err) throw err;
 
-			// First count the length of the database
-			db.collection('songs').count(function (err, count) {
+			var slugs = {
+				album: songAlbum && slugify(songAlbum),
+				artist: songArtist && slugify((Array.isArray(songArtist) ? songArtist.join('-') : songArtist) + (songFeatured && songFeatured.length > 0 ? (' feat. ' + (Array.isArray(songFeatured) ? songFeatured.join('-') : songFeatured )) : '')),
+				title: songTitle && slugify(songTitle)
+			};
+
+			var song = {
+				'added': new Date(),
+				'album': songAlbum,
+				'artist' : songArtist,
+				'audio': {
+					'source': streamUrl ? 'soundcloud' : 'file',
+					'url': streamUrl ? streamUrl : audioUrl,
+					'stream': resolvedUrl,
+					'starttime': startTime,
+					'endtime': endTime || songDuration,
+					'duration': songDuration
+				},
+				'available': true,
+				'featuredartist': songFeatured,
+				'covers': [songCover],
+				'slugs': {
+					'album': slugs.album,
+					'artist': slugs.artist,
+					'title': slugs.title
+				},
+				'permalink': slugs.artist + '-' + slugs.title,
+				'tags': null,
+				'title': songTitle
+			};
+
+			// Submit to the DB
+			db.collection('songs').insert(song, function (err, doc) {
 				if (err) throw err;
 
-				var slugs = {
-					album: songAlbum && slugify(songAlbum),
-					artist: songArtist && slugify((Array.isArray(songArtist) ? songArtist.join('-') : songArtist) + (songFeatured && songFeatured.length > 0 ? (' feat. ' + (Array.isArray(songFeatured) ? songFeatured.join('-') : songFeatured )) : '')),
-					title: songTitle && slugify(songTitle)
-				};
+				// Fetch newly created song id
+				var songId = doc[0]._id + '';
 
-				var song = {
-					'added': new Date(),
-					'album': songAlbum,
-					'artist' : songArtist,
-					'audio': {
-						'source': streamUrl ? 'soundcloud' : 'file',
-						'url': streamUrl ? streamUrl : audioUrl,
-						'stream': resolvedUrl,
-						'starttime': startTime,
-						'endtime': endTime || songDuration,
-						'duration': songDuration
-					},
-					'available': true,
-					'featuredartist': songFeatured,
-					'covers': [songCover],
-					'slugs': {
-						'album': slugs.album,
-						'artist': slugs.artist,
-						'title': slugs.title
-					},
-					'permalink': slugs.artist + '-' + slugs.title,
-					'tags': null,
-					'title': songTitle
-				};
+				collections.getOne(collectionId, null, function (data) {
+					var items = data.collection.items;
+					// Push newly created song to the items array
+					items.push(songId);
 
-				// Submit to the DB
-				db.collection('songs').insert(song, function (err, doc) {
-					if (err) throw err;
+					// Update collection with the new id
+					collections.update(collectionId, { 'items': items }, function ( ) {
+						console.log('Added ' + songId +' to collection ' + collectionId);
 
-					// Add newly added song to the collection document
-					var songId = doc[0]._id + '';
-					console.log(collectionId);
-					db.collection('collections').update(
-						{ _id: ObjectId(collectionId) }, // Find accompanying collection based on slug id
-						{ $push: { items: songId } // Push newly created songId to items array
-						}, function (err, doc) {
-							if (err) throw err;
-
+						if (typeof(result) === 'function') {
 							return result(song);
 						}
-					);
+					});
+
+					// Generate covers montage if song is in place 1-4
+					if (items.indexOf(songId) < 4) {
+						collections.createCoversMontage(collectionId);
+					}
 				});
 			});
-
 		});
 	},
 
@@ -351,7 +361,9 @@ module.exports = {
 		db.collection('songs').update({ _id: ObjectId(id) }, { '$set': query }, function (err) {
 			if (err) throw err;
 
-			return result(true);
+			if (typeof(result) === 'function') {
+				return result(true);
+			}
 		});
 	},
 
@@ -390,8 +402,12 @@ module.exports = {
 		], function (err) {
 			if (err) throw err;
 
-			return result(true);
+			if (typeof(result) === 'function') {
+				return result(true);
+			}
 		});
 	}
 
 };
+
+module.exports = songs;

@@ -204,4 +204,8 @@ module.exports = function (router) {
 
 	});
 
+	router.get('/create-covers-montage/:id', function (req, res) {
+		collections.createCoversMontage(req.params.id);
+	});
+
 };

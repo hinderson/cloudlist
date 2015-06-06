@@ -416,6 +416,7 @@
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
+
 .collection ol:hover .cover,
 .collection ol:focus .cover {
 	opacity: 0.4;
@@ -424,6 +425,7 @@
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
+
 .collection .playing .cover,
 .collection .paused .cover,
 .collection li:hover .cover,
@@ -431,10 +433,12 @@
 	display: block;
 	opacity: 1;
 }
+
 .collection li:hover .cover,
 .collection li:focus .cover {
 	z-index: 1;
 }
+
 @media (max-width: 685px) {
 	.collection .cover { display: none !important; }
 }
