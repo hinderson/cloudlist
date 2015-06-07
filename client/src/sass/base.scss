@@ -262,10 +262,12 @@
 	cursor: pointer;
 }
 .no-touch.sticky-header .collection-sub-title {
+	position: relative;
 	visibility: visible;
 	opacity: 1;
 	-webkit-transform: translate3d(0, 0, 0);
 	transform: translate3d(0, 0, 0);
+	pointer-events: visible;
 }
 .collection-sub-title {
 	cursor: pointer;
