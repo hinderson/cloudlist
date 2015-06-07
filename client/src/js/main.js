@@ -114,11 +114,9 @@ var itemHoverHandler = function (e) {
 	switch (e.type) {
 		case 'mouseover':
 			this.loadItemCover(target);
-			console.log('mouseover', target);
 			this.scrollOverflowingText(target);
 			break;
 		case 'mouseout':
-			console.log('mouseout', target);
 			this.scrollOverflowingText(target, true);
 			break;
 	}
@@ -601,11 +599,13 @@ module.exports = {
 			cover.setAttribute('width', item.width);
 			cover.setAttribute('height', item.height);
 
-			parentNode.appendChild(cover);
+			utils.requestAnimFrame.call(window, function ( ) {
+				parentNode.appendChild(cover);
+			});
 			c.coversLoaded.push(id);
 
 			this.randomCoverPosition(id, cover);
-		} else if (!(parentNode.classList.contains('playing') || parentNode.classList.contains('paused'))) { // Reposition again if cover has already been loaded
+		} else if (!(parentNode.classList.contains('playing') || parentNode.classList.contains('paused') || parentNode.classList.contains('loading'))) { // Reposition again if cover has already been loaded
 			this.randomCoverPosition(id);
 		}
 	},
@@ -640,7 +640,25 @@ module.exports = {
 			// Add loading class
 			c.elems.HTML.classList.add('loading-song');
 			elem.classList.add('loading');
-		};
+
+			// Unfocus previous item
+			var prevElem = c.elems.currentItem;
+			if (prevElem) {
+				c.elems.currentItem = null;
+				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
+			}
+
+			// Load item cover & scroll overflowing text
+			utils.simulateMouseEvent(elem.firstChild, 'mouseover');
+
+			// Store element globally
+			c.elems.currentItem = elem;
+
+			// Scroll to track if out of bounds
+			if (!utils.inViewport(elem, 250)) {
+				this.scrollToElement(elem);
+			}
+		}.bind(this);
 
 		var failed = function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
@@ -692,26 +710,7 @@ module.exports = {
 			// Add random palette color
 			color = 'color-' + Math.floor(Math.random() * 8);
 			elem.classList.add(color);
-
-			// Unfocus previous item
-			var prevElem = c.elems.currentItem;
-			if (prevElem) {
-				c.elems.currentItem = null;
-				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
-			}
-
-			// Load item cover & scroll overflowing text
-			utils.simulateMouseEvent(elem.firstChild, 'mouseover');
-
-			// Store element globally
-			console.log('Setting currentItem', elem);
-			c.elems.currentItem = elem;
-
-			// Scroll to track if out of bounds
-			if (!utils.inViewport(elem, 250)) {
-				this.scrollToElement(elem);
-			}
-		}.bind(this);
+		};
 
 		var paused = function ( ) {
 			elem.classList.remove('playing');
