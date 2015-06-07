@@ -23,7 +23,9 @@ block content
 					span 0
 					span 1
 					span 4
-	section.collection.group(data-id="#{collection._id}")
+
+	- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
+	section.collection.group(data-id="#{obfuscatedCollectionId}")
 		header.collection-header
 			h3.collection-sub-title #{collection.title}
 			h4.structural Sort tracks:
@@ -40,9 +42,10 @@ block content
 			Song list
 		ol
 			each song, index in songs
+				- var obfuscatedId = hashids.encodeHex(song._id);
 				- song = structureSong(song);
 
-				li(class=song.available === true ? undefined : "unavailable", data-id="#{song.id}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
+				li(class=song.available === true ? undefined : "unavailable", data-id="#{obfuscatedId}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
 					a(href="#{rootHost}/#{path}/#{song.permalink}/")
 						div.col.index #{index+1}
 						div.col.title

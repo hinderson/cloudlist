@@ -322,6 +322,10 @@
 .collection a:focus {
 	background: rgba(0, 0, 0, 0.15);
 }
+
+.collection .unavailable {
+	pointer-events: none;
+}
 .collection .unavailable a {
 	color: #474646;
 	pointer-events: none;
