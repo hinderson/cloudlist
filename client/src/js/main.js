@@ -12,7 +12,6 @@ var s, c;
 
 // Private variables
 var ticking = false;
-var clonedSpan = null;
 var lastScrollY = 0;
 
 // Private functions
@@ -115,9 +114,11 @@ var itemHoverHandler = function (e) {
 	switch (e.type) {
 		case 'mouseover':
 			this.loadItemCover(target);
+			console.log('mouseover', target);
 			this.scrollOverflowingText(target);
 			break;
 		case 'mouseout':
+			console.log('mouseout', target);
 			this.scrollOverflowingText(target, true);
 			break;
 	}
@@ -498,7 +499,7 @@ module.exports = {
 	},
 
 	scrollOverflowingText: function (target, reset) {
-		// Bounce – i.e. don't reset or retrigger any values – if current item is already playing/is paused
+		// Bounce – i.e. don't reset or retrigger any values if current item is already playing/is paused
 		if (target.parentNode === c.elems.currentItem) {
 			return;
 		}
@@ -510,17 +511,21 @@ module.exports = {
 					item.classList.remove('scroll-overflow');
 
 					// Remove cloned span
-					clonedSpan && clonedSpan.remove();
+					var clonedSpan = item.children[1];
+					utils.requestAnimFrame.call(window, function ( ) {
+						clonedSpan && clonedSpan.remove();
+					});
 				} else if (!item.classList.contains('scroll-overflow')) {
 					item.classList.add('scroll-overflow');
 
 					// Clone and append span
-					clonedSpan = item.firstElementChild.cloneNode(true);
-					item.appendChild(clonedSpan);
+					var clone = item.firstElementChild.cloneNode(true);
+					utils.requestAnimFrame.call(window, function ( ) {
+						item.appendChild(clone);
+					});
 				}
 			}
-
-		}.bind(this));
+		});
 	},
 
 	scrollToPosition: function (destination, duration, callback) {
@@ -699,6 +704,7 @@ module.exports = {
 			utils.simulateMouseEvent(elem.firstChild, 'mouseover');
 
 			// Store element globally
+			console.log('Setting currentItem', elem);
 			c.elems.currentItem = elem;
 
 			// Scroll to track if out of bounds

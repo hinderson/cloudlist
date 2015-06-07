@@ -193,6 +193,7 @@
 	-ms-user-select: none;
 	user-select: none;
 	font-weight: normal;
+	pointer-events: visible;
 }
 .sort strong svg {
 	display: inline-block;
@@ -243,6 +244,7 @@
 	width: 100%;
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
+	pointer-events: none;
 }
 .collection-sub-title {
 	visibility: hidden;
