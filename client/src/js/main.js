@@ -321,12 +321,10 @@ module.exports = {
 			this.throttleHoverStates();
 
 			// Add sticky-header class
-			if (this.viewportWidth > 600) {
-				if (lastScrollY > c.collectionTop) {
-					c.elems.HTML.classList.add('sticky-header');
-				} else {
-					c.elems.HTML.classList.remove('sticky-header');
-				}
+			if (lastScrollY > c.collectionTop) {
+				c.elems.HTML.classList.add('sticky-header');
+			} else {
+				c.elems.HTML.classList.remove('sticky-header');
 			}
 
 			// Re-focus on currently playing track
