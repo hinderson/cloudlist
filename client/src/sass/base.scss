@@ -373,11 +373,13 @@
 	-webkit-transition: background 0.65s;
 	transition: background 0.65s;
 }
+
 .collection .paused a {
 	color: #000;
 	-webkit-transition: background 0.2s;
 	transition: background 0.2s;
 }
+
 .collection svg.state-playing,
 .collection svg.state-paused {
 	position: absolute;
@@ -386,6 +388,13 @@
 	width: 16px;
 	z-index: 2;
 	fill: #000;
+}
+
+@media (max-width: 685px) {
+	.collection svg.state-playing,
+	.collection svg.state-paused {
+		margin-left: -8px;
+	}
 }
 
 /* Palettes */

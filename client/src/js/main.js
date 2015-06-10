@@ -12,7 +12,7 @@ var s, c;
 
 // Private variables
 var ticking = false;
-var lastScrollY = 0;
+var lastScrollY = null;
 
 // Private functions
 var getCollection = function (id, callback) {
@@ -172,9 +172,9 @@ module.exports = {
 
 	cache: {
 		collection: {
-			index: [], // This stores the actual index positions
+			index: [], // This stores the actual index positions from the db
 			order: [], // This stores the current, updatable sort order
-			items: {}
+			items: null
 		},
 		elems: {
 			HTML: document.getElementsByTagName('html')[0],
@@ -233,6 +233,7 @@ module.exports = {
 
 		this.registerEvents();
 		this.registerKeyboardEvents();
+		this.toggleStickyHeader();
 		this.findOverflowingElements();
 		this.storeViewportDimensions();
 	},
@@ -319,13 +320,7 @@ module.exports = {
 
 		var requestTick = function ( ) {
 			this.throttleHoverStates();
-
-			// Add sticky-header class
-			if (lastScrollY > c.collectionTop) {
-				c.elems.HTML.classList.add('sticky-header');
-			} else {
-				c.elems.HTML.classList.remove('sticky-header');
-			}
+			this.toggleStickyHeader();
 
 			// Re-focus on currently playing track
 			window.clearTimeout(this.focusInterval);
@@ -381,6 +376,15 @@ module.exports = {
 				item.classList.remove('overflow');
 			}
 		});
+	},
+
+	toggleStickyHeader: function ( ) {
+		var scrollPosition = lastScrollY || window.pageYOffset;
+		if (scrollPosition > c.collectionTop) {
+			c.elems.HTML.classList.add('sticky-header');
+		} else {
+			c.elems.HTML.classList.remove('sticky-header');
+		}
 	},
 
 	toggleFullscreen: function ( ) {
@@ -572,6 +576,11 @@ module.exports = {
 		var id = parentNode.getAttribute('data-id');
 
 		if (this.viewportWidth < 685) {
+			return;
+		}
+
+		// If AJAX call hasn't been completed yet
+		if (c.collection.items === null) {
 			return;
 		}
 

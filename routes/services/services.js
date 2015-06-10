@@ -132,26 +132,13 @@ module.exports = function (router) {
 		});
 	});
 
-	router.get('/spotify/create-playlist/:id', function (req, res) {
-
-		// TEMP: Render the link in the Jade view instead
-
-		var scopes = ['playlist-modify-private', 'playlist-modify-public'];
-		var state = req.params.id; // This is a decoded id
-
-		// Construct a Spotify authorization URL (could probably be made by hand)
-		var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
-
-		res.send(authorizeURL);
-	});
-
 	router.get('/spotify/callback', function (req, res) {
 
 		var id = hashids.decodeHex(req.query.state) || null;
 		var code = req.query.code || null;
 
 		collections.getOne(id, null, function (result) {
-			users.getOne(result.collection.owner, function (user) {
+			users.getOne(result.collection.owner, null, function (user) {
 
 				var spotifySongs = [];
 				var spotifyAccount = 'cloudlist.io';
@@ -206,6 +193,8 @@ module.exports = function (router) {
 
 	});
 
+
+	// TEMP: Not used
 	router.get('/create-covers-montage/:id', function (req, res) {
 		collections.createCoversMontage(req.params.id);
 	});
