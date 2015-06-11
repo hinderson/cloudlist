@@ -652,6 +652,7 @@ module.exports = {
 			var prevElem = c.elems.currentItem;
 			if (prevElem) {
 				c.elems.currentItem = null;
+				prevElem.firstChild.blur();
 				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
 			}
 
