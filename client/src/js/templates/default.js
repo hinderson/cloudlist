@@ -13,8 +13,7 @@ var cacheElems = function ( ) {
 var registerEvents = function ( ) {
 	main.cache.elems.playBtn.addEventListener('click', function (e) {
 		// Play first song in collection
-		var id = main.cache.collection.order[0];
-		audio.play(id);
+		audio.toggleState();
 	}.bind(this), false);
 };
 

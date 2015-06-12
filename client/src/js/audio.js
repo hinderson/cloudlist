@@ -56,14 +56,16 @@ module.exports = {
 		}
 	},
 
-	toggle: function (id) {
-		// Toggle play, resume or pause depending on states
+	toggleState: function (id) {
 		if (id && id !== state.currentId) {
 			this.play(id);
 		} else if (state.audio === 'paused') {
 			this.resume(state.currentId);
-		} else {
+		} else if (state.currentId) {
 			this.pause(state.currentId);
+		} else {
+			var id = collection.order[0];
+			this.play(id);
 		}
 	},
 

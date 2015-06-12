@@ -105,7 +105,7 @@ var itemClickHandler = function (e) {
 	e.preventDefault();
 
 	var id = e.delegateTarget.parentNode.getAttribute('data-id');
-	audio.toggle(id);
+	audio.toggleState(id);
 };
 
 var itemHoverHandler = function (e) {
@@ -189,6 +189,7 @@ module.exports = {
 			closeDialog: document.getElementsByClassName('close-dialog')[0],
 			dialogOverlay: document.getElementsByClassName('dialog-overlay')[0],
 			infoBtn: document.getElementsByClassName('info-toggle')[0],
+			playStateBtn: document.getElementsByClassName('play-state')[0],
 			fullscreen: document.getElementsByClassName('fullscreen')[0],
 			volume: document.getElementsByClassName('volume-slider')[0],
 			options: document.getElementsByClassName('options')[0],
@@ -248,6 +249,10 @@ module.exports = {
 		c.elems.sort.addEventListener('click', utils.delegate(utils.criteria.hasTagNames(['span', 'strong']), sortClickHandler), false);
 
 		c.elems.fullscreen.addEventListener('click', this.toggleFullscreen, false);
+
+		c.elems.playStateBtn.addEventListener('click', function ( ) {
+			audio.toggleState();
+		}, false);
 
 		c.elems.infoBtn.addEventListener('click', this.toggleDialog, false);
 
@@ -450,7 +455,7 @@ module.exports = {
 				case 32:
 					e.preventDefault();
 					console.log('Space');
-					audio.toggle();
+					audio.toggleState();
 					break;
 
 				// Left & up arrow
@@ -718,6 +723,9 @@ module.exports = {
 			// Add random palette color
 			color = 'color-' + Math.floor(Math.random() * 8);
 			elem.classList.add(color);
+
+			// Set global state
+			c.elems.playStateBtn.classList.add('playing');
 		};
 
 		var paused = function ( ) {
@@ -732,6 +740,9 @@ module.exports = {
 			// Update document title to remove ▶ character
 			var documentTitle = window.history.state.title.replace('▶ ', '');
 			history.updateDocumentTitle(documentTitle);
+
+			// Set global state
+			c.elems.playStateBtn.classList.remove('playing');
 		};
 
 		var resumed = function ( ) {
@@ -749,6 +760,9 @@ module.exports = {
 
 			// Scroll to track
 			this.scrollToElement(elem);
+
+			// Set global state
+			c.elems.playStateBtn.classList.add('playing');
 		}.bind(this);
 
 		var stopped = function ( ) {
@@ -763,6 +777,9 @@ module.exports = {
 				currentProgress.parentNode.removeChild(currentProgress);
 				progressBar.parentNode.removeChild(progressBar);
 			}
+
+			// Set global state
+			c.elems.playStateBtn.classList.remove('playing');
 		};
 
 		var updating = function (args) {
