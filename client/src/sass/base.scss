@@ -91,7 +91,8 @@
 
 .no-touch .fullscreen,
 .volume-slider,
-.info-toggle {
+.info-toggle,
+.play-state {
 	float: right;
 }
 .no-js .volume-slider,
@@ -156,13 +157,15 @@
 
 .info-toggle {
 	width: 12px;
-	margin-right: 19px;
+	margin-right: 18px;
 	border: 0;
 	background: none;
 }
+
 .info-toggle svg {
 	fill: #fff;
 }
+
 .info-toggle:hover,
 .info-toggle:focus {
 	opacity: 0.9;
@@ -170,9 +173,48 @@
 	transform: scale(1.05);
 	outline: 0;
 }
+
 .info-toggle:active {
 	-webkit-transform: scale(0.97);
 	transform: scale(0.97);
+}
+
+.play-state {
+	border: 0;
+	background: none;
+	margin-right: 15px;
+	cursor: pointer;
+}
+
+.play-state:hover,
+.play-state:focus {
+	opacity: 0.9;
+	-webkit-transform: scale(1.06);
+	transform: scale(1.06);
+	outline: 0;
+}
+
+.play-state:active {
+	-webkit-transform: scale(0.97);
+	transform: scale(0.97);
+}
+
+.play-state svg {
+	fill: #fff;
+	width: 16px;
+	height: 19px;
+}
+
+.play-state .pause {
+	display: none;
+}
+
+.play-state.playing .pause {
+	display: block;
+}
+
+.play-state.playing .play {
+	display: none;
 }
 
 @media (min-width: 686px) {

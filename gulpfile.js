@@ -103,7 +103,7 @@ watcher.on('change', function (event) {
 });
 
 // SVG Store
-gulp.task('svgstore', function () {
+gulp.task('svgstore', function ( ) {
 	function fileContents (filePath, file) {
 		return file.contents.toString('utf8')
 	}
@@ -122,7 +122,7 @@ gulp.task('svgstore', function () {
 	return gulp.src('./views/layout.jade')
 		.pipe(inject(svgs, { transform: fileContents } ))
 		.pipe(gulp.dest('./views/'));
-})
+});
 
 // Compress and move images
 gulp.task('images-assets', function ( ) {
