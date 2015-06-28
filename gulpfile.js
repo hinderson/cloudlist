@@ -92,7 +92,7 @@ gulp.task('sass:prod', function ( ) {
 		fileNameManifest: 'rev-manifest-css.json'
 	});
 
-	return sass('./client/src/sass', { sourcemap: false, style: 'compact' })
+	return sass('./client/src/sass', { sourcemap: false, style: 'compressed' })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
