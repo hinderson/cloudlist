@@ -36,7 +36,7 @@ html(lang="en-US", class="no-js")
 			meta(property="og:description", content="#{collection.description}")
 
 		if prod
-			link(href="https://static.cloudlist.io/assets/js/#{assets.styles['templates/' + collection.template + '.css']}", rel="stylesheet")
+			link(href="https://static.cloudlist.io/assets/css/#{assets.styles['templates/' + collection.template + '.css']}", rel="stylesheet")
 		else
 			link(href="#{rootHost}/assets/css/templates/#{collection.template}.css", rel="stylesheet")
 	body
