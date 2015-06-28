@@ -57,7 +57,8 @@ gulp.task('webpack:prod', function (callback) {
 			transformFilename: function (file, hash) {
 				var ext = path.extname(file.path);
 				return path.basename(file.path, ext) + '-' + hash.substr(0, 8) + ext;
-			}
+			},
+			fileNameManifest: 'rev-manifest-js.json'
 		});
 
 		// Rev the files and create a manifest with references to them
@@ -65,7 +66,7 @@ gulp.task('webpack:prod', function (callback) {
 			.pipe(revAll.revision())
 			.pipe(gulp.dest('./client/dist/assets/js/'))
 			.pipe(revAll.manifestFile())
-			.pipe(gulp.dest('./client/dist/assets/js/'));
+			.pipe(gulp.dest('./'));
 
 		callback();
 	});
@@ -87,7 +88,8 @@ gulp.task('sass:prod', function ( ) {
 		transformFilename: function (file, hash) {
 			var ext = path.extname(file.path);
 			return path.basename(file.path, ext) + '-' + hash.substr(0, 8) + ext;
-		}
+		},
+		fileNameManifest: 'rev-manifest-css.json'
 	});
 
 	return sass('./client/src/sass', { sourcemap: false, style: 'compact' })
@@ -98,7 +100,7 @@ gulp.task('sass:prod', function ( ) {
 		.pipe(revAll.revision())
 		.pipe(gulp.dest('./client/dist/assets/css/'))
 		.pipe(revAll.manifestFile())
-		.pipe(gulp.dest('./client/dist/assets/css/'));
+		.pipe(gulp.dest('./'));
 });
 
 // Watcher for Sass
