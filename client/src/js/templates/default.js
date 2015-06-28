@@ -39,11 +39,22 @@ var updateParallax = function (lastScrollY) {
 	translateY3d(main.cache.elems.heroContent, translateValue);
 };
 
+var playing = function ( ) {
+	main.cache.elems.playBtn.classList.add('playing');
+};
+
+var paused = function ( ) {
+	main.cache.elems.playBtn.classList.remove('playing');
+};
+
 cacheElems();
 registerEvents();
 main.init();
 
 pubsub.subscribe('scrolling', updateParallax);
+pubsub.subscribe('audioPlaying', playing);
+pubsub.subscribe('audioPaused', paused);
+pubsub.subscribe('audioResumed', playing);
 
 // TEMP: Test opacity change on header
 /*

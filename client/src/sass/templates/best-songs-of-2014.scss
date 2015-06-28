@@ -34,3 +34,61 @@
 @media (max-width: 600px) {
 	.collection-title { font-size: 2em; margin-top: 6rem; }
 }
+
+/* Palettes */
+.color-0.playing a {
+	/* background: #ffeadc; */
+	background: rgba(255, 234, 220, 0.85);
+}
+.color-0.paused a {
+	background: rgba(255, 234, 220, 0.55);
+}
+.color-1.playing a {
+	/* background: #dbf3d0; */
+	background: rgba(219, 243, 208, 0.85);
+}
+.color-1.paused a {
+	background: rgba(219, 243, 208, 0.55);
+}
+.color-2.playing a {
+	/* background: #fff6de; */
+	background: rgba(255, 246, 222, 0.85);
+}
+.color-2.paused a {
+	background: rgba(255, 246, 222, 0.55);
+}
+.color-3.playing a {
+	/* background: #d4dff3; */
+	background: rgba(212, 223, 243, 0.85);
+}
+.color-3.paused a {
+	background: rgba(212, 223, 243, 0.55);
+}
+.color-4.playing a {
+	// background: #fff1b5;
+	background: rgba(255, 241, 181, 0.85);
+}
+.color-4.paused a {
+	background: rgba(255, 241, 181, 0.55);
+}
+.color-5.playing a {
+	// background: #c2ceca;
+	background: rgba(194, 206, 202, 0.85);
+}
+.color-5.paused a {
+	background: rgba(194, 206, 202, 0.45);
+}
+.color-6.playing a {
+	// background: #e5d6d4;
+	background: rgba(229, 214, 212, 0.85);
+}
+.color-6.paused a {
+	background: rgba(229, 214, 212, 0.45);
+}
+.color-7.playing a {
+	// background: #d6dccd;
+	background: rgba(214, 220, 205, 0.85);
+}
+.color-7.paused a {
+	background: rgba(214, 220, 205, 0.45);
+}
