@@ -40,8 +40,8 @@ if (env === 'production') {
 	}));
 
 	var assets = {
-		'styles': require('./client/dist/assets/css/rev-manifest.json'),
-		'scripts': require('./client/dist/assets/js/rev-manifest.json')
+		'styles': require('https://static.cloudlist.io/assets/css/rev-manifest.json'),
+		'scripts': require('https://static.cloudlist.io/assets/js/rev-manifest.json')
 	};
 	app.locals.assets = assets;
 	app.locals.prod = true;
