@@ -16,7 +16,7 @@
 
 @media (max-width: 685px) {
 	.hero {
-		min-height: 350px;
+		min-height: 400px;
 		height: auto;
 	}
 }
@@ -78,6 +78,14 @@
 	animation: fadeIn ease-in 1;
 	animation-fill-mode: forwards;
 	animation-duration: 0.35s;
+}
+
+@media (max-width: 680px) {
+	.collection-hero {
+		width: 231px;
+		height: auto;
+		top: 31%;
+	}
 }
 
 

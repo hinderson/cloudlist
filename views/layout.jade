@@ -99,10 +99,6 @@ html(lang="en-US", class="no-js")
 					dt
 						kbd M
 					dd Toggle mute
-			// TODO: Fix Spotify authentication
-			// section.group
-				- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
-				a(href="https://accounts.spotify.com/authorize?client_id=89b926650c4f4576b4799ae98421a20d&response_type=code&redirect_uri=http://localhost:3000/spotify/callback&scope=playlist-modify-private%20playlist-modify-public&state=#{obfuscatedCollectionId}", target="_blank") Spotify
 			footer
 				small Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud. It’s currently in super-private (as in, only one person uses it) alpha.
 		noscript

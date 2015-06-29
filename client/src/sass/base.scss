@@ -65,7 +65,7 @@
 	width: 25px;
 	padding: 0;
 	border: 0;
-	margin: 0;
+	margin: 0 0 0 17px;
 	line-height: 0;
 	background: none;
 }
@@ -155,7 +155,7 @@
 
 .info-toggle {
 	width: 12px;
-	margin-right: 17px;
+	margin-left: 16px;
 	border: 0;
 	background: none;
 }
@@ -180,7 +180,6 @@
 .play-state {
 	border: 0;
 	background: none;
-	margin-right: 16px;
 	cursor: pointer;
 }
 
