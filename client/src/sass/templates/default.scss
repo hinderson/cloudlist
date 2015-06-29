@@ -14,24 +14,18 @@
 	height: 100vh;
 }
 
-@media (max-width: 685px) {
-	.hero {
-		min-height: 400px;
-		height: auto;
-	}
-}
-
 .hero-inner {
 	position: absolute;
 	z-index: 1;
 	width: 100%;
 	text-align: center;
 	will-change: transform;
+	transition: all 0.35s ease;
 }
 
 .hero-inner h1 {
 	margin: 9rem auto 0;
-	width: 63%;
+	width: 85%;
 	max-width: 800px;
 	max-height: 340px;
 
@@ -80,11 +74,97 @@
 	animation-duration: 0.35s;
 }
 
+
+// RESPONSIVENESS
+
+@media (min-width: 1200px) {
+	.hero-inner h1 {
+		margin: 13rem auto 0;
+		max-width: 950px;
+	}
+
+	.hero-inner button {
+		width: 80px;
+		height: 80px;
+		margin-top: 2.5em;
+	}
+}
+
+@media (min-width: 1300px) {
+	.hero-inner h1 {
+		margin: 14rem auto 0;
+	}
+
+	.hero-inner button {
+		width: 90px;
+		height: 90px;
+		margin-top: 4em;
+	}
+}
+
+// Default
+@media (max-width: 1290px) {
+	.hero-inner h1 {
+		margin: 9rem auto 0;
+		max-width: 800px;
+	}
+
+	.hero-inner button {
+		width: 77px;
+		height: 77px;
+		margin-top: 3em;
+	}
+}
+
+@media (max-width: 685px) {
+	.hero {
+		min-height: 400px;
+		height: auto;
+	}
+}
+
 @media (max-width: 680px) {
 	.collection-hero {
-		width: 231px;
+		top: 37%;
+		width: 240px;
 		height: auto;
-		top: 31%;
+	}
+
+	.hero-inner button {
+		width: 67px;
+		height: 67px;
+	}
+}
+
+@media (max-width: 550px) {
+	.collection-hero {
+		top: 32%;
+		width: 200px;
+		height: auto;
+	}
+
+	.hero-inner button {
+		width: 60px;
+		height: 60px;
+		margin-top: 2em;
+	}
+}
+
+@media (max-width: 500px) {
+	.collection-hero {
+		top: 32%;
+		width: 200px;
+		height: auto;
+	}
+
+	.hero-inner button {
+		width: 60px;
+		height: 60px;
+		margin-top: 1.5em;
+	}
+
+	.hero {
+		min-height: 350px;
 	}
 }
 
