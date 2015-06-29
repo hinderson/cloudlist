@@ -20,7 +20,6 @@
 	width: 100%;
 	text-align: center;
 	will-change: transform;
-	transition: all 0.35s ease;
 }
 
 .hero-inner h1 {
@@ -76,11 +75,34 @@
 
 
 // RESPONSIVENESS
+@media (min-width: 1500px) {
+	.hero-inner h1 {
+		margin: 14rem auto 0;
+		max-width: 950px;
+	}
 
-@media (min-width: 1200px) {
+	.hero-inner button {
+		width: 110px;
+		height: 110px;
+		margin-top: 4em;
+	}
+}
+
+@media (max-width: 1450px) {
+	.hero-inner h1 {
+		margin: 11rem auto 0;
+	}
+
+	.hero-inner button {
+		width: 85px;
+		height: 85px;
+		margin-top: 3.5em;
+	}
+}
+
+@media (max-width: 1400px) {
 	.hero-inner h1 {
 		margin: 13rem auto 0;
-		max-width: 950px;
 	}
 
 	.hero-inner button {
@@ -90,20 +112,8 @@
 	}
 }
 
-@media (min-width: 1300px) {
-	.hero-inner h1 {
-		margin: 14rem auto 0;
-	}
-
-	.hero-inner button {
-		width: 90px;
-		height: 90px;
-		margin-top: 4em;
-	}
-}
-
 // Default
-@media (max-width: 1290px) {
+@media (max-width: 1300px) {
 	.hero-inner h1 {
 		margin: 9rem auto 0;
 		max-width: 800px;
