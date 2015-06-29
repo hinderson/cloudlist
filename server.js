@@ -19,11 +19,7 @@ var app = express();
 var env = process.env.NODE_ENV;
 
 // Favicon
-if (env === 'production') {
-	app.use(favicon('https://static.cloudlist.io/favicon.ico'));
-} else {
-	app.use(favicon('./client/dev/favicon.ico'));
-}
+app.use(favicon(__dirname + '/assets/favicon.ico'));
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
