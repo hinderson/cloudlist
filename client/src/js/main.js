@@ -232,6 +232,9 @@ module.exports = {
 		// Init history
 		history.init();
 
+		// Trigger resize event when window has been focused again
+		pubsub.subscribe('windowFocused', this.resizeEvent);
+
 		this.registerEvents();
 		this.registerKeyboardEvents();
 		this.toggleStickyHeader();
