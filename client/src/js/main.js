@@ -233,7 +233,9 @@ module.exports = {
 		history.init();
 
 		// Trigger resize event when window has been focused again
-		pubsub.subscribe('windowFocused', this.resizeEvent);
+		pubsub.subscribe('windowFocused', function ( ) {
+			this.resizeEvent();
+		}.bind(this));
 
 		this.registerEvents();
 		this.registerKeyboardEvents();
