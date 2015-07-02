@@ -27,7 +27,7 @@ html(lang="en-US", class="no-js")
 			//- Determine if it's a screenshot of a moving mp4, or just a regular image
 			- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
 			meta(property="og:image", content="https://static.cloudlist.io/media/img/#{cover}")
-			meta(property="og:description", content="At position no. #{index} in the list Best Songs of 2014: &quot;#{single.title}&quot; by #{combinedArtist}.")
+			meta(property="og:description", content="At position no. #{index} in the list #{collection.title}: &quot;#{single.title}&quot; by #{combinedArtist}.")
 		else if collection.thumbnails
 			meta(property="og:image", content="https://static.cloudlist.io/media/img/#{collection.thumbnails.montage.filename}")
 			meta(property="og:description", content="#{collection.description}")
