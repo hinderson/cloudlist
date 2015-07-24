@@ -28,6 +28,7 @@ module.exports = function (router) {
 			var userId = user._id;
 			collections.getAll(userId, function (result) {
 				res.render('dashboard/index', {
+					user: user,
 					collections: result.collections,
 					sortorder: result.sortorder
 				});
@@ -51,8 +52,9 @@ module.exports = function (router) {
 
 
 	// CREATE collection
-	router.post('/create-collection', function (req, res) {
-		collections.create(req.body.title, function (result) {
+	router.post('/create-collection/:user', function (req, res) {
+		var user = hashids.decodeHex(req.params.user);
+		collections.create(req.body.title, user, function (result) {
 			res.redirect(req.headers.referer);
 		});
 	});
@@ -60,11 +62,11 @@ module.exports = function (router) {
 	// UPDATE collection
 	router.post('/update-collection/:id', function (req, res) {
 		var id = hashids.decodeHex(req.params.id);
-		var items = req.body.items;
-		if (items) {
-			for (var i = 0, len = items.length; i < len; i++) {
-				req.body.items[i] = hashids.decodeHex(items[i]);
-			}
+		// Transform encoded id's
+		if (req.body.items) {
+			req.body.items = req.body.items.map(function (item) {
+				return hashids.decodeHex(item);
+			});
 		}
 		collections.update(id, req.body, function (result) {
 			if (result) {

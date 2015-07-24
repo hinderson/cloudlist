@@ -107,10 +107,9 @@ module.exports = function (router) {
 
 					var response = data.response.images;
 					if (response) {
-						var allResults = [];
-						for (var i = 0, len = response.length; i < len; i++) {
-							allResults.push(response[i].url);
-						}
+						var allResults = response.map(function (item) {
+							return item.url;
+						});
 						callback(null, allResults);
 					} else {
 						callback(null, null);

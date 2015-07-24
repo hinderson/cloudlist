@@ -345,12 +345,12 @@ songs = {
 	update: function (id, args, result) {
 		if (!id) { return false; }
 
+		console.log('update', args);
+
 		var field = args.field;
 		var content = args.content;
 
-		var query = {
-			updated: new Date()
-		};
+		var query = { updated: new Date() };
 
 		if (field === 'available') {
 			query[field] = (content === 'true' ? true: false);
@@ -362,7 +362,7 @@ songs = {
 			if (err) throw err;
 
 			if (typeof(result) === 'function') {
-				return result(true);
+				return result();
 			}
 		});
 	},

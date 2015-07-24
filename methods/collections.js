@@ -50,11 +50,9 @@ collections = {
 
 			// Turn items into ObjectId's
 			var collection = collection[0];
-			var objectIds = collection.items;
-			var items = [];
-			for (var i = 0, len = objectIds.length; i < len; i++) {
-				items.push(ObjectId(objectIds[i]));
-			}
+			var items = collection.items.map(function (item) {
+				return ObjectId(item);
+			});
 
 			// Match songs that are contained within the collection's items array
 			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
@@ -72,7 +70,7 @@ collections = {
 		});
 	},
 
-	create: function (title, result) {
+	create: function (title, user, result) {
 		var title = title || 'New playlist';
 
 		var collection = {
@@ -80,7 +78,7 @@ collections = {
 			'covers': [],
 			'description': '',
 			'items': [],
-			'owner': 1, // TEMP: Update once we have a user system
+			'owner': user,
 			'permalink': slugify(title),
 			'published': false,
 			'slugs': {
@@ -97,9 +95,11 @@ collections = {
 			},
 			function (doc, callback) {
 				// Add new collection reference to user document
-				// TEMP: Update this when there's a user system in place
-				var collectionId = doc[0]._id + '';
-				db.collection('users').update( { _id: 1 }, { $push: { 'collections': collectionId } }, callback);
+				var newCollectionId = doc[0]._id + '';
+				users.getOne(user, null, function (user) {
+					user.collections.push(newCollectionId);
+					users.update(user._id, { 'collections': user.collections }, callback);
+				});
 			}
 		], function (err) {
 			if (err) throw err;
@@ -144,9 +144,13 @@ collections = {
 			},
 			function (doc, sort, callback) {
 				// Remove collection reference from user document
-				// TEMP: Update this when there's a user system in place (it should probably use ObjectId)
-				var owner = doc.owner;
-				db.collection('users').update( { _id: owner }, { $pull: { 'collections': id } }, callback);
+				users.getOne(doc.owner, null, function (user) {
+					var collections = user.collections.filter(function (collection) {
+						return collection !== id;
+					});
+
+					users.update(user._id, { 'collections': collections }, callback);
+				});
 			}
 		], function (err) {
 			if (err) throw err;

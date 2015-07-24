@@ -13,9 +13,6 @@ html(lang="en-US")
 			section.song-list
 				header
 					h2 My playlists
-
-				//- LÄGG TILL SORTORDER HÄR
-
 				ul.playlists
 					- if (collections) {
 						-	for (var i = 0, len = sortorder.length; i < len; i++) {
@@ -43,7 +40,8 @@ html(lang="en-US")
 					- }
 			section.create-playlist
 				h2 Create new playlist
-				form(name="create-collection", method="post", action="/create-collection", enctype="multipart/form-data")
+				- var obfuscatedUserId = hashids.encodeHex(user._id);
+				form(name="create-collection", method="post", action="/create-collection/#{obfuscatedUserId}", enctype="multipart/form-data")
 					fieldset.metadata
 						h3 Title
 						label Title
