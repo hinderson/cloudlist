@@ -58,7 +58,8 @@ collections = {
 			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
 				if (err) throw err;
 
-				var sortedSongs = utils.sortObj(items, '_id', collection.items);
+				var hashmap = utils.makeHashmap(items);
+				var sortedSongs = utils.sortHashmap(hashmap, collection.items);
 
 				if (typeof(result) === 'function') {
 					return result({

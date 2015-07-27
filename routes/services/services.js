@@ -59,7 +59,7 @@ module.exports = function (router) {
 			});
 
 			// Make songs into hashmap
-			var items = utils.generateHashmap(result.songs);
+			var items = utils.makeHashmap(result.songs);
 
 			res.json({
 				collection: {

@@ -146,8 +146,7 @@ utils = {
 		featured = Array.isArray(featured) && featured.length > 1 ? featured.slice(0, -1).join(', ') + ' & ' + featured[featured.length -1] : featured;
 		featured = featured && featured.length > 0 ? (separator + featured) : '';
 
-		var artists = artist + featured;
-		return artists;
+		return artist + featured;
 	},
 
 	structureSlugs: function (slugs) {

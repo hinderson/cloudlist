@@ -5,8 +5,9 @@ var Hashids = require('hashids');
 var secret = require('../config/private/secret.js');
 var hashids = new Hashids(secret);
 
-module.exports = {
+var utils = {};
 
+utils = {
 	forEach: function (array, callback, scope) {
 		for (var i = 0, len = array.length; i < len; i++) {
 			callback.call(scope, i, array[i]);
@@ -39,39 +40,24 @@ module.exports = {
 		return text;
 	},
 
-	sortObj: function (obj, sortKey, sortOrder) {
-		var sortedObjects = [];
-		var len = obj.length;
-
-		for (var i = 0; i < len; i++) {
-			var id = obj[i][sortKey];
-			obj[id] = obj[i];
-		}
-
-		for (var i = 0; i < len; i++) {
-			var id = sortOrder[i];
-			sortedObjects.push(obj[id]);
-		}
-
-		return sortedObjects;
+	makeHashmap: function (obj) {
+		return obj.reduce(function (acc, item) {
+			var sortKey = item.id || item._id;
+			acc[sortKey] = item;
+			return acc;
+		}, {});
 	},
 
-	generateHashmap: function (obj) {
-		var generatedObjects = {};
-		var len = obj.length;
-
-		for (var i = 0; i < len; i++) {
-			var id = obj[i].id;
-			generatedObjects[id] = obj[i];
-		}
-
-		return generatedObjects;
+	sortHashmap: function (hashmap, sortArray) {
+		return sortArray.map(function (id) {
+			return hashmap[id];
+		});
 	},
 
 	findByKey: function (source, type, key) {
 		return source.filter(function (obj) {
 			return obj[type] === key;
-		})[ 0 ];
+		})[0];
 	},
 
 	structureSong: function (song) {
@@ -87,5 +73,6 @@ module.exports = {
 
 		return song;
 	},
-
 };
+
+module.exports = utils;
