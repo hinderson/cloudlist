@@ -19,28 +19,12 @@ html(lang="en-US")
 					input(type="submit", value="OK")
 					button#spotify Export to Spotify playlist
 				- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
-				table.collection(data-id="#{obfuscatedCollectionId}")
-					caption.collection-title
+				div.collection(data-id="#{obfuscatedCollectionId}")
+					div.collection-title
 						span(contenteditable) #{collection.title}
 						small
 							a(href="#{rootHost}/hinderson/#{collection.permalink}/", target="_blank") #{rootHost}/hinderson/#{collection.permalink}/
-					thead
-						tr
-							th.image
-								span.structural Image
-							th.index Index
-							th.artist Artist(s)
-							th.featured Featured
-							th.title Song title
-							//th.album Album
-							th.duration Duration
-							th.source Source
-							th.updated Last modified
-							th.available
-								span.structural Availability
-							th.controls
-							th.handle
-					tbody
+					div.collection-list
 						each song, index in songs
 							-	var obfuscatedId = hashids.encodeHex(song._id);
 							-	var artist = Array.isArray(song.artist) && song.artist.length > 1 ? song.artist.slice(0, -1).join(', ') + ' & ' + song.artist[song.artist.length -1] : song.artist;
@@ -48,19 +32,23 @@ html(lang="en-US")
 							-	var duration = Math.floor((song.audio.duration / (60 * 1000)) % 60) + ':' + (Math.floor((song.audio.duration / 1000) % 60) < 10 ? '0' : '') + Math.floor((song.audio.duration / 1000) % 60);
 							-	var lastModified = song.updated || song.added;
 
-							tr(data-id="#{obfuscatedId}", data-available="")
-								td.image
+							div.collection-item(data-id="#{obfuscatedId}", data-available="")
+								div.availability
+									if song.available
+										input(type="checkbox", checked)
+									else
+										input(type="checkbox")
+								div.image
 									if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
 										div.img(style="background-image:url(/media/img/#{song.covers[0].filename});", title="#{song.covers[0].filename}")
 									else
 										div Video
-								td.index
-								td.artist(contenteditable) #{artist}
-								td.featuredartist(contenteditable) #{featuredartist}
-								td.title(contenteditable) #{song.title}
-								//td.album(contenteditable) #{song.album}
-								td.duration #{duration}
-								td.source
+								div.index
+								div.artist-title
+									span.title #{song.title}
+									span.artist #{artist} #{featuredartist}
+								div.duration #{duration}
+								div.source
 									if song.audio.source === 'soundcloud'
 										a(href="#{song.audio.url}", title="#{song.audio.url}")
 											svg.soundcloud(viewBox="0 0 56.693 56.693", width="40px", height="40px", xmlns="http://www.w3.org/2000/svg")
@@ -68,16 +56,12 @@ html(lang="en-US")
 									else
 										a(href="#{song.audio.url}", title="#{song.audio.url}")
 											img(src="/assets/img/icon-file.jpg", width="40", height="40", class="file")
-								td.updated #{lastModified.toDateString()} #{lastModified.getHours()}:#{lastModified.getMinutes()}:#{lastModified.getSeconds()}
-								td.availability
-									if song.available
-										input(type="checkbox", checked)
-									else
-										input(type="checkbox")
-								td.controls
+								div.updated #{lastModified.toDateString()} #{lastModified.getHours()}:#{lastModified.getMinutes()}:#{lastModified.getSeconds()}
+								div.controls
+									a.edit(href="/hinderson/#{obfuscatedId}/edit/") Edit
 									form(name="delete-song", method="post", action="/delete-song/#{obfuscatedId}", enctype="multipart/form-data")
 										button(type="submit").delete ✕ Delete
-								td.handle
+								div.handle
 									span(role="button", class="handle") ☰
 				p.stats <strong>Total songs:</strong> #{songs.length}
 			section.add-song

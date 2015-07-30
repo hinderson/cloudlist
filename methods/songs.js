@@ -29,8 +29,14 @@ songs = {
 
 	},
 
-	getOne: function (id, result) {
+	getOne: function (id, callback) {
+		if (id === null) { return false; }
 
+		db.collection('songs').find( { _id: ObjectId(id) } ).toArray(function (err, song) {
+			if (err || song === undefined || song.length === 0) return result(false);
+
+			return callback(song[0]);
+		});
 	},
 
 	create: function (collectionId, args, files, result) {

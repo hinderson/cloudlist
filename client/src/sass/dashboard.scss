@@ -53,73 +53,105 @@ select {
 	font-size:20px;
 }
 
-caption small {
+.collection small {
 	display: block;
 	margin-top: 14px;
 	font-size: 16px;
 }
 
-table {
+.collection {
 	position:relative;
 	width:100%;
 	max-width: 100%;
 	border-collapse:collapse;
 	counter-reset:section;
+
+	.collection-title {
+		text-align: center;
+	}
+
+	.collection-item {
+		position: relative;
+		line-height: 23px;
+	}
+
+	.collection-item:nth-child(odd) {
+		background-color: #f7f7f7;
+	}
+
+	.collection-item > div {
+		display: inline-block;
+		vertical-align: middle;
+		margin: 4px 5px 3px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.availability {
+		position: absolute;
+		bottom: -1px;
+		margin: 0;
+
+		input {
+			font-size: 20px;
+			margin: 3px;
+		}
+	}
+
+	.index {
+		font-size: 18px;
+
+		&::before {
+			counter-increment: section;
+			content: counter(section);
+		}
+	}
+
+	.artist-title span {
+		display: block;
+	}
+
+	.artist-title .title {
+		font-size: 17px;
+		font-weight: bold;
+	}
+
+	.artist-title .artist {
+		font-size: 16px;
+	}
+
+	.handle {
+		padding: 0 15px 0 6px;
+	}
+
+	[data-available="true"] .availability {
+		color: #00cb59;
+	}
+
+	[data-available="false"] .availability {
+		color: #ff5d5b;
+	}
+
 }
-thead th {
-	text-align:left;
-}
-tbody {
-	position:relative;
-}
-tbody tr td.index:before {
-	counter-increment:section;
-	content:counter(section);
-}
-tbody tr:nth-child(odd) {
-	background-color:#f6f6f6;
-}
-thead th,
-tbody td {
-	padding:6px;
-	white-space:nowrap;
-	overflow:hidden;
-	text-overflow:ellipsis;
-	max-width:170px;
-}
-tbody td.handle {
-	padding: 0 15px 0 6px;
-}
-tbody .image {
-	padding-left: 8px;
-	padding-right: 0;
-}
-tbody .availability {
-	font-size: 22px;
-}
-tr[data-available="true"] .availability {
-	color:#00cb59;
-}
-tr[data-available="false"] .availability {
-	color:#ff5d5b;
-}
-table .index {
+
+.collection .index {
 	text-align:center;
 	padding-left:0;
 	padding-right:0;
 }
-table .source {
+.collection .source {
 	text-align:center;
 }
-table .source .soundcloud {
+.collection .source .soundcloud {
 	fill: #ff5d00;
 }
-table .controls {
+.collection .controls {
 	position:relative;
 	padding-right:0;
 	overflow:visible;
 }
-table .controls button {
+.collection .controls button {
 	margin-right:5px;
 }
 p.stats {

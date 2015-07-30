@@ -1,0 +1,43 @@
+doctype html
+html(lang="en-US")
+	head
+		meta(charset="utf-8")
+		title= rootTitle
+		link(rel="stylesheet", href="/assets/css/dashboard.css")
+	body
+		header(role="banner")
+			h1
+				a(href="/hinderson/") Dashboard
+			h2.user-name hinderson
+		main(role="main")
+			section.song
+				- var obfuscatedSongId = hashids.encodeHex(song._id);
+				form(name="edit-song", method="post", action="/edit-song/#{obfuscatedSongId}", enctype="multipart/form-data")
+					fieldset.image
+						h3 Edit image
+						img(src="/media/img/#{song.covers[0].filename}", width="#{song.covers[0].width}", height="#{song.covers[0].height}", alt="")
+						label Upload new image
+							div.group
+								input(type="file", name="image", accept="image/*, video/*")
+					fieldset.metadata
+						h3 Edit metadata
+						label Title
+							input(type="text", value="#{song.title}")
+						label Artist(s)
+							input(type="text", value="#{song.artist}")
+						label Featured artist(s)
+							input(type="text", value="#{song.featuredartist}")
+						label Album
+							input(type="text", value="#{song.album}")
+						label Permalink
+							input(type="text", value="#{song.permalink}")
+						label Tags
+							input(type="text", value="#{song.tags}")
+					fieldset.audio
+						h3 Audio source
+					button Save
+
+		script(src="/assets/js/admin/libs/zepto.min.js")
+		script(src="/assets/js/admin/libs/id3.js")
+		script(src="/assets/js/admin/libs/slip.js")
+		script(src="/assets/js/admin/admin.js")

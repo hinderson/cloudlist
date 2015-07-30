@@ -38,7 +38,6 @@ module.exports = function (router) {
 
 	// GET Single collection page
 	router.get('/:user/:id/edit', auth.connect(basic), function (req, res, next) {
-		// TODO: Fix so that it's slug based
 		var id = hashids.decodeHex(req.params.id);
 		collections.getOne(id, null, function (result) {
 			if (!result) return next();
@@ -46,6 +45,18 @@ module.exports = function (router) {
 			res.render('dashboard/collection', {
 				collection: result.collection,
 				songs: result.songs
+			});
+		});
+	});
+
+	// GET single song page
+	router.get('/:user/:id/edit', auth.connect(basic), function (req, res, next) {
+		var id = hashids.decodeHex(req.params.id);
+		songs.getOne(id, function (song) {
+			if (!song) return next();
+
+			res.render('dashboard/song', {
+				song: song
 			});
 		});
 	});

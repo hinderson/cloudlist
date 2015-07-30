@@ -221,12 +221,12 @@
 	showHideBtn.addEventListener('click', toggleAdvancedInputs, false);
 
 
-	var deleteButtons = document.querySelectorAll('.song-list button.delete');
+	var deleteButtons = document.querySelectorAll('.song-list form');
+	console.log(deleteButtons);
 	[].forEach.call(deleteButtons, function (e) {
-		// TEMP
+		e.preventDefault();
 		return;
-
-		//e.addEventListener('click', deleteSong, false);
+		e.addEventListener('click', deleteSong, false);
 	});
 
 	var authenticateSpotifyUserBtn = document.querySelector('#spotify');
