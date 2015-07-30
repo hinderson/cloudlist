@@ -6,6 +6,7 @@ var utils = require('./utils.js');
 var config = require('./config.js');
 var pubsub = require('./pubsub.js');
 var audio = require('./audio.js');
+var collection = require('./data/collection.js');
 
 // Private aliases: settings, cache
 var s, c;
@@ -15,92 +16,6 @@ var ticking = false;
 var lastScrollY = null;
 
 // Private functions
-var getCollection = function (id, callback) {
-	if (!id) return;
-
-	// Store GET request, structure and store it in global array
-	var XMLHttp = new XMLHttpRequest();
-
-	XMLHttp.open('GET', '/song-collection/' + id, true);
-	XMLHttp.onreadystatechange = function ( ) {
-		if (XMLHttp.readyState === 4) {
-			if (XMLHttp.status === 200) {
-				var response = JSON.parse(XMLHttp.responseText);
-				return callback(response);
-			}
-		}
-	};
-	XMLHttp.send(null);
-};
-
-var sortCollection = function (options) {
-	var items = []; // Store all items that need to be sorted here
-	var order = c.collection.order;
-	var songs = c.collection.items;
-	var collection = c.elems.collection.children[2];
-	var collectionItems = collection.querySelectorAll('li');
-
-	var sortNum = function (a, b) {
-		return a.sortBy - b.sortBy;
-	};
-	var sortKey = function (a, b) {
-		if (a.sortBy > b.sortBy) {
-			return 1;
-		}
-		if (a.sortBy < b.sortBy) {
-			return -1;
-		}
-
-		return 0;
-	};
-
-	for (var i = 0, len = order.length; i < len; i++) {
-		var id = order[i];
-
-		switch (options.sortBy) {
-			case 'index':
-			items.push({index: i, id: id, sortBy: c.collection.index.indexOf(id)});
-			break;
-
-			case 'title':
-			items.push({index: i, id: id, sortBy: songs[id].title});
-			break;
-
-			case 'artist':
-			items.push({index: i, id: id, sortBy: songs[id].artist});
-			break;
-
-			case 'time':
-			items.push({index: i, id: id, sortBy: Math.round(songs[id].audio.duration)});
-			break;
-		}
-
-		collection.removeChild(collectionItems[i]);
-	}
-
-	if (options.isNum) {
-		items.sort(sortNum);
-	} else {
-		items.sort(sortKey);
-	}
-
-	if (options.order === 'desc') {
-		if (options.isNum) {
-			items.reverse(sortNum);
-		} else {
-			items.reverse(sortKey);
-		}
-	}
-
-	order.length = 0;
-	for (var i = 0, len = items.length; i < len; i++) {
-		var id = items[i].id;
-		var index = items[i].index;
-		order.push(id);
-		collection.appendChild(collectionItems[index]);
-	}
-};
-
 var itemClickHandler = function (e) {
 	e.preventDefault();
 
@@ -127,8 +42,6 @@ var sortClickHandler = function (e) {
 
 	var target = e.target;
 	var targetContent = target.textContent;
-	var sortDirection = target.className;
-	var type = target.parentNode.getAttribute('data-sort-type');
 
 	// First remove previous <strong> tag
 	var strong = this.getElementsByTagName('strong')[0];
@@ -140,17 +53,20 @@ var sortClickHandler = function (e) {
 	}
 
 	// Actually sort the collection
-	sortCollection({
-		sortBy: type,
-		isNum: (type === 'index' || type === 'time' ? true : false),
-		order: (sortDirection === 'asc' ? 'desc' : 'asc')
+	var items = collection.getCollection();
+	var type = e.target.parentNode.getAttribute('data-sort-type');
+	var reverse = e.target.className === 'asc' ? true : false;
+
+	collection.sortCollection(items, type, reverse).forEach(function (i) {
+		var index = items[i].index;
+		c.elems.collectionItems[0].parentNode.appendChild(c.elems.collectionItems[index]);
 	});
 
 	// Create new <strong> and replace it with the previous tag
 	var newStrong = document.createElement('strong');
 	newStrong.textContent = targetContent;
 
-	if (sortDirection === 'asc') {
+	if (reverse) {
 		newStrong.classList.remove('asc');
 		newStrong.classList.add('desc');
 
@@ -171,11 +87,6 @@ var sortClickHandler = function (e) {
 module.exports = {
 
 	cache: {
-		collection: {
-			index: [], // This stores the actual index positions from the db
-			order: [], // This stores the current, updatable sort order
-			items: null
-		},
 		elems: {
 			HTML: document.getElementsByTagName('html')[0],
 			heroContent: document.getElementsByClassName('hero-inner')[0],
@@ -184,6 +95,7 @@ module.exports = {
 			collectionTitle: document.getElementsByClassName('collection-title')[0],
 			collectionSubTitle: document.getElementsByClassName('collection-sub-title')[0],
 			collection: document.getElementsByClassName('collection')[0],
+			collectionItems: document.querySelectorAll('.collection ol li'),
 			scrollableOverflowElems: document.querySelectorAll('.artist, .title'),
 			sort: document.getElementsByClassName('sort')[0],
 			closeDialog: document.getElementsByClassName('close-dialog')[0],
@@ -210,24 +122,18 @@ module.exports = {
 
 		// Get collection
 		var id = c.elems.collection.getAttribute('data-id');
-		getCollection(id, function (res) {
+		collection.setCollection(id, function (res) {
 			// Set document title
 			s.documentTitle = res.collection.title + ' – Cloudlist.io';
-
-			// Save collection in cache
-			c.collection = res.collection;
-			c.collection.items = res.items;
-			c.collection.order = res.order;
-			c.collection.index = res.order.slice();
-
-			// Initialize audio object and pass the function our collection
-			this.setupAudio(res.collection);
 
 			// Autostart song if there is any
 			if (window.autostart) {
 				audio.play(window.autostart);
 			}
-		}.bind(this));
+		});
+
+		// Initialize audio object and pass the function our collection
+		this.setupAudio();
 
 		// Init history
 		history.init();
@@ -590,12 +496,12 @@ module.exports = {
 		}
 
 		// If AJAX call hasn't been completed yet
-		if (c.collection.items === null) {
+		if (collection.getCollection() === null) {
 			return;
 		}
 
 		if (c.coversLoaded.indexOf(id) === -1) {
-			var item = c.collection.items[id].covers[0];
+			var item = collection.getCollection()[id].covers[0];
 			var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
 			var cdn = s.cdn + '/media/' + format + '/';
 			var cover = document.createElement(format);
@@ -628,7 +534,7 @@ module.exports = {
 	},
 
 	randomCoverPosition: function (id, cover) {
-		var item = c.collection.items[id].covers[0];
+		var item = collection.getCollection()[id].covers[0];
 		var cover = cover || document.querySelector('[data-id="' + id + '"] .cover');
 
 		var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
@@ -642,8 +548,8 @@ module.exports = {
 		});
 	},
 
-	setupAudio: function (collection) {
-		audio.init(collection);
+	setupAudio: function ( ) {
+		audio.init();
 
 		// Set initial (visual) volume state
 		c.elems.volume.value = audio.settings.volume;
@@ -687,7 +593,7 @@ module.exports = {
 		};
 
 		var playing = function (id) {
-			var song = c.collection.items[id];
+			var song = collection.getCollection()[id];
 			var elemLink = elem.firstChild;
 
 			// Update browser history (incl. document title)
@@ -816,7 +722,7 @@ module.exports = {
 
 			// Give the browser some time catch up
 			setTimeout(function ( ) {
-				var currentSong = c.collection.items[audio.state.currentId];
+				var currentSong = collection.getCollection()[audio.state.currentId];
 				var currentPercent = percent - 100;
 				var timeLeft = currentSong.audio.duration - position;
 

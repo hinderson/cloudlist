@@ -5,12 +5,12 @@ require('./vendor/soundmanager2-nodebug-jsmin.js');
 var utils = require('./utils.js');
 var config = require('./config.js');
 var pubsub = require('./pubsub.js');
+var collection = require('./data/collection.js');
 
 // Private aliases
 var s;
 
 // Private variables
-var collection;
 var state;
 
 module.exports = {
@@ -27,9 +27,7 @@ module.exports = {
 		currentId: ''
 	},
 
-	init: function (data) {
-		collection = data;
-
+	init: function ( ) {
 		s = this.settings;
 		state = this.state;
 	},
@@ -64,7 +62,7 @@ module.exports = {
 		} else if (state.currentId) {
 			this.pause(state.currentId);
 		} else {
-			var id = collection.order[0];
+			var id = collection.getCollectionOrder()[0];
 			this.play(id);
 		}
 	},
@@ -80,7 +78,7 @@ module.exports = {
 		}
 		state.currentId = id;
 
-		var song = collection.items[id];
+		var song = collection.getCollection()[id];
 		var url = song.audio.source === 'soundcloud' ? song.audio.stream + '?consumer_key=' + s.key : s.path + song.audio.url;
 
 		pubsub.publish('audioLoading', id);
@@ -164,12 +162,12 @@ module.exports = {
 
 	next: function ( ) {
 		console.log('Next item');
-		var index = collection.order.indexOf(state.currentId);
-		var id = collection.order[index + 1] || collection.order[0];
-		var song = collection.items[id];
+		var index = collection.getCollectionOrder().indexOf(state.currentId);
+		var id = collection.getCollectionOrder()[index + 1] || collection.getCollectionOrder()[0];
+		var song = collection.getCollection()[id];
 
 		if (!song.available) {
-			id = collection.order[index + 2] || collection.order[0];
+			id = collection.getCollectionOrder()[index + 2] || collection.getCollectionOrder()[0];
 			return this.play(id);
 		}
 
@@ -178,12 +176,12 @@ module.exports = {
 
 	previous: function ( ) {
 		console.log('Previous item');
-		var index = collection.order.indexOf(state.currentId);
-		var id = collection.order[index - 1] || collection.order[collection.order.length - 1];
-		var song = collection.items[id];
+		var index = collection.getCollectionOrder().indexOf(state.currentId);
+		var id = collection.getCollectionOrder()[index - 1] || collection.getCollectionOrder()[collection.getCollectionOrder().length - 1];
+		var song = collection.getCollection()[id];
 
 		if (!song.available) {
-			id = collection.order[index - 2] || collection.order[collection.order.length - 1];
+			id = collection.getCollectionOrder()[index - 2] || collection.getCollectionOrder()[collection.getCollectionOrder().length - 1];
 			return this.play(id);
 		}
 
@@ -198,7 +196,7 @@ module.exports = {
 	},
 
 	stopAll: function ( ) {
-		var items = collection.order;
+		var items = collection.getCollectionOrder();
 		for (var i = 0, len = items.length; i < len; i++) {
 			this.stop(items[i]);
 		}

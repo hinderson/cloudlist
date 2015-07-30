@@ -47,15 +47,16 @@ module.exports = function (router) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}
 
-			// Convert sort array to decoded id's
-			utils.forEach(result.collection.items, function (index, item) {
-				result.collection.items[index] = hashids.encodeHex(item);
-			});
+			// Structure songs (add encoded id and index placement)
+			var order = result.collection.items.map(function (id, index) {
+				var encodedID = hashids.encodeHex(id);
+				var item = result.songs[index];
 
-			// Structure all songs
-			utils.forEach(result.songs, function (index, item) {
-				item.id = hashids.encodeHex(item._id);
+				item.index = index;
+				item.id = encodedID;
 				delete item._id;
+
+				return encodedID;
 			});
 
 			// Make songs into hashmap
@@ -67,7 +68,7 @@ module.exports = function (router) {
 					title: result.collection.title,
 					owner: result.collection.owner
 				},
-				order: result.collection.items,
+				order: order,
 				items: items
 			});
 		});
