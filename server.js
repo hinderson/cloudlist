@@ -18,7 +18,7 @@ var app = express();
 var env = process.env.NODE_ENV;
 
 // Favicon
-app.use(favicon(__dirname + '/assets/favicon.ico'));
+app.use(favicon(__dirname + '/client/src/favicon.ico'));
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));

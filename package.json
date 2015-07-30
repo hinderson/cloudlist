@@ -33,7 +33,8 @@
     "echojs": "~0.1.4",
     "forcedomain": "~0.4.0",
     "simple-imagemagick": "~0.2.2",
-    "shortid": "~2.2.2"
+    "shortid": "~2.2.2",
+    "config": "~1.15.0"
   },
   "devDependencies": {
     "gulp": "~3.8.11",

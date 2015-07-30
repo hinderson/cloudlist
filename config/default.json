@@ -1,0 +1,7 @@
+{
+	"cdn": {
+		"dbConfig": {
+			"host": "prod-db-server"
+		},
+	}
+}
