@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "express": "~4.2.0",
-    "static-favicon": "~1.0.0",
     "morgan": "~1.0.0",
     "cookie-parser": "~1.0.1",
     "body-parser": "~1.0.0",
@@ -23,7 +22,6 @@
     "jsonp-client": "~0.5.1",
     "http-auth": "~2.2.0",
     "compression": "~1.2.1",
-    "express-simple-cdn": "~1.0.1",
     "serve-favicon": "~2.2.0",
     "gm": "~1.17.0",
     "fluent-ffmpeg": "~2.0.0-rc3",
@@ -47,7 +45,6 @@
     "gulp-jshint": "~1.8.5",
     "gulp-watch": "~1.1.0",
     "gulp-preprocess": "~1.1.1",
-    "express-simple-cdn": "~1.0.1",
     "gulp-newer": "~0.4.0",
     "gulp-awspublish": "0.0.23",
     "merge-stream": "~0.1.6",

@@ -7,7 +7,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var compression = require('compression');
-var CDN = require('express-simple-cdn');
 var forceDomain = require('forcedomain');
 var utils = require('./utils/utils');
 

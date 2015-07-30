@@ -41,7 +41,8 @@ var sortClickHandler = function (e) {
 	e.preventDefault();
 
 	var target = e.target;
-	var targetContent = target.textContent;
+	var targetContent = e.target.textContent;
+	var reverse = e.target.className === 'asc' ? true : false;
 
 	// First remove previous <strong> tag
 	var strong = this.getElementsByTagName('strong')[0];
@@ -55,8 +56,6 @@ var sortClickHandler = function (e) {
 	// Actually sort the collection
 	var items = collection.getCollection();
 	var type = e.target.parentNode.getAttribute('data-sort-type');
-	var reverse = e.target.className === 'asc' ? true : false;
-
 	collection.sortCollection(items, type, reverse).forEach(function (i) {
 		var index = items[i].index;
 		c.elems.collectionItems[0].parentNode.appendChild(c.elems.collectionItems[index]);
