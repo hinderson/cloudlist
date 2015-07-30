@@ -15,7 +15,7 @@ html(lang="en-US")
 				form(name="edit-song", method="post", action="/edit-song/#{obfuscatedSongId}", enctype="multipart/form-data")
 					fieldset.image
 						h3 Edit image
-						img(src="/media/img/#{song.covers[0].filename}", width="#{song.covers[0].width}", height="#{song.covers[0].height}", alt="")
+						img(src="/uploads/img/#{song.covers[0].filename}", width="#{song.covers[0].width}", height="#{song.covers[0].height}", alt="")
 						label Upload new image
 							div.group
 								input(type="file", name="image", accept="image/*, video/*")

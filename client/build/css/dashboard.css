@@ -1,0 +1,214 @@
+.structural,
+.structural > *,
+.js .js-structural {
+  position: absolute;
+  left: -9999px; }
+
+.collection-title {
+  margin-bottom: 28px;
+  font-size: 30px;
+  font-weight: bold; }
+
+.img {
+  width: 54px;
+  height: 54px;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 1px solid #ddd; }
+
+button {
+  white-space: nowrap;
+  font-size: 12px; }
+
+body {
+  margin: 0;
+  padding: 1.5em 2em; }
+
+section {
+  margin-bottom: 40px; }
+
+label {
+  display: block;
+  margin-bottom: 13px; }
+
+input,
+select {
+  display: block;
+  font-size: 13px;
+  margin-top: 3px;
+  padding: 6px 7px; }
+
+input[type="text"] {
+  width: 225px; }
+
+select {
+  font-size: 20px; }
+
+.collection small {
+  display: block;
+  margin-top: 14px;
+  font-size: 16px; }
+
+.collection {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  counter-reset: section; }
+  .collection .collection-title {
+    text-align: center; }
+  .collection .collection-item {
+    position: relative;
+    line-height: 23px; }
+  .collection .collection-item:nth-child(odd) {
+    background-color: #f7f7f7; }
+  .collection .collection-item > div {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 4px 5px 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
+  .collection .availability {
+    position: absolute;
+    bottom: -1px;
+    margin: 0; }
+    .collection .availability input {
+      font-size: 20px;
+      margin: 3px; }
+  .collection .index {
+    font-size: 18px; }
+    .collection .index::before {
+      counter-increment: section;
+      content: counter(section); }
+  .collection .artist-title span {
+    display: block; }
+  .collection .artist-title .title {
+    font-size: 17px;
+    font-weight: bold; }
+  .collection .artist-title .artist {
+    font-size: 16px; }
+  .collection .handle {
+    padding: 0 15px 0 6px; }
+  .collection [data-available="true"] .availability {
+    color: #00cb59; }
+  .collection [data-available="false"] .availability {
+    color: #ff5d5b; }
+
+.collection .index {
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0; }
+
+.collection .source {
+  text-align: center; }
+
+.collection .source .soundcloud {
+  fill: #ff5d00; }
+
+.collection .controls {
+  position: relative;
+  padding-right: 0;
+  overflow: visible; }
+
+.collection .controls button {
+  margin-right: 5px; }
+
+p.stats {
+  text-align: center; }
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0; }
+
+form .group {
+  margin-top: 7px; }
+
+form .group > * {
+  display: inline-block;
+  vertical-align: middle; }
+
+form .group .image {
+  margin-right: 2px; }
+
+form .group input {
+  margin: 0; }
+
+button[type="submit"] {
+  font-size: 13px; }
+
+button.add-song {
+  float: right;
+  font-size: 18px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: #007aff; }
+
+button.add-song .icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 26px;
+  margin-right: 8px;
+  fill: none;
+  stroke: #007aff; }
+
+button.add-song span {
+  display: inline-block;
+  vertical-align: middle; }
+
+.add-song button[type="submit"] {
+  margin-top: 20px; }
+
+.expand-advanced {
+  display: inline-block;
+  margin-bottom: 10px; }
+
+span.handle {
+  font-size: 20px;
+  color: #d6d6d6;
+  cursor: -webkit-grab;
+  cursor: grab;
+  -webkit-font-smoothing: antialiased; }
+
+span.handle:active {
+  cursor: -webkit-grabbing;
+  cursor: grabbing; }
+
+span.handle:hover,
+span.handle:focus {
+  color: #606060; }
+
+.slip-swiping-container {
+  overflow-x: hidden; }
+
+/* Image search results */
+.image .search-results img {
+  max-width: 250px;
+  max-height: 250px; }
+
+.image .search-results input {
+  position: absolute;
+  left: -9999px; }
+
+.image .search-results label {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  font-size: 0;
+  border-radius: 3px; }
+
+.image .search-results label:hover,
+.image .search-results label:focus {
+  background-color: #efefef; }
+
+.image .search-results input:checked + label {
+  background-color: #1082ff; }
+
+.image .search-results img {
+  padding: 5px;
+  border-radius: 3px; }
+
+

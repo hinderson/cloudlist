@@ -18,7 +18,7 @@ var app = express();
 var env = process.env.NODE_ENV;
 
 // Favicon
-app.use(favicon(__dirname + '/client/src/favicon.ico'));
+app.use(favicon(__dirname + '/client/favicon.ico'));
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,8 +34,8 @@ if (env === 'production') {
 	}));
 
 	var assets = {
-		'styles': require('./rev-manifest-css.json'),
-		'scripts': require('./rev-manifest-js.json')
+		'styles': require('./client/build/rev-manifest-css.json'),
+		'scripts': require('./client/build/rev-manifest-js.json')
 	};
 	app.locals.assets = assets;
 	app.locals.prod = true;
@@ -82,7 +82,7 @@ if (env === 'production') {
 		next();
 	});
 } else {
-	app.use(express.static(path.join(__dirname, 'client/dev')));
+	app.use(express.static(path.join(__dirname, 'client/build')));
 }
 
 // Make our db accessible to our router

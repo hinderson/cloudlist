@@ -32,8 +32,8 @@ gulp.task('webpack:prod', function (callback) {
 
 	prodConfig.output = {
 		filename: '[name].js',
-		path: path.join(__dirname, './tmp/assets', 'js'),
-		publicPath: '/assets/js/'
+		path: path.join(__dirname, './tmp/', 'js'),
+		publicPath: '/js/'
 	};
 
 	prodConfig.plugins = prodConfig.plugins.concat(
@@ -62,11 +62,11 @@ gulp.task('webpack:prod', function (callback) {
 		});
 
 		// Rev the files and create a manifest with references to them
-		gulp.src('./tmp/assets/js/*')
+		gulp.src('./tmp/js/*')
 			.pipe(revAll.revision())
-			.pipe(gulp.dest('./client/dist/assets/js/'))
+			.pipe(gulp.dest('./client/build/js/'))
 			.pipe(revAll.manifestFile())
-			.pipe(gulp.dest('./'));
+			.pipe(gulp.dest('./client/build/'));
 
 		callback();
 	});
@@ -74,12 +74,12 @@ gulp.task('webpack:prod', function (callback) {
 
 // Sass for development
 gulp.task('sass:dev', function ( ) {
-	return sass('./client/src/sass', { sourcemap: true })
+	return sass('./client/dev/sass', { sourcemap: true })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
 		.pipe(prefix('last 2 versions', '> 1%'))
-		.pipe(gulp.dest('./client/dev/assets/css/'));
+		.pipe(gulp.dest('./client/build/css/'));
 });
 
 // Sass for production
@@ -92,19 +92,19 @@ gulp.task('sass:prod', function ( ) {
 		fileNameManifest: 'rev-manifest-css.json'
 	});
 
-	return sass('./client/src/sass', { sourcemap: false, style: 'compressed' })
+	return sass('./client/dev/sass', { sourcemap: false, style: 'compressed' })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
 		.pipe(prefix('last 2 versions', '> 1%'))
 		.pipe(revAll.revision())
-		.pipe(gulp.dest('./client/dist/assets/css/'))
+		.pipe(gulp.dest('./client/build/css/'))
 		.pipe(revAll.manifestFile())
-		.pipe(gulp.dest('./'));
+		.pipe(gulp.dest('./client/build/'));
 });
 
 // Watcher for Sass
-var watcher = gulp.watch('./client/src/sass/**/*.scss', ['sass:dev']);
+var watcher = gulp.watch('./client/dev/sass/**/*.scss', ['sass:dev']);
 watcher.on('change', function (event) {
 	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 });
@@ -115,7 +115,7 @@ gulp.task('svgstore', function ( ) {
 		return file.contents.toString('utf8')
 	}
 
-	var svgs = gulp.src('./client/dev/assets/img/sprite/*.svg')
+	var svgs = gulp.src('./client/build/img/sprite/*.svg')
 		.pipe(svgmin())
 		.pipe(svgstore({
 			fileName: 'asset-sprite.svg',
@@ -131,34 +131,14 @@ gulp.task('svgstore', function ( ) {
 		.pipe(gulp.dest('./views/'));
 });
 
-// Compress and move images
+// Compress images assets
 gulp.task('images-assets', function ( ) {
-	return gulp.src('./client/dev/assets/img/*.{gif,jpg,png,svg}')
-		.pipe(newer('./client/dist/assets/img/'))
+	return gulp.src('./client/build/img/*.{gif,jpg,png,svg}')
+		.pipe(newer('./client/build/img/'))
 		.pipe(cache(imagemin({
 			progressive: true,
 			use: [pngcrush()]
-		})))
-		.pipe(gulp.dest('./client/dist/assets/img/'));
-});
-
-gulp.task('images-media', function ( ) {
-	return gulp.src('./client/dev/media/img/*.{gif,jpg,png,svg}')
-		.pipe(newer('./client/dist/media/img/'))
-		.pipe(gulp.dest('./client/dist/media/img/'));
-});
-
-gulp.task('videos-media', function ( ) {
-	return gulp.src('./client/dev/media/video/*')
-		.pipe(newer('./client/dist/media/video/'))
-		.pipe(gulp.dest('./client/dist/media/video/'));
-});
-
-// Move entire audio folder to static dist
-gulp.task('audio', function ( ) {
-	return gulp.src('./client/dev/media/audio/*')
-		.pipe(newer('./client/dist/media/audio/'))
-		.pipe(gulp.dest('./client/dist/media/audio/'));
+		})));
 });
 
 // Publish to Amazon S3
@@ -169,24 +149,23 @@ gulp.task('publish', function ( ) {
 
 	return merge([
 		// Regular content: mainly media
-		gulp.src(['./client/dist/**/*', '!./client/dist/**/*.{css,js,woff}']),
+		gulp.src(['./client/build/**/*', '!./client/dist/**/*.{css,js,woff}']),
 		// Gzipped content: mainly assets
-		gulp.src('./client/dist/**/*.{css,js,woff}')
+		gulp.src('./client/build/**/*.{css,js,woff}')
 			.pipe(awspublish.gzip())
 	])
 	.pipe(publisher.publish(headers))
 	.pipe(publisher.cache())
 	.pipe(awspublish.reporter())
 	.pipe(cloudfront(aws));
-
 });
 
-gulp.task('publish-media', function ( ) {
+gulp.task('publish-uploads', function ( ) {
 	var headers = {'Cache-Control': 'max-age=315360000, no-transform, public'};
 	var aws = require('./config/private/aws.json');
 	var publisher = awspublish.create(aws);
 
-	return gulp.src('./client/dist/media/**/*')
+	return gulp.src('./client/build/uploads/**/*')
 		.pipe(publisher.publish(headers))
 		.pipe(publisher.cache())
 		.pipe(awspublish.reporter())
@@ -201,9 +180,9 @@ gulp.task('default', function ( ) {
 	gulp.start('sass:dev');
 });
 
-// Run deploy task for media folder
-gulp.task('deploy-media', function ( ) {
-	gulp.start('images-media', 'videos-media', 'audio', 'publish-media');
+// Run deploy task for uploads folder
+gulp.task('deploy-uploads', function ( ) {
+	gulp.start('publish-uploads');
 });
 
 // Run deploy task for assets

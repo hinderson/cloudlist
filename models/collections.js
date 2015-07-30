@@ -166,9 +166,9 @@ collections = {
 		if (!id) { return false; }
 
 		collections.getOne(id, null, function (result) {
-			var path = './client/dev/media/img/';
+			var path = './client/build/uploads/img/';
 			var tempPath = './tmp/';
-			var targetPath = './client/dev/media/img/';
+			var targetPath = './client/build/uploads/img/';
 			var covers = [];
 
 			var slicedArray = result.songs.slice(0, 4);
@@ -218,7 +218,7 @@ collections = {
 					// Add watermark
 					im.composite([
 						'-gravity', 'center',
-						'./client/dev/assets/img/cloudlist-watermark.png', tempPath + generatedFilename,
+						'./client/build/img/cloudlist-watermark.png', tempPath + generatedFilename,
 						targetPath + generatedFilename
 					], function (err) {
 						if (err) return console.log(err);

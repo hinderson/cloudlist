@@ -502,7 +502,7 @@ module.exports = {
 		if (c.coversLoaded.indexOf(id) === -1) {
 			var item = collection.getCollection()[id].covers[0];
 			var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
-			var cdn = s.cdn + '/media/' + format + '/';
+			var cdn = s.cdn + format + '/';
 			var cover = document.createElement(format);
 			var filename;
 

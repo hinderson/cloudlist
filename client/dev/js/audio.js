@@ -18,7 +18,7 @@ module.exports = {
 	settings: {
 		volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 90) || 90, // Default value is always 90
 		key: '879664becb66c01bf10c8cf0fd4fbec3',
-		path: config.settings.cdn + '/media/audio/'
+		path: config.settings.cdn + '/audio/'
 	},
 
 	state: {

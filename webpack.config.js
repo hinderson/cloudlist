@@ -3,13 +3,13 @@ var path = require("path");
 
 module.exports = {
 	entry: {
-		default: './client/src/js/templates/default.js',
-		'best-songs-of-2014': './client/src/js/templates/best-songs-of-2014.js'
+		default: './client/dev/js/templates/default.js',
+		'best-songs-of-2014': './client/dev/js/templates/best-songs-of-2014.js'
 	},
 	output: {
 		filename: '[name].js',
-		path: path.join(__dirname, 'client/dev/assets', 'js'),
-		publicPath: '/assets/js/'
+		path: path.join(__dirname, './client/build', 'js'),
+		publicPath: '/js/'
 	},
 	module: {
 		loaders: [
