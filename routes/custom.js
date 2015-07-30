@@ -11,7 +11,7 @@ var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi(spotifyCredentials);
 
 // Database methods
-var collections = require('../methods/collections.js');
+var collections = require('../models/collections.js');
 
 module.exports = function (router) {
 

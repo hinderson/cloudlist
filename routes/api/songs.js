@@ -6,8 +6,8 @@ var async = require('async');
 var ObjectId = require('mongoskin').ObjectID;
 
 // Database methods
-var collections = require('../../methods/collections.js');
-var songs = require('../../methods/songs.js');
+var collections = require('../../models/collections.js');
+var songs = require('../../models/songs.js');
 
 module.exports = function (router) {
 

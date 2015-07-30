@@ -28,9 +28,9 @@ var echojs = new EchojsAPI({
 });
 
 // Database methods
-var collections = require('../../methods/collections.js');
-var songs = require('../../methods/songs.js');
-var users = require('../../methods/users.js');
+var collections = require('../../models/collections.js');
+var songs = require('../../models/songs.js');
+var users = require('../../models/users.js');
 
 module.exports = function (router) {
 

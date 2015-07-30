@@ -12,7 +12,7 @@ var crypto = require('crypto');
 var im = require('simple-imagemagick');
 
 // Database methods
-var users = require('../methods/users.js');
+var users = require('../models/users.js');
 
 // Constructor
 var collections = {};
