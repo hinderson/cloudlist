@@ -28,7 +28,6 @@ node_modules
 .lock-wscript
 
 # Miscellaneous
-data
 config/private
 npm-debug.log
 gulp-cache
