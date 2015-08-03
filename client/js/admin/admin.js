@@ -221,11 +221,8 @@
 	showHideBtn.addEventListener('click', toggleAdvancedInputs, false);
 
 
-	var deleteButtons = document.querySelectorAll('.song-list form');
-	console.log(deleteButtons);
+	var deleteButtons = document.querySelectorAll('.song-list button.delete');
 	[].forEach.call(deleteButtons, function (e) {
-		e.preventDefault();
-		return;
 		e.addEventListener('click', deleteSong, false);
 	});
 
@@ -254,7 +251,7 @@
 
 
 	// LIVE EDIT
-	var editableSongs = document.querySelectorAll('table.collection [contenteditable]');
+	var editableSongs = document.querySelectorAll('.collection [contenteditable]');
 	var postSongEdit = function (e) {
 		var target = e.target;
 		var id = target.parentNode.getAttribute('data-id');
@@ -282,10 +279,10 @@
 		e.addEventListener('blur', postSongEdit, false);
 	});
 
-	var editableCollectionTitle = document.querySelector('table.collection .collection-title span');
+	var editableCollectionTitle = document.querySelector('.collection .collection-title span');
 	var postCollectionEdit = function (e) {
 		var title = e.target.innerHTML;
-		var id =  document.querySelector('table.collection').getAttribute('data-id');
+		var id =  document.querySelector('.collection').getAttribute('data-id');
 
 		// Post to database
 		$.ajax({
@@ -306,8 +303,7 @@
 
 
 	// DRAG AND DROP
-	var collection = document.querySelector('.collection > tbody');
-
+	var collection = document.querySelector('.collection-list');
 	collection.addEventListener('slip:beforereorder', function (e) {
 		if (/demo-no-reorder/.test(e.target.className)) {
 			e.preventDefault();
@@ -327,7 +323,7 @@
 	var collectionId = document.querySelector('.collection').getAttribute('data-id');
 
 	// Store item order on load
-	var items = document.querySelector('.collection > tbody').children;
+	var items = document.querySelector('.collection-list').children;
 	var sortOrder = [].map.call(items, function (obj) {
 		return obj.getAttribute('data-id');
 	});

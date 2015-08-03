@@ -33,6 +33,9 @@ npm-debug.log
 gulp-cache
 .sass-cache
 dump
-client/build/uploads
+client/css
+client/js/build
+client/media
+dist
 .awspublish-cloudlist
 tmp

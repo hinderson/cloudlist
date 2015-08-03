@@ -19,10 +19,6 @@
 	Reader.OPEN_URI = 2;
 	Reader.OPEN_LOCAL = 3;
 
-	if(typeof require === 'function') {
-		var fs = require('fs');
-	}
-
 	Reader.prototype.open = function(file, callback) {
 		this.file = file;
 		var self = this;

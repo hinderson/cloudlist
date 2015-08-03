@@ -15,7 +15,7 @@ html(lang="en-US")
 				form(name="edit-song", method="post", action="/edit-song/#{obfuscatedSongId}", enctype="multipart/form-data")
 					fieldset.image
 						h3 Edit image
-						img(src="/uploads/img/#{song.covers[0].filename}", width="#{song.covers[0].width}", height="#{song.covers[0].height}", alt="")
+						img(src="/media/img/#{song.covers[0].filename}", width="#{song.covers[0].width}", height="#{song.covers[0].height}", alt="")
 						label Upload new image
 							div.group
 								input(type="file", name="image", accept="image/*, video/*")
@@ -37,7 +37,7 @@ html(lang="en-US")
 						h3 Audio source
 					button Save
 
-		script(src="/assets/js/admin/libs/zepto.min.js")
-		script(src="/assets/js/admin/libs/id3.js")
-		script(src="/assets/js/admin/libs/slip.js")
-		script(src="/assets/js/admin/admin.js")
+		script(src="/js/admin/libs/zepto.min.js")
+		script(src="/js/admin/libs/id3.js")
+		script(src="/js/admin/libs/slip.js")
+		script(src="/js/admin/admin.js")

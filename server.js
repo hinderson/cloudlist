@@ -34,8 +34,8 @@ if (env === 'production') {
 	}));
 
 	var assets = {
-		'styles': require('./client/build/rev-manifest-css.json'),
-		'scripts': require('./client/build/rev-manifest-js.json')
+		'styles': require('./client/rev-manifest-css.json'),
+		'scripts': require('./client/rev-manifest-js.json')
 	};
 	app.locals.assets = assets;
 	app.locals.prod = true;
@@ -82,7 +82,7 @@ if (env === 'production') {
 		next();
 	});
 } else {
-	app.use(express.static(path.join(__dirname, 'client/build')));
+	app.use(express.static(path.join(__dirname, 'client')));
 }
 
 // Make our db accessible to our router

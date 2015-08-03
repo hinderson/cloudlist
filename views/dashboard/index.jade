@@ -25,7 +25,7 @@ html(lang="en-US")
 								input(type="checkbox", checked)
 							div.image
 								if collection.covers && collection.covers[0]
-									div.img(style="background-image:url(../uploads/img/#{collection.covers[0].src});", title="#{collection.covers[0].src}")
+									div.img(style="background-image:url(../media/img/#{collection.covers[0].src});", title="#{collection.covers[0].src}")
 							div.title
 								a(href="/hinderson/#{obfuscatedId}/edit/") #{collection.title}
 							div.stats Songs: #{collection.items.length}
@@ -47,6 +47,7 @@ html(lang="en-US")
 						label Title
 							input(type="text", placeholder="Title", name="title", required)
 					button(type="submit") Submit
+
 		script(src="/js/admin/libs/zepto.min.js")
 		script(src="/js/admin/libs/id3.js")
 		script(src="/js/admin/libs/slip.js")

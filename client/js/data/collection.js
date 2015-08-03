@@ -15,6 +15,7 @@ var setCollection = function (id, callback) {
 			if (XMLHttp.status === 200) {
 				var response = JSON.parse(XMLHttp.responseText);
 				songs = response.items;
+				order = response.order;
 				return callback(response);
 			}
 		}

@@ -64,9 +64,9 @@ gulp.task('webpack:prod', function (callback) {
 		// Rev the files and create a manifest with references to them
 		gulp.src('./tmp/js/*')
 			.pipe(revAll.revision())
-			.pipe(gulp.dest('./client/build/js/'))
+			.pipe(gulp.dest('./dist/js/'))
 			.pipe(revAll.manifestFile())
-			.pipe(gulp.dest('./client/build/'));
+			.pipe(gulp.dest('./client/'));
 
 		callback();
 	});
@@ -74,12 +74,12 @@ gulp.task('webpack:prod', function (callback) {
 
 // Sass for development
 gulp.task('sass:dev', function ( ) {
-	return sass('./client/dev/sass', { sourcemap: true })
+	return sass('./client/sass', { sourcemap: true })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
 		.pipe(prefix('last 2 versions', '> 1%'))
-		.pipe(gulp.dest('./client/build/css/'));
+		.pipe(gulp.dest('./client/css/'));
 });
 
 // Sass for production
@@ -92,19 +92,19 @@ gulp.task('sass:prod', function ( ) {
 		fileNameManifest: 'rev-manifest-css.json'
 	});
 
-	return sass('./client/dev/sass', { sourcemap: false, style: 'compressed' })
+	return sass('./client/sass', { sourcemap: false, style: 'compressed' })
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
 		.pipe(prefix('last 2 versions', '> 1%'))
 		.pipe(revAll.revision())
-		.pipe(gulp.dest('./client/build/css/'))
+		.pipe(gulp.dest('./dist/css/'))
 		.pipe(revAll.manifestFile())
-		.pipe(gulp.dest('./client/build/'));
+		.pipe(gulp.dest('./client/'));
 });
 
 // Watcher for Sass
-var watcher = gulp.watch('./client/dev/sass/**/*.scss', ['sass:dev']);
+var watcher = gulp.watch('./client/sass/**/*.scss', ['sass:dev']);
 watcher.on('change', function (event) {
 	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 });
@@ -115,7 +115,7 @@ gulp.task('svgstore', function ( ) {
 		return file.contents.toString('utf8')
 	}
 
-	var svgs = gulp.src('./client/build/img/sprite/*.svg')
+	var svgs = gulp.src('./client/img/sprite/*.svg')
 		.pipe(svgmin())
 		.pipe(svgstore({
 			fileName: 'asset-sprite.svg',
@@ -133,8 +133,8 @@ gulp.task('svgstore', function ( ) {
 
 // Compress images assets
 gulp.task('images-assets', function ( ) {
-	return gulp.src('./client/build/img/*.{gif,jpg,png,svg}')
-		.pipe(newer('./client/build/img/'))
+	return gulp.src('./client/img/*.{gif,jpg,png,svg}')
+		.pipe(newer('./client/img/'))
 		.pipe(cache(imagemin({
 			progressive: true,
 			use: [pngcrush()]
@@ -149,9 +149,9 @@ gulp.task('publish', function ( ) {
 
 	return merge([
 		// Regular content: mainly media
-		gulp.src(['./client/build/**/*', '!./client/dist/**/*.{css,js,woff}']),
+		gulp.src(['./dist/**/*', '!./dist/**/*.{css,js,woff}']),
 		// Gzipped content: mainly assets
-		gulp.src('./client/build/**/*.{css,js,woff}')
+		gulp.src('./dist/**/*.{css,js,woff}')
 			.pipe(awspublish.gzip())
 	])
 	.pipe(publisher.publish(headers))
@@ -165,7 +165,7 @@ gulp.task('publish-uploads', function ( ) {
 	var aws = require('./config/private/aws.json');
 	var publisher = awspublish.create(aws);
 
-	return gulp.src('./client/build/uploads/**/*')
+	return gulp.src('./client/media/**/*')
 		.pipe(publisher.publish(headers))
 		.pipe(publisher.cache())
 		.pipe(awspublish.reporter())

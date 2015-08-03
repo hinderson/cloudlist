@@ -280,7 +280,6 @@ utils = {
 		var parent = textNode.parentNode;
 
 		var characters = text.split('');
-		var elements = [];
 		characters.forEach(function(character) {
 			var element = document.createElement(tag);
 			var characterNode = document.createTextNode(character);

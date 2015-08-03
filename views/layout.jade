@@ -26,13 +26,13 @@ html(lang="en-US", class="no-js")
 			meta(property="og:title", content="#{single.title} by #{single.artist}")
 			//- Determine if it's a screenshot of a moving mp4, or just a regular image
 			- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
-			meta(property="og:image", content="https://static.cloudlist.io/uploads/img/#{cover}")
+			meta(property="og:image", content="https://static.cloudlist.io/media/img/#{cover}")
 			meta(property="og:description", content="At position no. #{index} in the list #{collection.title}: &quot;#{single.title}&quot; by #{combinedArtist}.")
 		else if collection.thumbnails
-			meta(property="og:image", content="https://static.cloudlist.io/uploads/img/#{collection.thumbnails.montage.filename}")
+			meta(property="og:image", content="https://static.cloudlist.io/media/img/#{collection.thumbnails.montage.filename}")
 			meta(property="og:description", content="#{collection.description}")
 		else
-			meta(property="og:image", content="https://static.cloudlist.io/uploads/img/cloudlist-splash.jpg")
+			meta(property="og:image", content="https://static.cloudlist.io/media/img/cloudlist-splash.jpg")
 			meta(property="og:description", content="#{collection.description}")
 
 		if prod
@@ -121,5 +121,5 @@ html(lang="en-US", class="no-js")
 			script(src="https://static.cloudlist.io/js/#{assets.scripts['common.js']}")
 			script(src="https://static.cloudlist.io/js/#{assets.scripts[collection.template + '.js']}")
 		else
-			script(src="#{rootHost}/js/common.js")
-			script(src="#{rootHost}/js/#{collection.template}.js")
+			script(src="#{rootHost}/js/build/common.js")
+			script(src="#{rootHost}/js/build/#{collection.template}.js")

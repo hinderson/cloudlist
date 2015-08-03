@@ -119,6 +119,13 @@ module.exports = {
 		c = this.cache;
 		s = config.settings;
 
+		this.setupAudio();
+		this.registerEvents();
+		this.registerKeyboardEvents();
+		this.toggleStickyHeader();
+		this.findOverflowingElements();
+		this.storeViewportDimensions();
+
 		// Get collection
 		var id = c.elems.collection.getAttribute('data-id');
 		collection.setCollection(id, function (res) {
@@ -131,9 +138,6 @@ module.exports = {
 			}
 		});
 
-		// Initialize audio object and pass the function our collection
-		this.setupAudio();
-
 		// Init history
 		history.init();
 
@@ -141,12 +145,6 @@ module.exports = {
 		pubsub.subscribe('windowFocused', function ( ) {
 			this.resizeEvent();
 		}.bind(this));
-
-		this.registerEvents();
-		this.registerKeyboardEvents();
-		this.toggleStickyHeader();
-		this.findOverflowingElements();
-		this.storeViewportDimensions();
 	},
 
 	registerEvents: function ( ) {
@@ -205,7 +203,6 @@ module.exports = {
 	},
 
 	detachEvents: function (e) {
-		var temp;
 		var evt;
 		for (var i = 0; i < this._events.length; i++) {
 			evt = this._events[i];
@@ -241,7 +238,7 @@ module.exports = {
 			window.clearTimeout(this.focusInterval);
 			this.focusInterval = window.setTimeout(function ( ) {
 				var elem = c.elems.currentItem;
-				if (elem && !utils.inViewport(elem, 250) && audio.state.audio === 'playing') {
+				if (elem && !utils.inViewport(elem, 250) && audio.getState().audio === 'playing') {
 					this.scrollToElement(elem);
 				} else {
 					window.clearTimeout(this.focusInterval);
@@ -548,10 +545,8 @@ module.exports = {
 	},
 
 	setupAudio: function ( ) {
-		audio.init();
-
 		// Set initial (visual) volume state
-		c.elems.volume.value = audio.settings.volume;
+		c.elems.volume.value = audio.getVolume();
 
 		// Private variables
 		var elem, currentProgress, progressBar, iconState, color, position, percent;
@@ -714,14 +709,14 @@ module.exports = {
 		};
 
 		var forceProgressRepaint = function ( ) {
-			if (audio.state.audio !== 'playing') return;
+			if (audio.getState().audio !== 'playing') return;
 
 			// Since Safari 8 pauses all animation when switching to another tab,
 			// we have to retrigger the animation when this tab retains focus
 
 			// Give the browser some time catch up
 			setTimeout(function ( ) {
-				var currentSong = collection.getCollection()[audio.state.currentId];
+				var currentSong = collection.getCollection()[audio.getState().currentId];
 				var currentPercent = percent - 100;
 				var timeLeft = currentSong.audio.duration - position;
 

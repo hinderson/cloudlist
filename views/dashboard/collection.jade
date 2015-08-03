@@ -40,7 +40,7 @@ html(lang="en-US")
 										input(type="checkbox")
 								div.image
 									if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
-										div.img(style="background-image:url(/uploads/img/#{song.covers[0].filename});", title="#{song.covers[0].filename}")
+										div.img(style="background-image:url(/media/img/#{song.covers[0].filename});", title="#{song.covers[0].filename}")
 									else
 										div Video
 								div.index
@@ -98,6 +98,7 @@ html(lang="en-US")
 								div.img
 								input(type="file", name="image", accept="image/*, video/*")
 					button(type="submit") Add song
+
 		script(src="/js/admin/libs/zepto.min.js")
 		script(src="/js/admin/libs/id3.js")
 		script(src="/js/admin/libs/slip.js")

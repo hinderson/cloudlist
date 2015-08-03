@@ -166,9 +166,9 @@ collections = {
 		if (!id) { return false; }
 
 		collections.getOne(id, null, function (result) {
-			var path = './client/build/uploads/img/';
+			var path = './client/media/img/';
 			var tempPath = './tmp/';
-			var targetPath = './client/build/uploads/img/';
+			var targetPath = './client/media/img/';
 			var covers = [];
 
 			var slicedArray = result.songs.slice(0, 4);
