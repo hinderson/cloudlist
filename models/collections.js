@@ -40,7 +40,7 @@ collections = {
 		// Find collection based on id or slug
 		var query = {};
 		if (id) {
-			query._id = ObjectId(id);
+			query._id = new ObjectId(id);
 		} else {
 			query.permalink = slug;
 		}
@@ -49,9 +49,9 @@ collections = {
 			if (err || collection === undefined || collection.length === 0) return result(false);
 
 			// Turn items into ObjectId's
-			var collection = collection[0];
+			collection = collection[0];
 			var items = collection.items.map(function (item) {
-				return ObjectId(item);
+				return new ObjectId(item);
 			});
 
 			// Match songs that are contained within the collection's items array
@@ -72,7 +72,7 @@ collections = {
 	},
 
 	create: function (title, user, result) {
-		var title = title || 'New playlist';
+		title = title || 'New playlist';
 
 		var collection = {
 			'created': new Date(),
@@ -126,7 +126,7 @@ collections = {
 			});
 		}
 
-		db.collection('collections').update( { _id: ObjectId(id) }, { '$set': query }, function (err) {
+		db.collection('collections').update( { _id: new ObjectId(id) }, { '$set': query }, function (err) {
 			if (err) throw err;
 
 			if (typeof(result) === 'function') {
@@ -141,7 +141,7 @@ collections = {
 		async.waterfall([
 			function (callback) {
 				// Remove collection document from database
-				db.collection('collections').findAndRemove( { _id: ObjectId(id) }, [], callback);
+				db.collection('collections').findAndRemove( { _id: new ObjectId(id) }, [], callback);
 			},
 			function (doc, sort, callback) {
 				// Remove collection reference from user document
@@ -239,7 +239,7 @@ collections = {
 							if (err) throw err;
 
 							console.log('Deleting temp ' + generatedFilename);
-						})
+						});
 					});
 				});
 			});

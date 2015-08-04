@@ -3,14 +3,8 @@
 // General
 var utils = require('../utils/utils');
 
-// Hashid
-var Hashids = require('hashids');
-var secret = require('../config/private/secret.js');
-var hashids = new Hashids(secret);
-
 // Database methods
 var collections = require('../models/collections.js');
-var songs = require('../models/songs.js');
 
 module.exports = function (router) {
 

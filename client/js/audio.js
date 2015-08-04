@@ -1,7 +1,7 @@
 'use strict';
 
 // Requires
-require('./vendor/soundmanager2-nodebug-jsmin.js');
+var soundManager = require('./vendor/soundmanager2-nodebug-jsmin.js').soundManager;
 var utils = require('./utils.js');
 var config = require('./config.js');
 var pubsub = require('./pubsub.js');
@@ -59,7 +59,7 @@ var toggleState = function (id) {
 	} else if (state.currentId) {
 		pause(state.currentId);
 	} else {
-		var id = collection.getCollectionOrder()[0];
+		id = collection.getCollectionOrder()[0];
 		play(id);
 	}
 };

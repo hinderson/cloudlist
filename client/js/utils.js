@@ -83,7 +83,7 @@ utils = {
 		var pattern = new RegExp('(?:^|\\s)' + name + '(?!\\S)', 'g');
 
 		className = className.replace(pattern, '');
-		elem.className = className.trim();
+		element.className = className.trim();
 	},
 
 	hasClass: function (element, name) {
@@ -265,10 +265,10 @@ utils = {
 
 		var childNodes = node.childNodes;
 		for (var i = 0; i < childNodes.length; i++) {
-			if (childNodes[i].nodeType == Node.TEXT_NODE) {
+			if (childNodes[i].nodeType === Node.TEXT_NODE) {
 				childTextNodes.push(childNodes[i]);
-			} else if (childNodes[i].nodeType == Node.ELEMENT_NODE) {
-				Array.prototype.push.apply(childTextNodes, getTextNodes(childNodes[i]));
+			} else if (childNodes[i].nodeType === Node.ELEMENT_NODE) {
+				Array.prototype.push.apply(childTextNodes, this.getTextNodes(childNodes[i]));
 			}
 		}
 

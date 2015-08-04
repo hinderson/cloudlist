@@ -21,7 +21,7 @@ module.exports = function (router) {
 	});
 
 	// Best songs of 2014 (without user name)
-	router.get('/best-songs-of-2014', function (req, res) {
+	router.get('/best-songs-of-2014', function (req, res, next) {
 		collections.getOne(null, 'best-songs-of-2014', function (result) {
 			if (!result) return next();
 

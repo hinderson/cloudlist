@@ -20,7 +20,7 @@ module.exports = {
 		// Find user based on id or name
 		var query = {};
 		if (id) {
-			query._id = ObjectId(id);
+			query._id = new ObjectId(id);
 		} else {
 			query.username = name;
 		}
@@ -41,7 +41,7 @@ module.exports = {
 	update: function (id, query, callback) {
 		if (!id) { return false; }
 
-		db.collection('users').update( { _id: ObjectId(id) }, { '$set': query }, function (err) {
+		db.collection('users').update( { _id: new ObjectId(id) }, { '$set': query }, function (err) {
 			if (err) throw err;
 
 			if (typeof(callback) === 'function') {

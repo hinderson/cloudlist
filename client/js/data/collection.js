@@ -3,6 +3,7 @@
 var order;
 var songs;
 
+// Store GET request, structure and store it in global array
 var setCollection = function (id, callback) {
 	if (!id) return;
 

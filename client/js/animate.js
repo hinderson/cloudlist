@@ -30,11 +30,7 @@ var easing = {
 };
 
 module.exports = {
-
-	init: function ( ) {
-		this.core = Cloudlist;
-	},
-
+	
 	effect: function (fn) {
 		return easing[fn];
 	}

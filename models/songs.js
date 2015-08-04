@@ -32,8 +32,8 @@ songs = {
 	getOne: function (id, callback) {
 		if (id === null) { return false; }
 
-		db.collection('songs').find( { _id: ObjectId(id) } ).toArray(function (err, song) {
-			if (err || song === undefined || song.length === 0) return result(false);
+		db.collection('songs').find( { _id: new ObjectId(id) } ).toArray(function (err, song) {
+			if (err || song === undefined || song.length === 0) return callback(false);
 
 			return callback(song[0]);
 		});
@@ -201,7 +201,7 @@ songs = {
 						.screenshots({
 							filename: '%b', // Expression means input basename (filename w/o extension)
 							count: 1,
-							timemarks: [ "50%" ], // The point at which to take the screenshot
+							timemarks: [ '50%' ], // The point at which to take the screenshot
 							folder: screenshotFolder // Output path
 						})
 						.on('filenames', function (filenames) {
@@ -364,7 +364,7 @@ songs = {
 			query[field] = content;
 		}
 
-		db.collection('songs').update({ _id: ObjectId(id) }, { '$set': query }, function (err) {
+		db.collection('songs').update({ _id: new ObjectId(id) }, { '$set': query }, function (err) {
 			if (err) throw err;
 
 			if (typeof(result) === 'function') {
@@ -379,7 +379,7 @@ songs = {
 		async.waterfall([
 			function (callback) {
 				// Remove song from database
-				db.collection('songs').findAndRemove( { _id: ObjectId(id) }, [], callback);
+				db.collection('songs').findAndRemove( { _id: new ObjectId(id) }, [], callback);
 			},
 			function (song, sort, callback) {
 				// Remove all associated files (audio files, images, etc.)
@@ -401,7 +401,7 @@ songs = {
 					// Delete every reference to the song from item array
 					collections.forEach(function (collection) {
 						var collectionId = collection._id;
-						db.collection('collections').update( { _id: ObjectId(collectionId) }, { $pull: { items: id } }, callback);
+						db.collection('collections').update( { _id: new ObjectId(collectionId) }, { $pull: { items: id } }, callback);
 					});
 				});
 			}

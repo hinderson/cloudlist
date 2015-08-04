@@ -1,7 +1,6 @@
 'use strict';
 
 // General
-var ObjectId = require('mongoskin').ObjectID;
 var async = require('async');
 var utils = require('../../utils/utils');
 
@@ -29,7 +28,6 @@ var echojs = new EchojsAPI({
 
 // Database methods
 var collections = require('../../models/collections.js');
-var songs = require('../../models/songs.js');
 var users = require('../../models/users.js');
 
 module.exports = function (router) {
@@ -123,7 +121,7 @@ module.exports = function (router) {
 			console.log('Image search complete', response);
 
 			// Remove null responses from array
-			response = response.filter(function (n) { return n !== null && n !== "" });
+			response = response.filter(function (n) { return n !== null && n !== '' });
 
 			// Flatten multi-layered response array
 			var images = [].concat.apply([], response);
@@ -147,13 +145,13 @@ module.exports = function (router) {
 				// Retrieve an access token and a refresh token
 				spotifyApi.authorizationCodeGrant(code)
 					.then(function (data) {
-						console.log('The token expires in ' + data.body['expires_in']);
-						console.log('The access token is ' + data.body['access_token']);
-						console.log('The refresh token is ' + data.body['refresh_token']);
+						console.log('The token expires in ' + data.body.expires_in);
+						console.log('The access token is ' + data.body.access_token);
+						console.log('The refresh token is ' + data.body.refresh_token);
 
 						// Set the access token on the API object to use it in later calls
-						spotifyApi.setAccessToken(data.body['access_token']);
-						spotifyApi.setRefreshToken(data.body['refresh_token']);
+						spotifyApi.setAccessToken(data.body.access_token);
+						spotifyApi.setRefreshToken(data.body.refresh_token);
 					})
 					.then(function (data) {
 

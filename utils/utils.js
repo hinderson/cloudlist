@@ -1,10 +1,5 @@
 'use strict';
 
-// Hashid
-var Hashids = require('hashids');
-var secret = require('../config/private/secret.js');
-var hashids = new Hashids(secret);
-
 var utils = {};
 
 utils = {
@@ -13,17 +8,6 @@ utils = {
 			callback.call(scope, i, array[i]);
 		}
 	},
-
-	/*
-
-	// Usage:
-	// optionally change the scope as final parameter too, like ECMA5
-	var myNodeList = document.querySelectorAll('li');
-	forEach(myNodeList, function (index, value) {
-		console.log(index, value); // passes index + value back!
-	});
-
-	*/
 
 	/**
 	 * Generates a random string containing numbers and letters

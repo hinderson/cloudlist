@@ -17,7 +17,7 @@ var requireFiles = function (directory, app) {
 			// Require the file
 			require(directory + '/' + fileName)(app);
 		}
-	})
+	});
 };
 
 module.exports = function (app) {

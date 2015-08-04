@@ -1,5 +1,4 @@
 var webpack = require('webpack');
-var path = require("path");
 
 module.exports = {
 	entry: {
@@ -10,6 +9,9 @@ module.exports = {
 		filename: '[name].js',
 		path: './client/js/build',
 		publicPath: '/js/'
+	},
+	resolve: {
+	    extensions: ['', '.js', '.json', '.coffee']
 	},
 	plugins: [
 		new webpack.optimize.CommonsChunkPlugin('common.js')
