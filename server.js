@@ -10,8 +10,13 @@ var compression = require('compression');
 var forceDomain = require('forcedomain');
 var utils = require('./utils/utils');
 
+// Config
+var config = require('config');
+
+// MongoDB
 var mongo = require('mongoskin');
-var db = mongo.db('mongodb://localhost:27017/cloudlist', { native_parser:true });
+var dbConfig = config.get('db');
+var db = mongo.db(dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.name, { native_parser:true });
 exports.db = db;
 
 var app = express();
@@ -29,7 +34,7 @@ if (env === 'production') {
 
 	// Force browser to www
 	app.use(forceDomain({
-		hostname: 'www.cloudlist.io',
+		hostname: config.host,
 		protocol: 'https'
 	}));
 
@@ -55,8 +60,7 @@ if (env === 'production') {
 }
 
 // Send globals
-app.locals.rootTitle = 'Cloudlist.io';
-app.locals.rootHost = env === 'production' ? 'https://www.cloudlist.io' : 'http://localhost:3000'
+app.locals.config = config;
 
 // Expose ID encryption util globally
 var Hashids = require('hashids');

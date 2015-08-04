@@ -6,7 +6,6 @@ var songs;
 var setCollection = function (id, callback) {
 	if (!id) return;
 
-	// Store GET request, structure and store it in global array
 	var XMLHttp = new XMLHttpRequest();
 
 	XMLHttp.open('GET', '/song-collection/' + id, true);
@@ -27,7 +26,7 @@ var getCollection = function ( ) {
 	return songs;
 };
 
-var getCollectionIDs = function ( ) {
+var getCollectionIds = function ( ) {
 	return Object.keys(getCollection());
 };
 
@@ -41,7 +40,7 @@ var setCollectionOrder = function (newOrder) {
 
 // Sorts and then returns the new order
 var sortCollection = function (items, key, reverse) {
-	var order = getCollectionIDs().map(function (id) {
+	var order = getCollectionIds().map(function (id) {
 		return {
 			'id': id,
 			'index': items[id].index,

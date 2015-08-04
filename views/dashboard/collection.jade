@@ -2,7 +2,7 @@ doctype html
 html(lang="en-US")
 	head
 		meta(charset="utf-8")
-		title= rootTitle
+		title= config.document.title
 		link(rel="stylesheet", href="/css/dashboard.css")
 	body
 		header(role="banner")
@@ -23,7 +23,7 @@ html(lang="en-US")
 					div.collection-title
 						span(contenteditable) #{collection.title}
 						small
-							a(href="#{rootHost}/hinderson/#{collection.permalink}/", target="_blank") #{rootHost}/hinderson/#{collection.permalink}/
+							a(href="#{config.host}/hinderson/#{collection.permalink}/", target="_blank") #{config.host}/hinderson/#{collection.permalink}/
 					div.collection-list
 						each song, index in songs
 							-	var obfuscatedId = hashids.encodeHex(song._id);

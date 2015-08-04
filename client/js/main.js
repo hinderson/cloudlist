@@ -202,19 +202,6 @@ module.exports = {
 		document.addEventListener(visibilityChange, this.handleVisibilityChange, false);
 	},
 
-	detachEvents: function (e) {
-		var evt;
-		for (var i = 0; i < this._events.length; i++) {
-			evt = this._events[i];
-			if (!e) {
-				//Handler.off(evt.target, evt.eventname, evt.listener);
-			} else if (e && evt.target === e.currentTarget) {
-				//Handler.off(evt.target, evt.eventname, evt.listener);
-				break;
-			}
-		}
-	},
-
 	storeViewportDimensions: function ( ) {
 		this.viewportWidth = window.innerWidth;
 		this.viewportHeight = window.innerHeight;
@@ -224,7 +211,7 @@ module.exports = {
 		c.mousePosition = {
 			x: x,
 			y: y
-		}
+		};
 	}, 150),
 
 	scrollEvent: function ( ) {
@@ -531,7 +518,7 @@ module.exports = {
 
 	randomCoverPosition: function (id, cover) {
 		var item = collection.getCollection()[id].covers[0];
-		var cover = cover || document.querySelector('[data-id="' + id + '"] .cover');
+		cover = cover || document.querySelector('[data-id="' + id + '"] .cover');
 
 		var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
 		var margin = (4 / 100) * this.viewportWidth; // The number 3 here is the percentage

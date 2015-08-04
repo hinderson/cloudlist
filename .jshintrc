@@ -1,0 +1,33 @@
+{
+	"node": true,
+	"globals": {
+		"jd": true,
+		"log": true,
+		"log0": true,
+		"log1": true,
+		"log2": true,
+		"log3": true,
+		"log4": true,
+		"log5": true,
+		"LOG_NOTICE": true,
+		"LOG_INFO": true,
+		"LOG_WARN": true,
+		"LOG_CRIT": true,
+		"LOG_ERR": true,
+		"LOG_ALERT": true,
+		"LOG_DEBUG": true,
+		"LOG_EMERG": true
+	},
+	"indent": 4,
+	"noempty": true,
+	"trailing": true,
+	"expr": true,
+	"unused": "vars",
+	"quotmark": "single",
+	"newcap": true,
+	"immed": true,
+	"eqeqeq": true,
+	"loopfunc": true,
+	"browser": true,
+	"-W100": true
+}

@@ -1,7 +1,12 @@
 {
-	"cdn": {
-		"dbConfig": {
-			"host": "prod-db-server"
-		},
+	"host": "http://localhost:3000",
+	"document": {
+		"title": "Cloudlist.io"
+	},
+	"cdn": "http://localhost:3000",
+	"db": {
+		"host": "mongodb://localhost",
+		"port": 27017,
+		"name": "cloudlist"
 	}
 }
