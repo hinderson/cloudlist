@@ -45,7 +45,7 @@ var sortClickHandler = function (e) {
 	var reverse = e.target.className === 'asc' ? true : false;
 
 	// First remove previous <strong> tag
-	var strong = this.getElementsByTagName('strong')[0];
+	var strong = e.delegateTarget.parentNode.parentNode.getElementsByTagName('strong')[0];
 	if (strong && strong !== target) {
 		var span = document.createElement('span');
 		span.innerHTML = strong.textContent;
@@ -81,6 +81,8 @@ var sortClickHandler = function (e) {
 
 	target.parentNode.appendChild(newStrong);
 	target.parentNode.removeChild(target);
+
+	pubsub.publish('forceCollectionRepaint');
 };
 
 module.exports = {
@@ -728,6 +730,7 @@ module.exports = {
 		pubsub.subscribe('audioUnmuted', unmuted);
 		pubsub.subscribe('historyChanged', historyChanged);
 		pubsub.subscribe('windowFocused', forceProgressRepaint);
+		pubsub.subscribe('forceCollectionRepaint', forceProgressRepaint);
 	},
 
 	handleVisibilityChange: function ( ) {
