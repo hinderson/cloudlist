@@ -1,7 +1,7 @@
 'use strict';
 
 // Requires
-var history = require('./history.js');
+var history = require('./history.js'); // jshint ignore:line
 var utils = require('./utils.js');
 var config = require('./config.js');
 var pubsub = require('./pubsub.js');

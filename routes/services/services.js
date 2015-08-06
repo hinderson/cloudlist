@@ -121,7 +121,7 @@ module.exports = function (router) {
 			console.log('Image search complete', response);
 
 			// Remove null responses from array
-			response = response.filter(function (n) { return n !== null && n !== '' });
+			response = response.filter(function (n) { return n !== null && n !== ''; });
 
 			// Flatten multi-layered response array
 			var images = [].concat.apply([], response);

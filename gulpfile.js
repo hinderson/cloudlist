@@ -112,7 +112,7 @@ watcher.on('change', function (event) {
 // SVG Store
 gulp.task('svgstore', function ( ) {
 	function fileContents (filePath, file) {
-		return file.contents.toString('utf8')
+		return file.contents.toString('utf8');
 	}
 
 	var svgs = gulp.src('./client/img/sprite/*.svg')
