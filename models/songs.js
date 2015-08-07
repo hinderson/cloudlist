@@ -9,6 +9,7 @@ var slugify = require('../utils/slugify.js');
 var async = require('async');
 var ObjectId = require('mongoskin').ObjectID;
 var jsonpClient = require('jsonp-client');
+var config = require('config');
 
 // Graphicsmagick
 var gm = require('gm');
@@ -71,8 +72,7 @@ songs = {
 				// First resolve the URL if it's Soundcloud
 				// Be sure to check for // in the beginning so we don't return true on api.soundcloud
 				if (streamUrl && streamUrl.indexOf('//soundcloud.com') > -1) {
-					var consumerKey = '879664becb66c01bf10c8cf0fd4fbec3';
-					jsonpClient('https://api.soundcloud.com/resolve?url=' + streamUrl + '&format=json&consumer_key=' + consumerKey, function (err, data) {
+					jsonpClient('https://api.soundcloud.com/resolve?url=' + streamUrl + '&format=json&consumer_key=' + config.get('soundCloudKey'), function (err, data) {
 						if (err) throw err;
 
 						// Update song duration variable
@@ -325,7 +325,7 @@ songs = {
 				// Fetch newly created song id
 				var songId = doc[0]._id + '';
 
-				collections.getOne(collectionId, null, function (data) {
+				collections.getOne({ 'id': collectionId }, function (data) {
 					var items = data.collection.items;
 					// Push newly created song to the items array
 					items.push(songId);

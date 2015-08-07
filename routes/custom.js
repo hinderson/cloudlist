@@ -20,7 +20,7 @@ module.exports = function (router) {
 
 	// Best songs of 2014 (without user name)
 	router.get('/best-songs-of-2014', function (req, res, next) {
-		collections.getOne(null, 'best-songs-of-2014', function (result) {
+		collections.getOne({ 'permalink': 'best-songs-of-2014' }, function (result) {
 			if (!result) return next();
 
 			// Render template
@@ -35,7 +35,7 @@ module.exports = function (router) {
 
 	// Best songs of 2014 (without user name): Single song
 	router.get('/best-songs-of-2014/:permalink', function (req, res, next) {
-		collections.getOne(null, 'best-songs-of-2014', function (result) {
+		collections.getOne({ 'permalink': 'best-songs-of-2014' }, function (result) {
 			if (!result) return next();
 
 			// Render template

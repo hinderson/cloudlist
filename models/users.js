@@ -15,14 +15,11 @@ module.exports = {
 		});
 	},
 
-	getOne: function (id, name, callback) {
-
-		// Find user based on id or name
-		var query = {};
-		if (id) {
-			query._id = new ObjectId(id);
-		} else {
-			query.username = name;
+	// Find user based on id or username
+	getOne: function (query, callback) {
+		if (query.hasOwnProperty('id')) {
+			query._id = new ObjectId(query.id);
+			delete query.id;
 		}
 
 		db.collection('users').findOne(query, function (err, user) {

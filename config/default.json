@@ -8,5 +8,6 @@
 		"host": "mongodb://localhost",
 		"port": 27017,
 		"name": "cloudlist"
-	}
+	},
+	"soundCloudKey": "879664becb66c01bf10c8cf0fd4fbec3"
 }

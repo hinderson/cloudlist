@@ -22,7 +22,7 @@ module.exports = function (router) {
 	// GET Dashboard home page
 	router.get('/:user', auth.connect(basic), function (req, res, next) {
 		var name = req.params.user;
-		users.getOne(null, name, function (user) {
+		users.getOne({ 'username': name }, function (user) {
 			if (!user) return next();
 
 			var userId = user._id;
@@ -39,7 +39,7 @@ module.exports = function (router) {
 	// GET Single collection page
 	router.get('/:user/:id/edit', auth.connect(basic), function (req, res, next) {
 		var id = hashids.decodeHex(req.params.id);
-		collections.getOne(id, null, function (result) {
+		collections.getOne({ 'id': id }, function (result) {
 			if (!result) return next();
 
 			res.render('dashboard/collection', {

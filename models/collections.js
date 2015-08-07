@@ -20,7 +20,7 @@ var collections = {};
 collections = {
 
 	getAll: function (user, result) {
-		users.getOne(user, null, function (user) {
+		users.getOne({ 'id': user }, function (user) {
 			db.collection('collections').find( ).toArray(function (err, collections) {
 				if (err) throw err;
 
@@ -34,15 +34,11 @@ collections = {
 		});
 	},
 
-	getOne: function (id, slug, result) {
-		if (id === null && slug === null) { return false; }
-
-		// Find collection based on id or slug
-		var query = {};
-		if (id) {
-			query._id = new ObjectId(id);
-		} else {
-			query.permalink = slug;
+	// Find collection based on id or permalink
+	getOne: function (query, result) {
+		if (query.hasOwnProperty('id')) {
+			query._id = new ObjectId(query.id);
+			delete query.id;
 		}
 
 		db.collection('collections').find(query).toArray(function (err, collection) {
@@ -97,7 +93,7 @@ collections = {
 			function (doc, callback) {
 				// Add new collection reference to user document
 				var newCollectionId = doc[0]._id + '';
-				users.getOne(user, null, function (user) {
+				users.getOne({ 'id': user }, function (user) {
 					user.collections.push(newCollectionId);
 					users.update(user._id, { 'collections': user.collections }, callback);
 				});
@@ -116,7 +112,7 @@ collections = {
 
 		// Generate covers montage if the order changes for the first 4 songs
 		if (query.hasOwnProperty('items')) {
-			collections.getOne(id, null, function (data) {
+			collections.getOne({ 'id': id }, function (data) {
 				// Look through the first 4 items in the old and new array to detect changes
 				var items = data.collection.items.splice(0, 4);
 				var isSame = items.every(function (element, index) {
@@ -145,7 +141,7 @@ collections = {
 			},
 			function (doc, sort, callback) {
 				// Remove collection reference from user document
-				users.getOne(doc.owner, null, function (user) {
+				users.getOne({ 'id': doc.owner }, function (user) {
 					var collections = user.collections.filter(function (collection) {
 						return collection !== id;
 					});
@@ -165,7 +161,7 @@ collections = {
 	createCoversMontage: function (id, result) {
 		if (!id) { return false; }
 
-		collections.getOne(id, null, function (result) {
+		collections.getOne({ 'id': id }, function (result) {
 			var path = './client/media/img/';
 			var tempPath = './tmp/';
 			var targetPath = './client/media/img/';

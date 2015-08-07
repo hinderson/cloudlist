@@ -1,6 +1,3 @@
-/*jslint browser: true */
-/*global Zepto */
-
 (function () {
 	'use strict';
 
@@ -47,21 +44,11 @@
 		if (confirmation) {
 
 			// If they did, do our delete
-			var songId = $(this).closest('tr').attr('data-id');
-			var collectionId = $(this).closest('table').attr('data-id');
+			var songId = $(this).closest('.collection-item').attr('data-id');
 			$.ajax({
-				type: 'DELETE',
-				url: '/deletesong/',
-				data: {
-					'songId': songId,
-					'collectionId': collectionId
-				},
-				success: function (response) {
-					// Check for a successful (blank) response
-					if (response.msg !== '') {
-						alert('Error: ' + response.msg);
-					}
-
+				type: 'POST',
+				url: '/delete-song/' + songId,
+				success: function ( ) {
 					window.location.reload(true);
 				}
 			});
@@ -149,7 +136,7 @@
 		var imageSection = document.querySelector('fieldset.image');
 
 		var container = document.createElement('div');
-		container.className = "search-results";
+		container.className = 'search-results';
 
 		for (var i = 0, len = images.length; i < len; i++) {
 			var imageUrl = images[i];
@@ -187,7 +174,7 @@
 	}
 
 	function toggleElemVisibility (elem) {
-		if (elem.style.display == 'block' || elem.style.display=='') {
+		if (elem.style.display === 'block' || elem.style.display === '') {
 			elem.style.display = 'none';
 		} else {
 			elem.style.display = 'block';
@@ -334,9 +321,7 @@
 		updateIndexInDatabase(collectionId);
 
 		return false;
-
 	}, false);
 
-	var slip = new Slip(collection);
-
+		var slip = new Slip(collection);
 })();

@@ -38,7 +38,7 @@ module.exports = function (router) {
 
 		var collectionId = hashids.decodeHex(req.params.id);
 
-		collections.getOne(collectionId, null, function (result) {
+		collections.getOne({ 'id': collectionId }, function (result) {
 			if (!result) return false;
 
 			if ('production' === process.env.NODE_ENV) {
@@ -135,8 +135,8 @@ module.exports = function (router) {
 		var id = hashids.decodeHex(req.query.state) || null;
 		var code = req.query.code || null;
 
-		collections.getOne(id, null, function (result) {
-			users.getOne(result.collection.owner, null, function (user) {
+		collections.getOne({ 'id': id }, function (result) {
+			users.getOne({ 'id': result.collection.owner }, function (user) {
 
 				var spotifySongs = [];
 				var spotifyAccount = 'cloudlist.io';
