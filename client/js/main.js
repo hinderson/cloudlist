@@ -694,8 +694,13 @@ module.exports = {
 		};
 
 		var historyChanged = function (id) {
-			if (id) audio.play(id);
-		};
+			if (id) {
+				audio.play(id);
+			} else {
+				audio.stop();
+				this.scrollToPosition(0, 400);
+			}
+		}.bind(this);
 
 		var forceProgressRepaint = function ( ) {
 			if (audio.getState().audio !== 'playing') return;

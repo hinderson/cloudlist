@@ -186,10 +186,11 @@ var previous = function ( ) {
 };
 
 var stop = function (id) {
+	id = id || state.currentId;
 	soundManager.stop(id);
 	state.audio = 'stopped';
+	state.currentId = '';
 	console.log('Stopping', id);
-	// TEMP: Shouldn't this also reset documentTitle?
 };
 
 var stopAll = function ( ) {

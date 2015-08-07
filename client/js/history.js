@@ -10,7 +10,7 @@ module.exports = {
 		// Listens for changes/updates
 		var checkState = function (e) {
 			if (e.state === null) {
-				window.location.reload(true);
+				this.resetDocumentTitle();
 				pubsub.publish('historyChanged');
 			} else {
 				this.updateDocumentTitle(window.history.state.title);
@@ -18,20 +18,22 @@ module.exports = {
 			}
 		}.bind(this);
 
-		// The small time-out makes Safari ignore initial popstate, which it should do according to spec
-		setTimeout( function() {
-			window.addEventListener('popstate', checkState, false);
-		}, 500);
+		// This 0 ms time-out makes Safari ignore initial popstate, which it should do according to spec
+		window.addEventListener('load', function ( ) {
+			setTimeout(function ( ) {
+				window.addEventListener('popstate', checkState, false);
+			}, 0);
+       }, false);
 	},
 
 	update: function (id, href, documentTitle) {
-		if (window.history.state !== null && window.history.state.id === id) {
-			documentTitle && this.updateDocumentTitle(documentTitle);
-			return;
+		var state = {id: id, title: documentTitle || ''};
+		if (href === window.location.href) {
+			window.history.replaceState(state, null, href);
+		} else {
+			window.history.pushState(state, null, href);
 		}
-
 		documentTitle && this.updateDocumentTitle(documentTitle);
-		window.history.pushState({id: id, title: documentTitle || ''}, null, href || null);
 	},
 
 	updateDocumentTitle: function (title, removeBaseTitle) {

@@ -14,7 +14,7 @@ var registerEvents = function ( ) {
 	main.cache.elems.playBtn.addEventListener('click', function (e) {
 		// Play first song in collection
 		audio.toggleState();
-	}.bind(this), false);
+	}, false);
 };
 
 var updateParallax = function (lastScrollY) {
@@ -43,7 +43,7 @@ var playing = function ( ) {
 	main.cache.elems.playBtn.classList.add('playing');
 };
 
-var paused = function ( ) {
+var stopped = function ( ) {
 	main.cache.elems.playBtn.classList.remove('playing');
 };
 
@@ -53,7 +53,8 @@ main.init();
 
 pubsub.subscribe('scrolling', updateParallax);
 pubsub.subscribe('audioPlaying', playing);
-pubsub.subscribe('audioPaused', paused);
+pubsub.subscribe('audioPaused', stopped);
+pubsub.subscribe('audioStopped', stopped);
 pubsub.subscribe('audioResumed', playing);
 
 // TEMP: Test opacity change on header
