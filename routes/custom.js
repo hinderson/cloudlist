@@ -1,9 +1,7 @@
 'use strict';
 
-// Hashid
-var Hashids = require('hashids');
-var secret = require('../config/private/secret.js');
-var hashids = new Hashids(secret);
+// General
+var utils = require('../utils/utils');
 
 // Spotify Web API
 var spotifyCredentials = require('../config/private/spotify-api.js');
@@ -25,16 +23,29 @@ module.exports = function (router) {
 		collections.getOne(null, 'best-songs-of-2014', function (result) {
 			if (!result) return next();
 
-			// Set view state cookie
-			var collectionId = hashids.encodeHex(result.collection._id);
-			res.cookie('cl_collection', collectionId, { maxAge: 900000 });
-
 			// Render template
 			var template = result.collection.template;
 			res.render('templates/' + template, {
 				path: 'best-songs-of-2014',
 				collection: result.collection,
 				songs: result.songs
+			});
+		});
+	});
+
+	// Best songs of 2014 (without user name): Single song
+	router.get('/best-songs-of-2014/:permalink', function (req, res, next) {
+		collections.getOne(null, 'best-songs-of-2014', function (result) {
+			if (!result) return next();
+
+			// Render template
+			var single = utils.findByKey(result.songs, 'permalink', req.params.permalink);
+			var template = result.collection.template;
+			res.render('templates/' + template, {
+				path: 'best-songs-of-2014',
+				collection: result.collection,
+				songs: result.songs,
+				single: single
 			});
 		});
 	});
