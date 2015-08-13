@@ -16,13 +16,13 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.optimize.CommonsChunkPlugin({
-			name: 'admin-commons',
-			filename: 'admin-commons.js',
+			name: 'admin-common',
+			filename: 'admin-common.js',
 			chunks: ['admin'],
 		}),
 		new webpack.optimize.CommonsChunkPlugin({
-			name: 'commons',
-			filename: 'commons.js',
+			name: 'common',
+			filename: 'common.js',
 			chunks: ['default', 'best-songs-of-2014'],
 		})
 	]
