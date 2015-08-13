@@ -672,6 +672,10 @@ module.exports = {
 				progressBar.parentNode.removeChild(progressBar);
 			}
 
+			// Update document title to remove ▶ character
+			var documentTitle = window.history.state.title.replace('▶ ', '');
+			history.updateDocumentTitle(documentTitle);
+
 			// Set global state
 			c.elems.playStateBtn.classList.remove('playing');
 		};
