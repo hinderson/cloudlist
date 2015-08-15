@@ -632,7 +632,7 @@ module.exports = {
 			});
 
 			// Update document title to remove ▶ character
-			var documentTitle = window.history.state.title.replace('▶ ', '');
+			var documentTitle = document.title.replace('▶ ', '');
 			history.updateDocumentTitle(documentTitle);
 
 			// Set global state
@@ -649,7 +649,7 @@ module.exports = {
 			});
 
 			// Update document title with ▶ character
-			var documentTitle = '▶ ' + window.history.state.title;
+			var documentTitle = '▶ ' + document.title;
 			history.updateDocumentTitle(documentTitle);
 
 			// Scroll to track
@@ -673,7 +673,7 @@ module.exports = {
 			}
 
 			// Update document title to remove ▶ character
-			var documentTitle = window.history.state.title.replace('▶ ', '');
+			var documentTitle = document.title.replace('▶ ', '');
 			history.updateDocumentTitle(documentTitle);
 
 			// Set global state
