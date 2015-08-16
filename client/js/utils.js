@@ -195,36 +195,24 @@ utils = {
 			rect.top < winHeight - offset;
 	},
 
+	// Uses fractional values to determine if an element overflows its container
 	isOverflowed: function (element) {
-		return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+		var rect = element.getBoundingClientRect();
+		var scrollHeight = element.scrollHeight + (parseInt(rect.height) - rect.height);
+		var scrollWidth  = element.scrollWidth + (parseInt(rect.width) - rect.width);
+		return scrollHeight > rect.height || scrollWidth > rect.width;
 	},
 
-	simulateMouseEvent: function (node, eventType) {
-		var event;
-		try {
-			// DOM Level 3
-			event = new MouseEvent(eventType, {
-				'view': window,
-				'bubbles': true,
-				'cancelable': true
-			});
-
-			node.dispatchEvent(event);
-		} catch (err) {
-			if (document.createEvent) {
-				// DOM Level 2
-				event = document.createEvent('MouseEvents');
-				event.initMouseEvent(eventType, true, true, window, null, 0, 0, 0, 0, '', false, false, false, false, 0, previousNode);
-
-				node.dispatchEvent(event);
-			} else {
-				// IE8 and below
-				event = document.createEventObject();
-				event.relatedTarget = previousNode;
-
-				node.fireEvent(eventType, event);
-			}
-		}
+	simulateMouseEvent: function (element, eventName) {
+		var evt;
+		if (document.createEvent) {
+            evt = document.createEvent('HTMLEvents');
+            evt.initEvent(eventName, true, true);
+            element.dispatchEvent(evt);
+        } else {
+            evt = document.createEventObject();
+            element.fireEvent('on' + eventName,evt);
+        }
 	},
 
 	createSVGFragment: function (name, viewBox) {
