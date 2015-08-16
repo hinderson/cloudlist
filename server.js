@@ -28,6 +28,9 @@ app.use(favicon(__dirname + '/client/favicon.ico'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// Send globals
+app.locals.config = config;
+
 if (env === 'production') {
 	console.log('Server started and listening on port 443 in production mode');
 
@@ -57,9 +60,6 @@ if (env === 'production') {
 		});
 	});
 }
-
-// Send globals
-app.locals.config = config;
 
 // Expose ID encryption util globally
 var Hashids = require('hashids');

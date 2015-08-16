@@ -1,6 +1,7 @@
 {
 	"host": {
 		"name": "www.cloudlist.io",
+		"port": 443,
 		"protocol": "https"
 	},
 	"cdn": "https://static.cloudlist.io"
