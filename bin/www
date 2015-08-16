@@ -36,8 +36,8 @@ if ('production' === env) {
 	var server = http.createServer(app);
 	var secureServer = https.createServer(httpsOptions, app);
 
-	secureServer.listen(443)
-	server.listen(80)
+	secureServer.listen(443);
+	server.listen(80);
 } else {
 	app.set('port', process.env.PORT || 3000);
 	var server = app.listen(app.get('port'), function ( ) {
