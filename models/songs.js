@@ -64,227 +64,231 @@ songs = {
 		songTitle && songTitle.trim();
 		songAlbum && songAlbum.trim();
 
-		// Main async chain
-		async.series({
+		function determineAudioSource (callback) {
 
-			determineAudioSource: function (callback) {
+			// First resolve the URL if it's Soundcloud
+			// Be sure to check for // in the beginning so we don't return true on api.soundcloud
+			if (streamUrl && streamUrl.indexOf('//soundcloud.com') > -1) {
+				jsonpClient('https://api.soundcloud.com/resolve?url=' + streamUrl + '&format=json&consumer_key=' + config.get('soundCloudKey'), function (err, data) {
+					if (err) throw err;
 
-				// First resolve the URL if it's Soundcloud
-				// Be sure to check for // in the beginning so we don't return true on api.soundcloud
-				if (streamUrl && streamUrl.indexOf('//soundcloud.com') > -1) {
-					jsonpClient('https://api.soundcloud.com/resolve?url=' + streamUrl + '&format=json&consumer_key=' + config.get('soundCloudKey'), function (err, data) {
+					// Update song duration variable
+					songDuration = data.duration;
+
+					// Update resolved URL variable
+					resolvedUrl = data.stream_url;
+
+					callback(null);
+				});
+
+			} else if (audioUrl) {
+
+				// Analyze audio duration and move the file
+				var tempAudioPath = files.audio.path;
+				var targetAudioPath = './client/media/audio/' + files.audio.name;
+
+				fs.rename(tempAudioPath, targetAudioPath, function (err) {
+					if (err) throw err;
+
+					// Delete the temporary file
+					fs.unlink(tempAudioPath, function() {
 						if (err) throw err;
 
-						// Update song duration variable
-						songDuration = data.duration;
-
-						// Update resolved URL variable
-						resolvedUrl = data.stream_url;
-
-						callback(null);
-					});
-
-				} else if (audioUrl) {
-
-					// Analyze audio duration and move the file
-					var tempAudioPath = files.audio.path;
-					var targetAudioPath = './client/media/audio/' + files.audio.name;
-
-					fs.rename(tempAudioPath, targetAudioPath, function (err) {
-						if (err) throw err;
-
-						// Delete the temporary file
-						fs.unlink(tempAudioPath, function() {
+						// Read duration data
+						probe(targetAudioPath, function (err, res) {
 							if (err) throw err;
 
-							// Read duration data
-							probe(targetAudioPath, function (err, res) {
+							// Update song duration variable
+							songDuration = res.format.duration * 1000; // Converted to milliseconds to match SoundCloud API
+
+							callback(null);
+						});
+					});
+				});
+
+			} else {
+
+				callback(null);
+
+			}
+		}
+
+		function processImageSearchResults (callback) {
+			var image = args.image || null;
+			if (!image) {
+				return callback(null);
+			}
+
+			var downloadImage = function (sourceUrl, dest, cb) {
+				var file = request
+					.get(sourceUrl)
+					.on('error', function(err) {
+						fs.unlink(dest);
+					})
+					.pipe(fs.createWriteStream(dest));
+
+				file.on('finish', function ( ) {
+					file.close(cb(file));  // close() is async, call cb after close completes.
+				});
+			};
+
+			tempFilename = crypto.randomBytes(16).toString('hex');
+			downloadImage(image, './tmp/' + tempFilename, function (file) {
+				tempCoverPath = file.path;
+
+				callback(null);
+			});
+		}
+
+		function identifyCoverType (callback) {
+			if (!tempCoverPath) {
+				return callback(null);
+			}
+
+			// First check if we're dealing with an image or a video
+			var ext = path.extname(tempCoverPath);
+			if (ext !== '.mp4') {
+				var filename = ext ? tempFilename.replace(ext, '.jpg') : (tempFilename + '.jpg'); // If there is no extension
+				targetCoverPath = './client/media/img/' + filename;
+
+				// Resize img
+				gm(tempCoverPath).size(function (err, sizes) {
+
+					// Determine size
+					var width;
+					var height;
+					if (sizes.width > sizes.height) {
+						width = sizes.width < 400 ? null : 400;
+						height = 260;
+					} else {
+						width = 280;
+						height = sizes.height < 400 ? null : 400;
+					}
+
+					gm(tempCoverPath)
+						.resize(width, height) // Automatically keeps its ratio
+						.noProfile()
+						.setFormat('jpg')
+						.quality(90)
+						.write(tempCoverPath, function (err) {
+							if (err) throw err;
+
+							gm(tempCoverPath).identify(function (err, identify) {
 								if (err) throw err;
 
-								// Update song duration variable
-								songDuration = res.format.duration * 1000; // Converted to milliseconds to match SoundCloud API
+								songCover = {
+									format: identify.format,
+									filename: filename,
+									width: identify.size.width,
+									height: identify.size.height,
+									filesize: identify.Filesize
+								};
 
 								callback(null);
 							});
 						});
-					});
-
-				} else {
-
-					callback(null);
-
-				}
-			},
-
-			processImageSearchResults: function (callback) {
-				var image = args.image || null;
-				if (!image) {
-					return callback(null);
-				}
-
-				var downloadImage = function (sourceUrl, dest, cb) {
-					var file = request
-						.get(sourceUrl)
-						.on('error', function(err) {
-							fs.unlink(dest);
-						})
-						.pipe(fs.createWriteStream(dest));
-
-					file.on('finish', function ( ) {
-						file.close(cb(file));  // close() is async, call cb after close completes.
-					});
-				};
-
-				tempFilename = crypto.randomBytes(16).toString('hex');
-				downloadImage(image, './tmp/' + tempFilename, function (file) {
-					tempCoverPath = file.path;
-
-					callback(null);
 				});
-			},
+			} else { // Upload mp4
+				targetCoverPath = './client/media/video/' + files.image.name;
+				var screenshotFolder = './client/media/img/';
 
-			identifyCoverType: function (callback) {
-				if (!tempCoverPath) {
-					return callback(null);
-				}
+				// Take screenshot
+				var screenshot;
+				ffmpeg(tempCoverPath)
+					.screenshots({
+						filename: '%b', // Expression means input basename (filename w/o extension)
+						count: 1,
+						timemarks: [ '50%' ], // The point at which to take the screenshot
+						folder: screenshotFolder // Output path
+					})
+					.on('filenames', function (filenames) {
+						screenshot = filenames;
+					})
+					.on('end', function ( ) {
 
-				// First check if we're dealing with an image or a video
-				var ext = path.extname(tempCoverPath);
-				if (ext !== '.mp4') {
-					var filename = ext ? tempFilename.replace(ext, '.jpg') : (tempFilename + '.jpg'); // If there is no extension
-					targetCoverPath = './client/media/img/' + filename;
+						var newScreenshot = screenshot[0].replace(path.extname(screenshot[0]), '.jpg');
+						var tempScreenshot = screenshotFolder + screenshot[0];
+						var targetScreenshot = screenshotFolder + newScreenshot;
 
-					// Resize img
-					gm(tempCoverPath).size(function (err, sizes) {
-
-						// Determine size
-						var width;
-						var height;
-						if (sizes.width > sizes.height) {
-							width = sizes.width < 400 ? null : 400;
-							height = 260;
-						} else {
-							width = 280;
-							height = sizes.height < 400 ? null : 400;
-						}
-
-						gm(tempCoverPath)
-							.resize(width, height) // Automatically keeps its ratio
-							.noProfile()
+						// Convert PNG screenshot to JPG
+						gm(tempScreenshot)
 							.setFormat('jpg')
 							.quality(90)
-							.write(tempCoverPath, function (err) {
+							.write(tempScreenshot, function (err) {
 								if (err) throw err;
 
-								gm(tempCoverPath).identify(function (err, identify) {
+								// Rename the temporary PNG file
+								fs.rename(tempScreenshot, targetScreenshot, function (err) {
 									if (err) throw err;
 
-									songCover = {
-										format: identify.format,
-										filename: filename,
-										width: identify.size.width,
-										height: identify.size.height,
-										filesize: identify.Filesize
-									};
-
-									callback(null);
-								});
-							});
-					});
-				} else { // Upload mp4
-					targetCoverPath = './client/media/video/' + files.image.name;
-					var screenshotFolder = './client/media/img/';
-
-					// Take screenshot
-					var screenshot;
-					ffmpeg(tempCoverPath)
-						.screenshots({
-							filename: '%b', // Expression means input basename (filename w/o extension)
-							count: 1,
-							timemarks: [ '50%' ], // The point at which to take the screenshot
-							folder: screenshotFolder // Output path
-						})
-						.on('filenames', function (filenames) {
-							screenshot = filenames;
-						})
-						.on('end', function ( ) {
-
-							var newScreenshot = screenshot[0].replace(path.extname(screenshot[0]), '.jpg');
-							var tempScreenshot = screenshotFolder + screenshot[0];
-							var targetScreenshot = screenshotFolder + newScreenshot;
-
-							// Convert PNG screenshot to JPG
-							gm(tempScreenshot)
-								.setFormat('jpg')
-								.quality(90)
-								.write(tempScreenshot, function (err) {
-									if (err) throw err;
-
-									// Rename the temporary PNG file
-									fs.rename(tempScreenshot, targetScreenshot, function (err) {
+									// Delete the temporary file
+									fs.unlink(tempScreenshot, function() {
 										if (err) throw err;
 
-										// Delete the temporary file
-										fs.unlink(tempScreenshot, function() {
+										// Read metadata
+										ffmpeg.ffprobe(tempCoverPath, function (err, metadata) {
 											if (err) throw err;
 
-											// Read metadata
-											ffmpeg.ffprobe(tempCoverPath, function (err, metadata) {
-												if (err) throw err;
+											songCover = {
+												format: 'MP4',
+												src: songImage,
+												width: metadata.streams[0].width,
+												height: metadata.streams[0].height,
+												filesize: metadata.format.size,
+												screenshot: newScreenshot
+											};
 
-												songCover = {
-													format: 'MP4',
-													src: songImage,
-													width: metadata.streams[0].width,
-													height: metadata.streams[0].height,
-													filesize: metadata.format.size,
-													screenshot: newScreenshot
-												};
-
-												callback(null);
-											});
+											callback(null);
 										});
-
 									});
 
 								});
-						});
-				}
-			},
 
-			processCover: function (callback) {
-				if (!tempCoverPath) {
-					return callback(null);
-				}
-
-				console.log(tempCoverPath, targetCoverPath);
-				fs.rename(tempCoverPath, targetCoverPath, function (err) {
-					if (err) throw err;
-
-					// Delete the temporary file
-					fs.unlink(tempCoverPath, function() {
-						if (err) throw err;
-
-						callback(null);
+							});
 					});
-				});
-			},
+			}
+		}
 
-			formatInputFields: function (callback) {
-				// Check for multiple artists
-				if (songArtist && songArtist.indexOf(',') > -1) {
-					songArtist = songArtist.split(/\s*,\s*/);
-				}
-
-				// Check for multiple featured artists
-				if (songFeatured && songFeatured.indexOf(',') > -1) {
-					songFeatured = songFeatured.split(/\s*,\s*/);
-				}
-
-				callback(null);
+		function processCover (callback) {
+			if (!tempCoverPath) {
+				return callback(null);
 			}
 
-		}, function (err) {
+			fs.rename(tempCoverPath, targetCoverPath, function (err) {
+				if (err) throw err;
+
+				// Delete the temporary file
+				fs.unlink(tempCoverPath, function() {
+					if (err) throw err;
+
+					callback(null);
+				});
+			});
+		}
+
+		function formatInputFields (callback) {
+			// Check for multiple artists
+			if (songArtist && songArtist.indexOf(',') > -1) {
+				songArtist = songArtist.split(/\s*,\s*/);
+			}
+
+			// Check for multiple featured artists
+			if (songFeatured && songFeatured.indexOf(',') > -1) {
+				songFeatured = songFeatured.split(/\s*,\s*/);
+			}
+
+			callback(null);
+		}
+
+		// Main async chain
+		async.series([
+			determineAudioSource,
+			processImageSearchResults,
+			identifyCoverType,
+			processCover,
+			formatInputFields
+		],
+		function (err) {
 			if (err) throw err;
 
 			var slugs = {
