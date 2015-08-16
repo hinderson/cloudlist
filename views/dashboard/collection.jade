@@ -23,7 +23,7 @@ html(lang="en-US")
 					div.collection-title
 						span(contenteditable) #{collection.title}
 						small
-							a(href="#{config.host}/hinderson/#{collection.permalink}/", target="_blank") #{config.host}/hinderson/#{collection.permalink}/
+							a(href="#{config.host.protocol}://#{config.host.name}/hinderson/#{collection.permalink}/", target="_blank") #{config.host.protocol}://#{config.host.name}/hinderson/#{collection.permalink}/
 					div.collection-list
 						each song, index in songs
 							-	var obfuscatedId = hashids.encodeHex(song._id);

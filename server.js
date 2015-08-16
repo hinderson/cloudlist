@@ -33,8 +33,8 @@ if (env === 'production') {
 
 	// Force browser to www
 	app.use(forceDomain({
-		hostname: config.host,
-		protocol: 'https'
+		hostname: config.host.name,
+		protocol: config.host.protocol
 	}));
 
 	var assets = {

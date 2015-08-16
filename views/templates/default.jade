@@ -13,7 +13,7 @@ block content
 		if prod
 			img.collection-hero(src="#{config.cdn}/media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
 		else
-			img.collection-hero(src="#{config.host}/media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
+			img.collection-hero(src="#{config.host.protocol}://#{config.host.name}/media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
 
 	- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
 	section.collection.group(data-id="#{obfuscatedCollectionId}")
@@ -37,7 +37,7 @@ block content
 				- song = structureSong(song);
 
 				li(class=song.available === true ? undefined : "unavailable", data-id="#{obfuscatedId}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
-					a(href="#{config.host}/#{path}/#{song.permalink}/")
+					a(href="#{config.host.protocol}://#{config.host.name}/#{path}/#{song.permalink}/")
 						div.col.index #{index+1}
 						div.col.title
 							span #{song.title}

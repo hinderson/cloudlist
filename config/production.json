@@ -1,4 +1,7 @@
 {
-	"host": "https://www.cloudlist.io",
+	"host": {
+		"name": "www.cloudlist.io",
+		"protocol": "https"
+	},
 	"cdn": "https://static.cloudlist.io"
 }

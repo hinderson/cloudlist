@@ -1,5 +1,8 @@
 {
-	"host": "http://localhost:3000",
+	"host": {
+		"name": "localhost:3000",
+		"protocol": "http"
+	},
 	"document": {
 		"title": "Cloudlist.io"
 	},
