@@ -257,7 +257,7 @@ module.exports = {
 	resizeEvent: utils.debounce(function ( ) {
 		this.storeViewportDimensions();
 
-		// Find overflowing elements and determine animation duration based on elem width
+		// Find overflowing elements and determine animation duration based on character length
 		this.findOverflowingElements();
 
 		// Update position of collection top
@@ -488,7 +488,7 @@ module.exports = {
 		if (c.coversLoaded.indexOf(id) === -1) {
 			var item = collection.getCollection()[id].covers[0];
 			var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
-			var cdn = s.cdn + format + '/';
+			var cdn = s.cdn + '/' + format + '/';
 			var cover = document.createElement(format);
 			var filename;
 
@@ -710,7 +710,7 @@ module.exports = {
 			if (audio.getState().audio !== 'playing') return;
 
 			// Since Safari 8 pauses all animation when switching to another tab,
-			// we have to retrigger the animation when this tab retains focus
+			// we have to retrigger the animation when this tab regains focus
 
 			// Give the browser some time catch up
 			setTimeout(function ( ) {
