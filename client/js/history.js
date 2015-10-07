@@ -34,6 +34,11 @@ module.exports = {
 			window.history.pushState(state, null, href);
 		}
 		documentTitle && this.updateDocumentTitle(documentTitle);
+
+		// Disable scroll jumps
+		if ('scrollRestoration' in window.history) {
+			window.history.scrollRestoration = 'manual';
+		}
 	},
 
 	updateDocumentTitle: function (title, removeBaseTitle) {
