@@ -175,7 +175,8 @@ module.exports = {
 		}, false);
 
 		c.elems.volume.addEventListener('input', function (e) {
-			audio.setVolume(e.target.value);
+  			var fraction = parseInt(e.target.value) / parseInt(e.target.max);
+			audio.setVolume(fraction * fraction);
 		}.bind(this), false);
 
 		c.elems.goToTop.addEventListener('click', function (e) {
@@ -535,12 +536,12 @@ module.exports = {
 
 	setupAudio: function ( ) {
 		// Set initial (visual) volume state
-		c.elems.volume.value = audio.getVolume();
+		c.elems.volume.value = audio.getVolume() * 100;
 
 		// Private variables
 		var elem, currentProgress, progressBar, iconState, color, position, percent;
 
-		var loading = function (id) {
+		pubsub.subscribe('audioLoading', function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
 
 			// Add loading class
@@ -555,6 +556,10 @@ module.exports = {
 				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
 			}
 
+			// Add random palette color
+			color = 'color-' + Math.floor(Math.random() * 8);
+			elem.classList.add(color);
+
 			// Load item cover & scroll overflowing text
 			utils.simulateMouseEvent(elem.firstChild, 'mouseover');
 
@@ -565,17 +570,17 @@ module.exports = {
 			if (!utils.inViewport(elem, 250)) {
 				this.scrollToElement(elem);
 			}
-		}.bind(this);
+		}.bind(this));
 
-		var failed = function (id) {
+		pubsub.subscribe('audioFailedLoading', function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
 			c.elems.HTML.classList.remove('loading-song');
 			elem.classList.remove('loading');
 			elem.classList.remove(color);
 			elem.classList.add('unavailable');
-		};
+		});
 
-		var playing = function (id) {
+		pubsub.subscribe('audioPlaying', function (id) {
 			var song = collection.getCollection()[id];
 			var elemLink = elem.firstChild;
 
@@ -614,15 +619,11 @@ module.exports = {
 				elemLink.insertBefore(iconState, elemLink.firstChild);
 			});
 
-			// Add random palette color
-			color = 'color-' + Math.floor(Math.random() * 8);
-			elem.classList.add(color);
-
 			// Set global state
 			c.elems.playStateBtn.classList.add('playing');
-		};
+		});
 
-		var paused = function ( ) {
+		pubsub.subscribe('audioPaused', function ( ) {
 			elem.classList.remove('playing');
 			elem.classList.add('paused');
 
@@ -637,9 +638,9 @@ module.exports = {
 
 			// Set global state
 			c.elems.playStateBtn.classList.remove('playing');
-		};
+		});
 
-		var resumed = function ( ) {
+		pubsub.subscribe('audioResumed', function ( ) {
 			elem.classList.remove('paused');
 			elem.classList.add('playing');
 
@@ -657,9 +658,9 @@ module.exports = {
 
 			// Set global state
 			c.elems.playStateBtn.classList.add('playing');
-		}.bind(this);
+		}.bind(this));
 
-		var stopped = function ( ) {
+		pubsub.subscribe('audioStopped', function ( ) {
 			// Remove all classes
 			elem.classList.remove(color);
 			elem.classList.remove('paused');
@@ -678,38 +679,41 @@ module.exports = {
 
 			// Set global state
 			c.elems.playStateBtn.classList.remove('playing');
-		};
+		});
 
-		var updating = function (args) {
+		pubsub.subscribe('audioUpdating', function (args) {
 			position = args[0];
 			percent = args[1];
 
 			utils.requestAnimFrame.call(window, function ( ) {
-				currentProgress.innerHTML = utils.convertToReadableTime(position + 500) + ' / ';
+				currentProgress.innerHTML = utils.convertToReadableTime(position) + ' / ';
 			});
-		};
+		});
 
-		var muted = function ( ) {
+		pubsub.subscribe('audioMuted', function ( ) {
 			c.elems.volume.value = 0;
-		};
+		});
 
-		var unmuted = function (volume) {
+		pubsub.subscribe('audioUnmuted', function (volume) {
 			c.elems.volume.value = volume;
-		};
+		});
 
-		var historyChanged = function (id) {
+		pubsub.subscribe('historyChanged', function (id) {
 			if (id) {
 				audio.play(id);
 			} else {
 				audio.stop();
 				this.scrollToPosition(0, 400);
 			}
-		}.bind(this);
+		}.bind(this));
+
+		pubsub.subscribe('windowFocused', forceProgressRepaint);
+		pubsub.subscribe('forceCollectionRepaint', forceProgressRepaint);
 
 		var forceProgressRepaint = function ( ) {
 			if (audio.getState().audio !== 'playing') return;
 
-			// Since Safari 8 pauses all animation when switching to another tab,
+			// Since Safari pauses all animation when switching to another tab,
 			// we have to retrigger the animation when this tab regains focus
 
 			// Give the browser some time catch up
@@ -727,19 +731,6 @@ module.exports = {
 				progressBar = clone;
 			}, 300);
 		};
-
-		pubsub.subscribe('audioLoading', loading);
-		pubsub.subscribe('audioFailedLoading', failed);
-		pubsub.subscribe('audioPlaying', playing);
-		pubsub.subscribe('audioPaused', paused);
-		pubsub.subscribe('audioResumed', resumed);
-		pubsub.subscribe('audioStopped', stopped);
-		pubsub.subscribe('audioUpdating', updating);
-		pubsub.subscribe('audioMuted', muted);
-		pubsub.subscribe('audioUnmuted', unmuted);
-		pubsub.subscribe('historyChanged', historyChanged);
-		pubsub.subscribe('windowFocused', forceProgressRepaint);
-		pubsub.subscribe('forceCollectionRepaint', forceProgressRepaint);
 	},
 
 	handleVisibilityChange: function ( ) {

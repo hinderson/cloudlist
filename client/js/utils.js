@@ -131,8 +131,8 @@ utils = {
 	},
 
 	convertToReadableTime: function (position) {
-		var seconds = Math.floor((position / 1000) % 60),
-			minutes = Math.floor((position / (60 * 1000)) % 60);
+		var seconds = Math.floor(position % 60);
+		var minutes = Math.floor((position / 60) % 60);
 		return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 	},
 

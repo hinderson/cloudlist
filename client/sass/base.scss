@@ -409,10 +409,11 @@
 }
 
 /* States */
+.collection .loading a,
 .collection .playing a {
 	color: #000;
-	-webkit-transition: background 0.65s;
-	transition: background 0.65s;
+	-webkit-transition: background 0.6s;
+	transition: background 0.6s;
 }
 
 .collection .paused a {
