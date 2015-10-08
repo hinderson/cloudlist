@@ -228,7 +228,7 @@ module.exports = {
 			window.clearTimeout(this.focusInterval);
 			this.focusInterval = window.setTimeout(function ( ) {
 				var elem = c.elems.currentItem;
-				if (elem && !utils.inViewport(elem, 250) && audio.getState().audio === 'playing') {
+				if (elem && !utils.inViewport(elem, 250) && audio.getState() === 'playing') {
 					this.scrollToElement(elem);
 				} else {
 					window.clearTimeout(this.focusInterval);
@@ -692,9 +692,6 @@ module.exports = {
 			}
 		}.bind(this));
 
-		pubsub.subscribe('windowFocused', forceProgressRepaint);
-		pubsub.subscribe('forceCollectionRepaint', forceProgressRepaint);
-
 		var forceProgressRepaint = function ( ) {
 			if (audio.getState().audio !== 'playing') return;
 
@@ -716,6 +713,9 @@ module.exports = {
 				progressBar = clone;
 			}, 300);
 		};
+
+		pubsub.subscribe('windowFocused', forceProgressRepaint);
+		pubsub.subscribe('forceCollectionRepaint', forceProgressRepaint);
 	},
 
 	handleVisibilityChange: function ( ) {

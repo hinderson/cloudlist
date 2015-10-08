@@ -43,11 +43,9 @@ var getVolume = function ( ) {
 };
 
 var toggleState = function (id) {
-	console.log('Toggle state', id, getState());
 	if (id && id !== currentId) {
 		play(id);
 	} else if (getState() === 'paused') {
-		console.log('trying to resume');
 		resume(currentId);
 	} else if (currentId) {
 		pause(currentId);
@@ -65,12 +63,12 @@ var play = function (id) {
 	if (currentId) {
 		stop(currentId);
 	}
-	var prevId = currentId;
 	currentId = id;
 
 	var song = collection.getCollection()[id];
 	var url = song.audio.source === 'soundcloud' ? song.audio.stream + '?consumer_key=' + settings.key : settings.path + song.audio.url;
 
+	setState('loading');
 	pubsub.publish('audioLoading', id);
 
 	audioElement = new Audio();
@@ -92,18 +90,14 @@ var play = function (id) {
 	});
 
 	audioElement.addEventListener('canplay', function ( ) {
+		setState('playing');
+		pubsub.publish('audioPlaying', id);
 		audioElement.play();
-	});
-
-	audioElement.addEventListener('playing', function ( ) {
-		if (getState() === 'idle' || getState() === 'stopped') {
-			pubsub.publish('audioPlaying', id);
-		}
 	});
 
 	audioElement.addEventListener('ended', function ( ) {
 		stop();
-		next();
+		next(); // TODO: Fix direction
 	});
 
 	audioElement.addEventListener('timeupdate', function (e) {
@@ -117,7 +111,7 @@ var play = function (id) {
 	audioElement.addEventListener('error', function (e) {
 		console.log(url, 'has failed loading', e);
 		pubsub.publish('audioFailedLoading', id);
-		next();
+		next(); // TODO: Fix direction
 	});
 };
 
