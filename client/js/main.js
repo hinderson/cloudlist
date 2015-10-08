@@ -381,13 +381,6 @@ module.exports = {
 					}
 					break;
 
-				// Mute sound
-				case 77:
-					e.preventDefault();
-					console.log('M');
-					audio.toggleMute();
-					break;
-
 				default: return;
 			}
 		}.bind(this);
@@ -688,14 +681,6 @@ module.exports = {
 			utils.requestAnimFrame.call(window, function ( ) {
 				currentProgress.innerHTML = utils.convertToReadableTime(position) + ' / ';
 			});
-		});
-
-		pubsub.subscribe('audioMuted', function ( ) {
-			c.elems.volume.value = 0;
-		});
-
-		pubsub.subscribe('audioUnmuted', function (volume) {
-			c.elems.volume.value = volume;
 		});
 
 		pubsub.subscribe('historyChanged', function (id) {

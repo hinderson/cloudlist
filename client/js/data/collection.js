@@ -1,7 +1,7 @@
 'use strict';
 
 var order;
-var songs;
+var items;
 
 // Store GET request, structure and store it in global array
 var setCollection = function (id, callback) {
@@ -14,7 +14,7 @@ var setCollection = function (id, callback) {
 		if (XMLHttp.readyState === 4) {
 			if (XMLHttp.status === 200) {
 				var response = JSON.parse(XMLHttp.responseText);
-				songs = response.items;
+				items = response.items;
 				order = response.order;
 				return callback(response);
 			}
@@ -24,7 +24,7 @@ var setCollection = function (id, callback) {
 };
 
 var getCollection = function ( ) {
-	return songs;
+	return items;
 };
 
 var getCollectionIds = function ( ) {
@@ -32,7 +32,7 @@ var getCollectionIds = function ( ) {
 };
 
 var getCollectionOrder = function ( ) {
-	return order;
+	return order.slice(0);
 };
 
 var setCollectionOrder = function (newOrder) {
@@ -71,21 +71,40 @@ var getItemPosition = function (id) {
 	return getCollectionOrder().indexOf(id);
 };
 
-var getNextItem = function (currentIndex) {
-	return getCollectionOrder()[currentIndex + 1] || getFirstItem();
+var getNextItem = function (currentId) {
+	var itemId = getCollectionOrder()
+		.splice(getItemPosition(currentId) + 1)
+		.filter(function (id) {
+			return getItem(id).available;
+		})[0];
+	if (!itemId) {
+		return getFirstItem();
+	}
+	return getItem(itemId);
 };
 
-var getPreviousItem = function (currentIndex) {
-	return getCollectionOrder()[currentIndex - 1] || getLastItem();
+var getPreviousItem = function (currentId) {
+	var itemId = getCollectionOrder()
+		.slice(0, getItemPosition(currentId))
+		.reverse()
+		.filter(function (id) {
+			return getItem(id).available;
+		})[0];
+	if (!itemId) {
+		return getLastItem();
+	}
+	return getItem(itemId);
 };
 
 var getFirstItem = function ( ) {
-	return getCollectionOrder()[0];
+	var id = getCollectionOrder()[0];
+	return getItem(id);
 };
 
 var getLastItem = function ( ) {
 	var collectionLength = getCollectionOrder().length;
-	return getCollectionOrder()[collectionLength - 1];
+	var id = getCollectionOrder()[collectionLength - 1];
+	return getItem(id);
 };
 
 // Export interface

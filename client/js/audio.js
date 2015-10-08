@@ -14,14 +14,13 @@ var gainNode;
 // Settings
 var settings = {
 	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 9.0) || 9.0, // Default value is always 90
-	muted: false,
 	key: config.settings.soundCloudKey,
 	path: config.settings.cdn + '/audio/'
 };
 
 // State
 var currentState = 'idle';
-var currentId = '';
+var currentId;
 
 var getState = function ( ) {
 	return currentState;
@@ -43,18 +42,6 @@ var getVolume = function ( ) {
 	return settings.volume;
 };
 
-var toggleMute = function ( ) {
-	if (settings.muted) {
-		gainNode.gain.value = settings.volume;
-		currentId = false;
-		pubsub.publish('audioUnmuted', settings.volume);
-	} else {
-		gainNode.gain.value = 0;
-		currentId = true;
-		pubsub.publish('audioMuted');
-	}
-};
-
 var toggleState = function (id) {
 	console.log('Toggle state', id, getState());
 	if (id && id !== currentId) {
@@ -65,8 +52,7 @@ var toggleState = function (id) {
 	} else if (currentId) {
 		pause(currentId);
 	} else {
-		id = collection.getCollectionOrder()[0];
-		play(id);
+		play(collection.getFirstItem());
 	}
 };
 
@@ -79,6 +65,7 @@ var play = function (id) {
 	if (currentId) {
 		stop(currentId);
 	}
+	var prevId = currentId;
 	currentId = id;
 
 	var song = collection.getCollection()[id];
@@ -95,11 +82,7 @@ var play = function (id) {
 	gainNode.connect(context.destination);
 
 	// Set initial volume
-	if (settings.muted) {
-		gainNode.gain.value = 0;
-	} else {
-		gainNode.gain.value = settings.volume;
-	}
+	gainNode.gain.value = settings.volume;
 
 	// Load URL
 	audioElement.src = url;
@@ -151,35 +134,21 @@ var resume = function (id) {
 	audioElement.play();
 };
 
-var next = function ( ) {
-	var currentPosition = collection.getItemPosition(currentId);
-	var id = collection.getNextItem(currentPosition);
-
-	var song = collection.getItem(id);
-	if (!song.available) {
-		id = collection.getNextItem(currentPosition++);
-	}
-
-	play(id);
+var next = function () {
+	if (!currentId) { return false; }
+	play(collection.getNextItem(currentId).id);
 };
 
-var previous = function ( ) {
-	var currentPosition = collection.getItemPosition(currentId);
-	var id = collection.getPreviousItem(currentPosition);
-
-	var song = collection.getItem(id);
-	if (!song.available) {
-		id = collection.getPreviousItem(currentPosition--);
-	}
-
-	play(id);
+var previous = function (acc) {
+	if (!currentId) { return false; }
+	play(collection.getPreviousItem(currentId).id);
 };
 
 var stop = function (id) {
 	id = id || currentId;
+	currentId = '';
 	audioElement.pause();
 	audioElement.currentTime = 0;
-	currentId = '';
 	setState('stopped');
 	pubsub.publish('audioStopped', id);
 
@@ -188,9 +157,7 @@ var stop = function (id) {
 
 var stopAll = function ( ) {
 	var items = collection.getCollectionOrder();
-	for (var i = 0, len = items.length; i < len; i++) {
-		stop(items[i]);
-	}
+	items.forEach(stop);
 };
 
 // Export interface
@@ -198,7 +165,6 @@ module.exports = {
 	getState: getState,
 	setVolume: setVolume,
 	getVolume: getVolume,
-	toggleMute: toggleMute,
 	toggleState: toggleState,
 	play: play,
 	pause: pause,
