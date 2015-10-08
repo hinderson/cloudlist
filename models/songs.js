@@ -72,11 +72,16 @@ songs = {
 				jsonpClient('https://api.soundcloud.com/resolve?url=' + streamUrl + '&format=json&consumer_key=' + config.get('soundCloudKey'), function (err, data) {
 					if (err) throw err;
 
-					// Update song duration variable
-					songDuration = data.duration;
-
 					// Update resolved URL variable
 					resolvedUrl = data.stream_url;
+
+					if (!resolvedUrl) {
+						console.log('Stream url not found');
+						throw err;
+					}
+
+					// Update song duration variable
+					songDuration = data.duration;
 
 					callback(null);
 				});
