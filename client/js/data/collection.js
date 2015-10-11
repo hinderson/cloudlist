@@ -76,10 +76,7 @@ var getNextItem = function (currentId) {
 		.splice(getItemPosition(currentId) + 1)
 		.filter(function (id) {
 			return getItem(id).available;
-		})[0];
-	if (!itemId) {
-		return getFirstItem();
-	}
+		})[0] || getFirstItem().id;
 	return getItem(itemId);
 };
 
@@ -89,10 +86,7 @@ var getPreviousItem = function (currentId) {
 		.reverse()
 		.filter(function (id) {
 			return getItem(id).available;
-		})[0];
-	if (!itemId) {
-		return getLastItem();
-	}
+		})[0] || getLastItem().id;
 	return getItem(itemId);
 };
 
