@@ -50,22 +50,18 @@ var toggleState = function (id) {
 	} else if (currentId) {
 		pause(currentId);
 	} else {
-		play(collection.getFirstItem());
+		play(collection.getFirstItem().id);
 	}
-};
-
-var destroy = function (id) {
-	// source.mediaElement.src = '';
 };
 
 var play = function (id) {
+	var direction = collection.getItemPosition(currentId) - collection.getItemPosition(id) === 1 ? 'backwards' : 'forwards';
+
 	// First stop the currently playing sound, if any
-	if (currentId) {
-		stop(currentId);
-	}
+	if (currentId) { stop(currentId); }
 	currentId = id;
 
-	var song = collection.getCollection()[id];
+	var song = collection.getItem(id);
 	var url = song.audio.source === 'soundcloud' ? song.audio.stream + '?consumer_key=' + settings.key : settings.path + song.audio.url;
 
 	setState('loading');
@@ -85,34 +81,76 @@ var play = function (id) {
 	// Load URL
 	audioElement.src = url;
 
-	audioElement.addEventListener('loadedmetadata', function ( ) {
-		audioElement.currentTime = Math.max((song.audio.starttime / 1000), 0);
-	});
+	function moveOn (direction) {
+		if (direction === 'forwards') {
+			next();
+		} else {
+			previous();
+		}
+	}
 
-	audioElement.addEventListener('canplay', function ( ) {
-		setState('playing');
-		pubsub.publish('audioPlaying', id);
-		audioElement.play();
-	});
+	function removeEventListeners ( ) {
+		audioElement.removeEventListener('loadedmetadata', events.onLoad);
+		audioElement.removeEventListener('canplay', events.onPlay);
+		audioElement.removeEventListener('ended', events.onStop);
+		audioElement.removeEventListener('timeupdate', events.whilePlaying);
+		audioElement.removeEventListener('error', events.onError);
+	}
 
-	audioElement.addEventListener('ended', function ( ) {
-		stop();
-		next(); // TODO: Fix direction
-	});
+	var events = {
+		onLoad: function ( ) {
+			audioElement.currentTime = Math.max((song.audio.starttime / 1000), 0);
+		},
+		onPlay: function ( ) {
+			setState('playing');
+			pubsub.publish('audioPlaying', id);
+			audioElement.play();
+		},
+		onStop: function ( ) {
+			if (currentState !== 'playing') { return; }
+			removeEventListeners();
+			stop();
+			moveOn(direction);
+		},
+		onError: function (e) {
+			switch (e.target.error.code) {
+				case e.target.error.MEDIA_ERR_ABORTED:
+					console.log('You aborted the video playback.', url);
+					break;
+				case e.target.error.MEDIA_ERR_NETWORK:
+					console.log('A network error caused the audio download to fail.', url);
+					break;
+				case e.target.error.MEDIA_ERR_DECODE:
+					console.log('The audio playback was aborted due to a corruption problem or because the video used features your browser did not support.', url);
+					break;
+				case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+					console.log('The video audio not be loaded, either because the server or network failed or because the format is not supported.', url);
+					break;
+				default:
+					console.log('An unknown error occurred.', url);
+					break;
+			}
 
-	audioElement.addEventListener('timeupdate', function (e) {
-		var duration = audioElement.duration;
-		var position = audioElement.currentTime - Math.max((song.audio.starttime / 1000), 0);
-		var percent = position / duration * 100;
+			removeEventListeners();
+			pubsub.publish('audioFailedLoading', id);
+			moveOn(direction);
+		},
+		whilePlaying: function ( ) {
+			if (currentState !== 'playing') { return; }
 
-		pubsub.publish('audioUpdating', [ position, percent ]);
-	});
+			var duration = audioElement.duration;
+			var position = audioElement.currentTime - Math.max((song.audio.starttime / 1000), 0);
+			var percent = position / duration * 100;
 
-	audioElement.addEventListener('error', function (e) {
-		console.log(url, 'has failed loading', e);
-		pubsub.publish('audioFailedLoading', id);
-		next(); // TODO: Fix direction
-	});
+			pubsub.publish('audioUpdating', [ position, percent ]);
+		},
+	};
+
+	audioElement.addEventListener('loadedmetadata', events.onLoad, false);
+	audioElement.addEventListener('canplay', events.onPlay, false);
+	audioElement.addEventListener('ended', events.onStop, false);
+	audioElement.addEventListener('timeupdate', events.whilePlaying, false);
+	audioElement.addEventListener('error', events.onError, false);
 };
 
 var pause = function (id) {
@@ -139,19 +177,23 @@ var previous = function (acc) {
 };
 
 var stop = function (id) {
-	id = id || currentId;
+	if (!id) { id = currentId; }
 	currentId = '';
-	audioElement.pause();
-	audioElement.currentTime = 0;
+
 	setState('stopped');
 	pubsub.publish('audioStopped', id);
-
 	destroy(id);
 };
 
 var stopAll = function ( ) {
 	var items = collection.getCollectionOrder();
 	items.forEach(stop);
+};
+
+var destroy = function (id) {
+	if (audioElement) {
+		audioElement.pause();
+	}
 };
 
 // Export interface

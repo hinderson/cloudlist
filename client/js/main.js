@@ -338,20 +338,17 @@ module.exports = {
 				// Enter
 				case 13:
 					e.preventDefault();
-					console.log('Enter');
 					break;
 
 				// Esc
 				case 27:
 					e.preventDefault();
 					c.elems.HTML.classList.remove('overlay');
-					console.log('Esc');
 					break;
 
 				// Space
 				case 32:
 					e.preventDefault();
-					console.log('Space');
 					audio.toggleState();
 					break;
 
@@ -359,7 +356,6 @@ module.exports = {
 				case 38:
 				case 37:
 					e.preventDefault();
-					console.log('Left arrow');
 					audio.previous();
 					break;
 
@@ -367,7 +363,6 @@ module.exports = {
 				case 39:
 				case 40:
 					e.preventDefault();
-					console.log('Right or down arrow');
 					audio.next();
 					break;
 
@@ -375,7 +370,6 @@ module.exports = {
 				case 16: // Alt
 				case 70: // F
 					e.preventDefault();
-					console.log('Alt or F');
 					if (keys[16] && keys[70]) {
 						this.toggleFullscreen();
 					}
@@ -574,7 +568,7 @@ module.exports = {
 		});
 
 		pubsub.subscribe('audioPlaying', function (id) {
-			var song = collection.getCollection()[id];
+			var song = collection.getItem(id);
 			var elemLink = elem.firstChild;
 
 			// Update browser history (incl. document title)
@@ -616,7 +610,7 @@ module.exports = {
 			c.elems.playStateBtn.classList.add('playing');
 		});
 
-		pubsub.subscribe('audioPaused', function ( ) {
+		pubsub.subscribe('audioPaused', function (id) {
 			elem.classList.remove('playing');
 			elem.classList.add('paused');
 
@@ -633,7 +627,7 @@ module.exports = {
 			c.elems.playStateBtn.classList.remove('playing');
 		});
 
-		pubsub.subscribe('audioResumed', function ( ) {
+		pubsub.subscribe('audioResumed', function (id) {
 			elem.classList.remove('paused');
 			elem.classList.add('playing');
 
@@ -653,11 +647,12 @@ module.exports = {
 			c.elems.playStateBtn.classList.add('playing');
 		}.bind(this));
 
-		pubsub.subscribe('audioStopped', function ( ) {
+		pubsub.subscribe('audioStopped', function (id) {
 			// Remove all classes
 			elem.classList.remove(color);
 			elem.classList.remove('paused');
 			elem.classList.remove('playing');
+			elem.classList.remove('loading');
 
 			// Remove DOM elements but first check if they are actually in the DOM, just in case
 			if (utils.isInDOM(iconState)) {
