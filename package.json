@@ -34,7 +34,9 @@
     "forcedomain": "~0.4.0",
     "simple-imagemagick": "~0.2.2",
     "shortid": "~2.2.2",
-    "config": "~1.15.0"
+    "config": "~1.15.0",
+    "dominant-color": "0.0.1",
+    "bluebird": "~2.10.2"
   },
   "devDependencies": {
     "gulp": "~3.8.11",
@@ -62,7 +64,7 @@
     "gulp-ruby-sass": "~1.0.1",
     "gulp-autoprefixer": "~2.2.0",
     "gulp-sourcemaps": "~1.5.2",
-    "webpack": "~1.8.10",
+    "webpack": "~1.12.2",
     "gulp-util": "~3.0.4",
     "gulp-rev-all": "~0.8.18",
     "del": "~1.1.1"
