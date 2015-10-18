@@ -56,12 +56,3 @@ pubsub.subscribe('audioPlaying', playing);
 pubsub.subscribe('audioPaused', stopped);
 pubsub.subscribe('audioStopped', stopped);
 pubsub.subscribe('audioResumed', playing);
-
-// TEMP: Test opacity change on header
-/*
-pubsub.subscribe('scrolling', function (lastScrollY) {
-	var distance = Cloudlist.getViewportDimensions().height * 1.7;
-	c.elems.heroImage.style.webkitAnimationFillMode = 'backwards';
-	c.elems.heroImage.style.opacity = Math.max((1 - lastScrollY/distance), 0);
-});
-*/
