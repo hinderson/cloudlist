@@ -729,9 +729,11 @@ html.overlay {
 	display: none;
 	margin-bottom: 32px;
 }
+
 .no-touch .keyboard-mapping {
 	display: block;
 }
+
 .keyboard-mapping dl {
 	float: left;
 	width: 48.5%;
@@ -740,17 +742,20 @@ html.overlay {
 	font-size: 13px;
 	line-height: 27px;
 }
+
 .keyboard-mapping dl dt {
 	float: left;
-	width: 70px;
-	margin: 0 16px 0 0;
+	width: 84px;
+	margin: 0 10px 0 0;
 }
+
 .keyboard-mapping dl dd {
 	float: left;
 	height: 27px;
 	margin: 0;
 	line-height: 27px;
 }
+
 .keyboard-mapping dl dt kbd {
 	float: left;
 	min-width: 31px;
@@ -766,12 +771,20 @@ html.overlay {
 	text-align: center;
 	text-transform: capitalize;
 }
+
+.keyboard-mapping dl dt span {
+	float: left;
+	margin-left: 3px;
+}
+
 .keyboard-mapping dl.big dt kbd {
 	width: 70px;
 }
+
 .keyboard-mapping dl.medium dt kbd {
 	width: 45px;
 }
+
 .keyboard-mapping dl.arrow dt kbd {
 	font-size: 12px;
 }
