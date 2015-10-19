@@ -28,10 +28,11 @@
 
 .main-header .logo {
 	position: fixed;
-	top: 26px;
+	top: 25px;
 	left: 24px;
 	z-index: 6;
-	width: 89px;
+	width: 92px;
+	height: auto;
 	fill: #fff;
 	will-change: transform;
 }
