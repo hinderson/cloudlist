@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "webpack -d --watch --devtool & gulp & node ./bin/www"
+    "start": "webpack --progress --colors gulp & node ./bin/www"
   },
   "dependencies": {
     "express": "~4.2.0",
