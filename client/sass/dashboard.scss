@@ -13,13 +13,21 @@
 	font-weight: bold;
 }
 
-.img {
+form .group .preview {
+	display: block;
+	margin-bottom: 10px;
+}
+
+.img,
+.placeholder {
+	display: inline-block;
 	width: 54px;
 	height: 54px;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
 	background-size: cover;
 	border: 1px solid #ddd;
+	margin-right: 5px;
 }
 
 button {
@@ -159,25 +167,31 @@ p.stats {
 }
 
 fieldset {
-	border:0;
-	margin:0;
-	padding:0;
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
+
 form .group {
-	margin-top:7px;
+	margin-top: 7px;
 }
+
 form .group > * {
-	display:inline-block;
-	vertical-align:middle;
+	display: inline-block;
+	vertical-align: middle;
 }
+
 form .group .image {
-	margin-right:2px;
+	margin-right: 2px;
 }
+
 form .group input {
-	margin:0;
+	margin: 0;
+	padding: 0;
 }
+
 button[type="submit"] {
-	font-size:13px;
+	font-size: 13px;
 }
 
 button.add-song {

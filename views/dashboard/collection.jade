@@ -16,6 +16,7 @@ html(lang="en-US")
 					select#template(name="template")
 						option(selected=collection.template == "default", value="default") Default
 						option(selected=collection.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
+						option(selected=collection.template == "best-songs-of-2015", value="best-songs-of-2015") Best Songs of 2015
 					input(type="submit", value="OK")
 					button#spotify Export to Spotify playlist
 				- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
@@ -42,7 +43,7 @@ html(lang="en-US")
 									if song.covers && song.covers[0] && song.covers[0].format !== 'MP4'
 										div.img(style="background-image:url(/media/img/#{song.covers[0].filename});", title="#{song.covers[0].filename}")
 									else
-										div Video
+										div.img(style="background-image:url(/media/img/#{song.covers[0].screenshot});", title="#{song.covers[0].screenshot}") Video
 								div.index
 								div.artist-title
 									span.title #{song.title}
@@ -95,8 +96,8 @@ html(lang="en-US")
 						h3 Choose image
 						label Upload image
 							div.group
-								div.img
 								input(type="file", name="image", accept="image/*, video/*")
+								input(type="hidden", name="gradientplaceholder", value="")
 					button(type="submit") Add song
 
 		script(src="/js/admin/libs/zepto.min.js")
