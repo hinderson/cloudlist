@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "webpack --progress --colors gulp & node ./bin/www"
+    "start": "webpack --progress --colors & gulp & node ./bin/www"
   },
   "dependencies": {
     "express": "~4.2.0",
@@ -36,7 +36,7 @@
     "shortid": "~2.2.2",
     "config": "~1.15.0",
     "dominant-color": "0.0.1"
-},
+  },
   "devDependencies": {
     "gulp": "~3.8.11",
     "gulp-imagemin": "~1.0.1",

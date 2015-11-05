@@ -13,9 +13,24 @@ var collections = require('../models/collections.js');
 
 module.exports = function (router) {
 
-	// TEMP: Redirect to 2014 Best Of playlist
+	// TEMP: Redirect to 2015 Best Of playlist
 	router.get('/', function (req, res) {
-		res.redirect('/best-songs-of-2014/');
+		res.redirect('/2015/');
+	});
+
+	// Best songs of 2015 (without user name)
+	router.get('/2015', function (req, res, next) {
+		collections.getOne({ 'permalink': '2015' }, function (result) {
+			if (!result) return next();
+
+			// Render template
+			var template = result.collection.template;
+			res.render('templates/' + template, {
+				path: '2015',
+				collection: result.collection,
+				songs: result.songs
+			});
+		});
 	});
 
 	// Best songs of 2014 (without user name)

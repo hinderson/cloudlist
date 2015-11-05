@@ -5,19 +5,19 @@ var main = require('../main.js');
 var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
 
-var cacheElems = function ( ) {
+function cacheElems ( ) {
 	// Extends to main cache object
 	main.cache.elems.playBtn = document.querySelector('.hero button');
-};
+}
 
-var registerEvents = function ( ) {
+function registerEvents ( ) {
 	main.cache.elems.playBtn.addEventListener('click', function (e) {
 		// Play first song in collection
 		audio.toggleState();
 	}, false);
-};
+}
 
-var updateParallax = function (lastScrollY) {
+function updateParallax (lastScrollY) {
 	// Bail if we've reached the collection
 	if (lastScrollY > main.cache.collectionTop) {
 		return;
@@ -37,22 +37,31 @@ var updateParallax = function (lastScrollY) {
 	}
 
 	translateY3d(main.cache.elems.heroContent, translateValue);
-};
+}
 
-var playing = function ( ) {
-	main.cache.elems.playBtn.classList.add('playing');
-};
+var currentColor;
+function stopped (id) {
+	var elem = main.cache.elems.collection.querySelector('[data-id="' + id + '"]');
+	elem.classList.remove(currentColor);
+}
 
-var stopped = function ( ) {
-	main.cache.elems.playBtn.classList.remove('playing');
-};
+function loading (id) {
+	// Add random palette color
+	var elem = main.cache.elems.collection.querySelector('[data-id="' + id + '"]');
+	currentColor = 'color-' + Math.floor(Math.random() * 8);
+	elem.classList.add(currentColor);
+}
+
+function failedLoading (id) {
+	var elem = main.cache.elems.collection.querySelector('[data-id="' + id + '"]');
+	elem.classList.remove(currentColor);
+}
 
 cacheElems();
 registerEvents();
 main.init();
 
 pubsub.subscribe('scrolling', updateParallax);
-pubsub.subscribe('audioPlaying', playing);
-pubsub.subscribe('audioPaused', stopped);
+pubsub.subscribe('audioLoading', loading);
+pubsub.subscribe('audioFailedLoading', failedLoading);
 pubsub.subscribe('audioStopped', stopped);
-pubsub.subscribe('audioResumed', playing);

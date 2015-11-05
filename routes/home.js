@@ -13,9 +13,7 @@ module.exports = function (router) {
 		collections.getOne({ 'permalink': req.params.collection }, function (result) {
 			if (!result) return next();
 
-			// Render template
-			var template = result.collection.template;
-			res.render('templates/' + template, {
+			res.render('templates/' + result.collection.template, {
 				path: req.params.user + '/' + req.params.collection,
 				collection: result.collection,
 				songs: result.songs
@@ -28,10 +26,10 @@ module.exports = function (router) {
 		collections.getOne({ 'permalink': req.params.collection }, function (result) {
 			if (!result) return next();
 
-			// Render template
 			var single = utils.findByKey(result.songs, 'permalink', req.params.permalink);
-			var template = result.collection.template;
-			res.render('templates/' + template, {
+			if (!single) return next(); // Return 404 if song isn't found
+
+			res.render('templates/' + result.collection.template, {
 				path: req.params.user + '/' + req.params.collection,
 				collection: result.collection,
 				songs: result.songs,

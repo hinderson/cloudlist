@@ -3,6 +3,7 @@
 // General
 var async = require('async');
 var utils = require('../../utils/utils');
+var url = require('url');
 
 // Hashid
 var Hashids = require('hashids');
@@ -32,15 +33,9 @@ var users = require('../../models/users.js');
 
 module.exports = function (router) {
 
-	// Return all songs in JSON format (based on sent cookie)
-	router.get('/song-collection/:id', function (req, res, next) {
-		if (!req.params.id) return;
-
-		var collectionId = hashids.decodeHex(req.params.id);
-
-		collections.getOne({ 'id': collectionId }, function (result) {
-			if (!result) return false;
-
+	// Return all songs in JSON format
+	router.get('/api/v1/collection', function (req, res, next) {
+		function returnJSON (result) {
 			if ('production' === process.env.NODE_ENV) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
 			}
@@ -69,7 +64,22 @@ module.exports = function (router) {
 				order: order,
 				items: items
 			});
-		});
+		}
+
+		// Resolve query
+		if (req.query.id) {
+			collections.getOne({ 'id': hashids.decodeHex(req.query.id) }, returnJSON);
+		} else {
+			var paths = url.parse(req.headers.referer).pathname.split('/').slice(1, -1);
+			var collectionFound;
+			paths.forEach(function (path) {
+				if (collectionFound) { return; }
+
+				collections.getOne({ 'permalink': path }, function (result) {
+					if (result) { returnJSON(result); collectionFound = true; }
+				});
+			});
+		}
 	});
 
 	router.get('/fetch-artist-images', function (req, res) {

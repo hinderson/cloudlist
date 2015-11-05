@@ -25,11 +25,17 @@ var itemClickHandler = function (e) {
 
 var itemHoverHandler = function (e) {
 	var target = e.delegateTarget;
-
 	switch (e.type) {
 		case 'mouseover':
-			this.loadItemCover(target);
-			this.scrollOverflowingText(target);
+			if (target !== this.currentHover) {
+				this.currentHover = target;
+				this.scrollOverflowingText(target);
+				if (!(target.parentNode.classList.contains('playing') ||
+					target.parentNode.classList.contains('paused') ||
+					target.parentNode.classList.contains('loading'))) {
+						this.showItemCover(target);
+					}
+			}
 			break;
 		case 'mouseout':
 			this.scrollOverflowingText(target, true);
@@ -54,7 +60,7 @@ var sortClickHandler = function (e) {
 	}
 
 	// Actually sort the collection
-	var items = collection.getCollection();
+	var items = collection.getAllItems();
 	var type = e.target.parentNode.getAttribute('data-sort-type');
 	collection.sortCollection(items, type, reverse).forEach(function (i) {
 		var index = items[i].index;
@@ -91,13 +97,12 @@ module.exports = {
 		elems: {
 			HTML: document.getElementsByTagName('html')[0],
 			heroContent: document.getElementsByClassName('hero-inner')[0],
-			heroImage: document.querySelector('.hero picture'),
 			collectionHeader: document.getElementsByClassName('collection-header')[0],
 			collectionTitle: document.getElementsByClassName('collection-title')[0],
 			collectionSubTitle: document.getElementsByClassName('collection-sub-title')[0],
 			collection: document.getElementsByClassName('collection')[0],
 			collectionItems: document.querySelectorAll('.collection ol li'),
-			scrollableOverflowElems: document.querySelectorAll('.artist, .title'),
+			scrollableOverflowElems: document.querySelectorAll('.collection ol .artist, .collection ol .title'),
 			sort: document.getElementsByClassName('sort')[0],
 			closeDialog: document.getElementsByClassName('close-dialog')[0],
 			dialogOverlay: document.getElementsByClassName('dialog-overlay')[0],
@@ -109,7 +114,6 @@ module.exports = {
 			goToTop: document.getElementsByClassName('go-to-top')[0].firstChild,
 			currentItem: null
 		},
-		coversLoaded: [],
 		mousePosition: {
 			x: 0,
 			y: 0
@@ -121,16 +125,16 @@ module.exports = {
 		c = this.cache;
 		s = config.settings;
 
-		this.setupAudio();
 		this.registerEvents();
+		this.setupAudio();
 		this.registerKeyboardEvents();
 		this.toggleStickyHeader();
 		this.findOverflowingElements();
-		this.storeViewportDimensions();
+		this.viewportWidth = window.innerWidth;
+		this.viewportHeight = window.innerHeight;
 
 		// Get collection
-		var id = c.elems.collection.getAttribute('data-id');
-		collection.setCollection(id, function (res) {
+		collection.getCollection.then(function (res) {
 			// Set document title
 			s.documentTitle = res.collection.title + ' – Cloudlist.io';
 
@@ -145,7 +149,9 @@ module.exports = {
 
 		// Trigger resize event when window has been focused again
 		pubsub.subscribe('windowFocused', function ( ) {
-			this.resizeEvent();
+			if (window.innerWidth !== this.viewportWidth || window.innerHeight !== this.viewportHeight) {
+				this.resizeEvent();
+			}
 		}.bind(this));
 	},
 
@@ -205,11 +211,6 @@ module.exports = {
 		document.addEventListener(visibilityChange, this.handleVisibilityChange, false);
 	},
 
-	storeViewportDimensions: function ( ) {
-		this.viewportWidth = window.innerWidth;
-		this.viewportHeight = window.innerHeight;
-	},
-
 	storeMousePosition: utils.debounce(function (x, y) {
 		c.mousePosition = {
 			x: x,
@@ -256,10 +257,21 @@ module.exports = {
 	},
 
 	resizeEvent: utils.debounce(function ( ) {
-		this.storeViewportDimensions();
+		// Set new viewport dimensions
+		this.viewportWidth = window.innerWidth;
+		this.viewportHeight = window.innerHeight;
 
-		// Find overflowing elements and determine animation duration based on character length
-		this.findOverflowingElements();
+		// Remove or add overflowing text and reposition cover on currently playing item
+		if (c.elems.currentItem !== null) {
+			this.showItemCover(c.elems.currentItem.firstChild);
+			this.scrollOverflowingText(c.elems.currentItem.firstChild, true, true);
+			setTimeout(function ( ) {
+				this.findOverflowingElements();
+				this.scrollOverflowingText(c.elems.currentItem.firstChild, false, true);
+			}.bind(this), 1000);
+		} else {
+			this.findOverflowingElements();
+		}
 
 		// Update position of collection top
 		c.collectionTop = utils.getElemDistanceFromDoc(c.elems.collection).top;
@@ -296,7 +308,8 @@ module.exports = {
 			document.msFullscreenEnabled ||
 			document.documentElement.webkitRequestFullScreen;
 
-		if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+		if (!document.fullscreenElement && !document.mozFullScreenElement &&
+				!document.webkitFullscreenElement && !document.msFullscreenElement) {
 			if (document.documentElement.requestFullscreen) {
 				document.documentElement.requestFullscreen();
 			} else if (document.documentElement.msRequestFullscreen) {
@@ -387,32 +400,40 @@ module.exports = {
 		window.addEventListener('keyup', keysReleased, false);
 	},
 
-	scrollOverflowingText: function (target, reset) {
+	scrollOverflowingText: function (target, reset, force) {
 		// Bounce – i.e. don't reset or retrigger any values if current item is already playing/is paused
-		if (target.parentNode === c.elems.currentItem) {
+		if (target.parentNode === c.elems.currentItem && !force) {
 			return;
 		}
 
+		var resetScrolling = function (item) {
+			item.classList.remove('scroll-overflow');
+
+			// Remove cloned span
+			var clonedSpan = item.children[1];
+			utils.requestAnimFrame.call(window, function ( ) {
+				clonedSpan && clonedSpan.remove();
+			});
+		};
+
+		var triggerScrolling = function (item) {
+			item.classList.add('scroll-overflow');
+
+			// Clone and append span
+			var clone = item.firstElementChild.cloneNode(true);
+			utils.requestAnimFrame.call(window, function ( ) {
+				item.appendChild(clone);
+			});
+		};
+
 		var items = target.children;
 		utils.forEach(items, function (index, item) {
-			if (item.classList.contains('overflow')) {
-				if (reset) {
-					item.classList.remove('scroll-overflow');
+			if (!item.classList.contains('overflow')) { return; }
 
-					// Remove cloned span
-					var clonedSpan = item.children[1];
-					utils.requestAnimFrame.call(window, function ( ) {
-						clonedSpan && clonedSpan.remove();
-					});
-				} else if (!item.classList.contains('scroll-overflow')) {
-					item.classList.add('scroll-overflow');
-
-					// Clone and append span
-					var clone = item.firstElementChild.cloneNode(true);
-					utils.requestAnimFrame.call(window, function ( ) {
-						item.appendChild(clone);
-					});
-				}
+			if (reset) {
+				resetScrolling(item);
+			} else if (!item.classList.contains('scroll-overflow')) {
+				triggerScrolling(item);
 			}
 		});
 	},
@@ -460,64 +481,65 @@ module.exports = {
 		this.scrollToPosition(offsetTop - offset, 500);
 	},
 
-	loadItemCover: function (target) {
-		var parentNode = target.parentNode;
-		var id = parentNode.getAttribute('data-id');
+	showItemCover: function (target) {
+		if (this.viewportWidth < 685) { return; }
 
-		if (this.viewportWidth < 685) {
-			return;
-		}
+		var loadItemCover = function (target) {
+			target.coverPromise = target.coverPromise || new Promise(function (resolve, reject) {
+				var parentNode = target.parentNode;
+				var id = parentNode.getAttribute('data-id');
+				var item = collection.getItem(id).covers[0];
+				var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
+				var cdn = s.cdn + '/' + format + '/';
+				var coverContainer = parentNode.querySelector('.cover');
+				var cover = format === 'video' ? document.createElement(format) : new Image();
 
-		// If AJAX call hasn't been completed yet
-		if (collection.getCollection() === null) {
-			return;
-		}
+				cover.setAttribute('width', item.width);
+				cover.setAttribute('height', item.height);
 
-		if (c.coversLoaded.indexOf(id) === -1) {
-			var item = collection.getCollection()[id].covers[0];
-			var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
-			var cdn = s.cdn + '/' + format + '/';
-			var cover = document.createElement(format);
-			var filename;
+				if (format === 'video') {
+					cover.setAttribute('muted', '');
+					cover.setAttribute('autoplay', true);
+					cover.setAttribute('loop', true);
+					cover.setAttribute('src', cdn + item.filename);
+					utils.requestAnimFrame.call(window, function ( ) {
+						coverContainer.appendChild(cover);
+					});
+				} else {
+					cover.setAttribute('src', cdn + (item.screenshot ? item.screenshot : item.filename));
+					cover.setAttribute('alt', '');
+					cover.onload = function ( ) {
+						utils.requestAnimFrame.call(window, function ( ) {
+							coverContainer.appendChild(cover);
+							setTimeout(function ( ) {
+								coverContainer.classList.add('cover-loaded');
+							}, 10);
+						});
+					};
+				}
 
-			// Below checks both for video and if the mp4 format is supported in the browser
-			if (format === 'video') {
-				filename = cdn + item.filename;
-				cover.setAttribute('autoplay', '');
-				cover.setAttribute('loop', '');
-			} else {
-				filename = cdn + (item.screenshot ? item.screenshot : item.filename);
-				cover.setAttribute('alt', '');
-			}
+				resolve(id);
+			});
 
-			cover.setAttribute('src', filename);
-			cover.className = 'cover';
-			cover.setAttribute('width', item.width);
-			cover.setAttribute('height', item.height);
+			return target.coverPromise;
+		};
+
+		var randomCoverPosition = function (id) {
+			var cover = collection.getItem(id).covers[0];
+			var topPos = Math.floor(Math.random() * (-(cover.height - 100) - (-30)) + (- 30));
+			var margin = (4 / 100) * this.viewportWidth; // The number 4 here is the percentage
+			var leftMin = margin;
+			var leftMax = (this.viewportWidth - cover.width) - margin;
+			var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
 
 			utils.requestAnimFrame.call(window, function ( ) {
-				parentNode.appendChild(cover);
+				var coverContainer = target.parentNode.querySelector('[data-id="' + id + '"] .cover');
+				coverContainer.style.cssText = coverContainer.style.cssText + 'top: ' + topPos +'px; left: ' + leftPos +'px';
 			});
-			c.coversLoaded.push(id);
+		}.bind(this);
 
-			this.randomCoverPosition(id, cover);
-		} else if (!(parentNode.classList.contains('playing') || parentNode.classList.contains('paused') || parentNode.classList.contains('loading'))) { // Reposition again if cover has already been loaded
-			this.randomCoverPosition(id);
-		}
-	},
-
-	randomCoverPosition: function (id, cover) {
-		var item = collection.getCollection()[id].covers[0];
-		cover = cover || document.querySelector('[data-id="' + id + '"] .cover');
-
-		var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
-		var margin = (4 / 100) * this.viewportWidth; // The number 3 here is the percentage
-		var leftMin = margin;
-		var leftMax = (this.viewportWidth - item.width) - margin;
-		var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
-
-		utils.requestAnimFrame.call(window, function ( ) {
-			cover.style.cssText = 'top: ' + topPos +'px; left: ' + leftPos +'px';
+		collection.getCollection.then(function ( ) {
+			loadItemCover(target).then(randomCoverPosition);
 		});
 	},
 
@@ -526,29 +548,32 @@ module.exports = {
 		c.elems.volume.value = audio.getVolume() * 100;
 
 		// Private variables
-		var elem, currentProgress, progressBar, iconState, color, position, percent;
+		var elem, currentProgress, progressBar, iconState, position, percent;
 
 		pubsub.subscribe('audioLoading', function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
-
-			// Add loading class
-			c.elems.HTML.classList.add('loading-song');
-			elem.classList.add('loading');
+			var song = collection.getItem(id);
+			var elemLink = elem.firstChild;
 
 			// Unfocus previous item
 			var prevElem = c.elems.currentItem;
 			if (prevElem) {
 				c.elems.currentItem = null;
 				prevElem.firstChild.blur();
-				utils.simulateMouseEvent(prevElem.firstChild, 'mouseout');
+				utils.simulateEvent(prevElem.firstChild, 'mouseout');
 			}
 
-			// Add random palette color
-			color = 'color-' + Math.floor(Math.random() * 8);
-			elem.classList.add(color);
-
 			// Load item cover & scroll overflowing text
-			utils.simulateMouseEvent(elem.firstChild, 'mouseover');
+			utils.simulateEvent(elem.firstChild, 'mouseover');
+
+			// Add loading class
+			c.elems.HTML.classList.add('loading-song');
+			elem.classList.add('loading');
+
+			// Update browser history (incl. document title)
+			var href = elemLink.href;
+			var documentTitle = utils.makeDocumentTitle([utils.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ') + ' – ' + config.settings.documentTitle;
+			history.update(id, href, documentTitle);
 
 			// Store element globally
 			c.elems.currentItem = elem;
@@ -563,7 +588,6 @@ module.exports = {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
 			c.elems.HTML.classList.remove('loading-song');
 			elem.classList.remove('loading');
-			elem.classList.remove(color);
 			elem.classList.add('unavailable');
 		});
 
@@ -571,14 +595,13 @@ module.exports = {
 			var song = collection.getItem(id);
 			var elemLink = elem.firstChild;
 
-			// Update browser history (incl. document title)
-			var href = elemLink.href;
-			var documentTitle = '▶ ' + utils.makeDocumentTitle([utils.structureArtists(song.artist, song.featuredartist), '"' + song.title + '"'], ', ');
-			history.update(id, href, documentTitle);
-
 			c.elems.HTML.classList.remove('loading-song');
 			elem.classList.remove('loading');
 			elem.classList.add('playing');
+
+			// Update document title with ▶ character
+			var documentTitle = '▶ ' + document.title;
+			history.updateDocumentTitle(documentTitle);
 
 			// Insert duration element
 			var time = elem.getElementsByClassName('time')[0];
@@ -649,7 +672,7 @@ module.exports = {
 
 		pubsub.subscribe('audioStopped', function (id) {
 			// Remove all classes
-			elem.classList.remove(color);
+			c.elems.HTML.classList.remove('loading-song');
 			elem.classList.remove('paused');
 			elem.classList.remove('playing');
 			elem.classList.remove('loading');
@@ -688,25 +711,27 @@ module.exports = {
 		}.bind(this));
 
 		var forceProgressRepaint = function ( ) {
-			if (audio.getState().audio !== 'playing') return;
-
-			// Since Safari pauses all animation when switching to another tab,
-			// we have to retrigger the animation when this tab regains focus
+			if (audio.getState() !== 'playing' && audio.getState() !== 'paused') { return; }
 
 			// Give the browser some time catch up
 			setTimeout(function ( ) {
-				var currentSong = collection.getCollection()[audio.getState().currentId];
+				var currentSong = collection.getItem(audio.getCurrentId());
 				var currentPercent = percent - 100;
 				var timeLeft = currentSong.audio.duration - position;
 
 				var clone = progressBar.cloneNode(true);
 				progressBar.parentNode.replaceChild(clone, progressBar);
 
-				clone.style.webkitTransform = 'translate3d(' + currentPercent +'%, 0, 0)';
-				clone.style.webkitAnimation = 'progress-bar ' + timeLeft + 'ms linear both';
+				['', 'webkit', 'moz'].forEach(function (vendor) {
+					clone.style[vendor + 'Transform'] = 'translate3d(' + currentPercent +'%, 0, 0)';
+					clone.style[vendor + 'AnimationDuration'] = timeLeft + 'ms';
+					clone.style[vendor + 'AnimationName'] = 'progress-bar';
+					clone.style[vendor + 'AnimationTimingFunction'] = 'linear';
+					clone.style[vendor + 'AnimationFillMode'] = 'both';
+				});
 
 				progressBar = clone;
-			}, 300);
+			}, 100);
 		};
 
 		pubsub.subscribe('windowFocused', forceProgressRepaint);

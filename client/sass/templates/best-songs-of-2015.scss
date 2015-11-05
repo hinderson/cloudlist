@@ -9,6 +9,15 @@
 
 @import "../base";
 
+html, body {
+	background: #fff;
+}
+
+.main-header .logo {
+	fill: #000;
+	width: 95px;
+}
+
 .hero {
 	min-height: 500px;
 	height: 100vh;
@@ -184,75 +193,19 @@
 	}
 }
 
-// Covers
-.collection .cover img {
-	transition: opacity 0.6s ease-in-out;
+/* Cover */
+.collection .cover {
+	background: #f3f3f3;
 }
 
-/* Palettes */
-.color-0.playing a {
-	background: rgba(255, 234, 220, 0.85);
+.best-songs-of-2015 .collection ol:hover .cover-loaded img,
+.best-songs-of-2015 .collection ol:focus .cover-loaded img {
+	transition: opacity 0.2s ease-out;
 }
 
-.color-0.paused a {
-	background: rgba(255, 234, 220, 0.55);
+a,
+a:visited {
+	color: #000;
 }
-
-.color-1.playing a {
-	background: rgba(219, 243, 208, 0.85);
-}
-
-.color-1.paused a {
-	background: rgba(219, 243, 208, 0.55);
-}
-
-.color-2.playing a {
-	background: rgba(255, 246, 222, 0.85);
-}
-
-.color-2.paused a {
-	background: rgba(255, 246, 222, 0.55);
-}
-
-.color-3.playing a {
-	background: rgba(212, 223, 243, 0.85);
-}
-
-.color-3.paused a {
-	background: rgba(212, 223, 243, 0.55);
-}
-
-.color-4.playing a {
-	background: rgba(255, 241, 181, 0.85);
-}
-
-.color-4.paused a {
-	background: rgba(255, 241, 181, 0.55);
-}
-
-.color-5.playing a {
-	background: rgba(194, 206, 202, 0.85);
-}
-
-.color-5.paused a {
-	background: rgba(194, 206, 202, 0.45);
-}
-
-.color-6.playing a {
-	background: rgba(229, 214, 212, 0.85);
-}
-
-.color-6.paused a {
-	background: rgba(229, 214, 212, 0.45);
-}
-
-.color-7.playing a {
-	background: rgba(214, 220, 205, 0.85);
-}
-
-.color-7.paused a {
-	background: rgba(214, 220, 205, 0.45);
-}
-
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

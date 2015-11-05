@@ -57,6 +57,19 @@ utils = {
 
 		return song;
 	},
+
+	deepCopy: function (o) {
+		var copy = o,k;
+
+    	if (o && typeof o === 'object') {
+        	copy = Object.prototype.toString.call(o) === '[object Array]' ? [] : {};
+	    	for (k in o) {
+	        	copy[k] = utils.deepCopy(o[k]);
+	        }
+	    }
+
+	    return copy;
+	}
 };
 
 module.exports = utils;

@@ -4,23 +4,29 @@
 var main = require('../main.js');
 var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
+var collection = require('../data/collection.js');
+var config = require('../config.js');
+var placeholders = require('../placeholders.js');
+
+// Extend config
+config.api.version = 'v1';
 
 // Template specific stuff
 var stackBlur = require('../vendor/stackblur.js');
 
-var cacheElems = function ( ) {
+function cacheElems ( ) {
 	// Extends to main cache object
 	main.cache.elems.playBtn = document.querySelector('.hero button');
-};
+}
 
-var registerEvents = function ( ) {
+function registerEvents ( ) {
 	main.cache.elems.playBtn.addEventListener('click', function (e) {
 		// Play first song in collection
 		audio.toggleState();
 	}, false);
-};
+}
 
-var updateParallax = function (lastScrollY) {
+function updateParallax (lastScrollY) {
 	var translateY3d = function (elem, value) {
 		var translate = 'translate3d(0px,' + value + 'px, 0px)';
 		elem.style['-webkit-transform'] = translate;
@@ -35,9 +41,9 @@ var updateParallax = function (lastScrollY) {
 	}
 
 	translateY3d(main.cache.elems.heroContent, translateValue);
-};
+}
 
-var initCanvas = function ( ) {
+function initCanvas ( ) {
 	var collectionHero = document.querySelector('.collection-hero');
 	var canvas = collectionHero.querySelector('canvas');
 	var hero = collectionHero.querySelector('img');
@@ -51,46 +57,76 @@ var initCanvas = function ( ) {
 	hero.style.visibility = 'hidden';
 
 	return { collectionHero: collectionHero, canvas: canvas, hero: hero, cctx: cctx };
-};
+}
 
 var canvas;
 var windowLoaded = false;
-window.onload = function ( ) {
+window.addEventListener('load', function ( ) {
 	windowLoaded = true;
 	canvas = initCanvas();
-};
+});
 
-var blurHero = function (lastScrollY) {
+function blurHero (lastScrollY) {
 	if (!windowLoaded) { return; }
 	// canvas.collectionHero.style.opacity = (100 - (lastScrollY / 5)) / 100;
 	canvas.cctx.drawImage(canvas.hero, 0, 0);
 	stackBlur.canvasRGB(canvas.canvas, 0, 0, canvas.canvas.width, canvas.canvas.height, lastScrollY / 9);
-};
+}
 
-var updateHero = function (lastScrollY) {
+function updateHero (lastScrollY) {
 	// Bail if we've reached the collection
 	if (lastScrollY > main.cache.collectionTop) {
 		return;
 	}
 
 	updateParallax(lastScrollY);
-	blurHero(lastScrollY);
-};
+	//TEMP: blurHero(lastScrollY);
+}
 
-var playing = function ( ) {
+function loading (id) {
+	// Add assigned color based on first associated cover
+	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
+	var rgb = collection.getItem(id).covers[0].colors.primary;
+	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
+}
+
+function playing ( ) {
 	main.cache.elems.playBtn.classList.add('playing');
-};
+}
 
-var stopped = function ( ) {
+function paused (id) {
+	// Change opacity of cover color
+	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
+	var rgb = collection.getItem(id).covers[0].colors.primary;
+	elemLink.style.background = 'rgba(' + rgb + ', 0.45)';
+
 	main.cache.elems.playBtn.classList.remove('playing');
-};
+}
+
+function resume (id) {
+	// Add assigned color based on first associated cover
+	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
+	var rgb = collection.getItem(id).covers[0].colors.primary;
+	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
+
+	main.cache.elems.playBtn.classList.add('playing');
+}
+
+function stopped (id) {
+	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
+	elemLink.removeAttribute('style');
+
+	main.cache.elems.playBtn.classList.remove('playing');
+}
 
 cacheElems();
 registerEvents();
+placeholders.lazyLoad();
 main.init();
 
 pubsub.subscribe('scrolling', updateHero);
+pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioPlaying', playing);
-pubsub.subscribe('audioPaused', stopped);
+pubsub.subscribe('audioPaused', paused);
 pubsub.subscribe('audioStopped', stopped);
-pubsub.subscribe('audioResumed', playing);
+pubsub.subscribe('audioResumed', resume);

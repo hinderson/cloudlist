@@ -1,35 +1,28 @@
 'use strict';
 
+// Requires
+var utils = require('../utils.js');
+var config = require('../config.js');
+
 var order;
 var items;
 
 // Store GET request, structure and store it in global array
-var setCollection = function (id, callback) {
-	if (!id) return;
-
-	var XMLHttp = new XMLHttpRequest();
-
-	XMLHttp.open('GET', '/song-collection/' + id, true);
-	XMLHttp.onreadystatechange = function ( ) {
-		if (XMLHttp.readyState === 4) {
-			if (XMLHttp.status === 200) {
-				var response = JSON.parse(XMLHttp.responseText);
-				items = response.items;
-				order = response.order;
-				return callback(response);
-			}
+var getCollection = new Promise(function (resolve, reject) {
+	var url = config.api.url + config.api.version + '/collection';
+    utils.getJSON(url).then(function (data) {
+		if (data) {
+			items = data.items;
+			order = data.order;
+	        resolve(data);
+		} else {
+			reject('No data');
 		}
-	};
-	XMLHttp.send(null);
-};
-
-var getCollection = function ( ) {
-	return items;
-};
-
-var getCollectionIds = function ( ) {
-	return Object.keys(getCollection());
-};
+    }).catch(function (error) {
+		// TODO: Handle error
+        console.log('An error has occured', error.stack);
+    });
+});
 
 var getCollectionOrder = function ( ) {
 	return order.slice(0);
@@ -41,7 +34,7 @@ var setCollectionOrder = function (newOrder) {
 
 // Sorts and then returns the new order
 var sortCollection = function (items, key, reverse) {
-	var order = getCollectionIds().map(function (id) {
+	var order = getAllItemIds().map(function (id) {
 		return {
 			'id': id,
 			'index': items[id].index,
@@ -63,8 +56,16 @@ var sortCollection = function (items, key, reverse) {
 	return order;
 };
 
+var getAllItemIds = function ( ) {
+	return Object.keys(getAllItems());
+};
+
+var getAllItems = function ( ) {
+	return items;
+};
+
 var getItem = function (id) {
-	return getCollection()[id];
+	return getAllItems()[id];
 };
 
 var getItemPosition = function (id) {
@@ -103,10 +104,10 @@ var getLastItem = function ( ) {
 
 // Export interface
 module.exports = {
-	setCollection: setCollection,
 	getCollection: getCollection,
 	getCollectionOrder: getCollectionOrder,
 	sortCollection: sortCollection,
+	getAllItems: getAllItems,
 	getItem: getItem,
 	getItemPosition: getItemPosition,
 	getNextItem: getNextItem,

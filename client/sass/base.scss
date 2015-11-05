@@ -11,7 +11,8 @@
 @import "_animation/_animation";
 
 
-.loading-song {
+.loading-song,
+.loading-song .loading a {
 	cursor: wait;
 }
 
@@ -156,7 +157,7 @@
 
 .info-toggle {
 	width: 12px;
-	margin-left: 16px;
+	margin-left: 14px;
 	border: 0;
 	background: none;
 }
@@ -291,7 +292,7 @@
 /* Collection header */
 .collection-header {
 	position: absolute;
-	top: 0;
+	top: -120px;
 	left: 0;
 	z-index: 5;
 	width: 100%;
@@ -359,13 +360,13 @@
 
 .collection ol {
 	margin: 0;
-	padding-top: 120px;
+	margin-top: 120px;
 	list-style: none;
 }
 
 @media (max-width: 685px) {
 	.collection ol {
-		padding-top: 104px;
+		margin-top: 104px;
 	}
 }
 
@@ -450,24 +451,59 @@
 	will-change: transform, opacity;
 }
 
-.collection ol:hover .cover,
-.collection ol:focus .cover {
+.collection ol:hover .cover-loaded img,
+.collection ol:focus .cover-loaded img {
 	opacity: 0.4;
-	-webkit-transition: opacity 0.2s ease-out;
-	transition: opacity 0.2s ease-out;
 }
 
 .collection .playing .cover,
 .collection .paused .cover,
+.collection .loading .cover,
 .collection li:hover .cover,
 .collection li:focus .cover {
 	display: block;
+}
+
+.collection .playing .cover-loaded img,
+.collection .paused .cover-loaded img,
+.collection .loading .cover-loaded img,
+.collection li:hover .cover-loaded img,
+.collection li:focus .cover-loaded img {
 	opacity: 1;
 }
 
 .collection li:hover .cover,
 .collection li:focus .cover {
 	z-index: 1;
+}
+
+.collection .cover .placeholder {
+	display: none;
+}
+
+.collection .cover .canvas {
+	display: block;
+	transition: visibility 0s linear 500ms, opacity 100ms 400ms;
+}
+
+.collection .cover img {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s linear 0s, opacity 0.15s linear 0s;
+}
+
+.collection .cover-loaded img {
+	visibility: visible;
+	opacity: 1;
+}
+
+.collection .cover-loaded .canvas {
+	visibility: hidden;
+	opacity: 0;
 }
 
 @media (max-width: 685px) {

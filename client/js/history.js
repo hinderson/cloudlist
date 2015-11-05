@@ -41,7 +41,7 @@ module.exports = {
 		}
 	},
 
-	updateDocumentTitle: function (title, removeBaseTitle) {
+	updateDocumentTitle: function (title) {
 		document.title = title;
 		if (window.history.state && window.history.state.id) {
 			window.history.state.title = title;

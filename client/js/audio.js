@@ -13,9 +13,11 @@ var gainNode;
 
 // Settings
 var settings = {
-	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 9.0) || 9.0, // Default value is always 90
 	key: config.settings.soundCloudKey,
-	path: config.settings.cdn + '/audio/'
+	path: config.settings.cdn + '/audio/',
+	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 9.0) || 9.0, // Default value is always 9
+	repeat: true,
+	shuffle: false,
 };
 
 // State
@@ -24,6 +26,10 @@ var currentId;
 
 var getState = function ( ) {
 	return currentState;
+};
+
+var getCurrentId = function ( ) {
+	return currentId;
 };
 
 var setState = function (state) {
@@ -56,7 +62,6 @@ var toggleState = function (id) {
 
 var play = function (id) {
 	var direction = collection.getItemPosition(currentId) - collection.getItemPosition(id) === 1 ? 'backwards' : 'forwards';
-
 	// First stop the currently playing sound, if any
 	if (currentId) { stop(currentId); }
 	currentId = id;
@@ -80,8 +85,9 @@ var play = function (id) {
 
 	// Load URL
 	audioElement.src = url;
+	audioElement.load();
 
-	function moveOn (direction) {
+	function moveOn ( ) {
 		if (direction === 'forwards') {
 			next();
 		} else {
@@ -92,7 +98,8 @@ var play = function (id) {
 	function removeEventListeners ( ) {
 		audioElement.removeEventListener('loadedmetadata', events.onLoad);
 		audioElement.removeEventListener('canplay', events.onPlay);
-		audioElement.removeEventListener('ended', events.onStop);
+		audioElement.removeEventListener('ended', events.onEnd);
+		audioElement.removeEventListener('stopped', events.onStop);
 		audioElement.removeEventListener('timeupdate', events.whilePlaying);
 		audioElement.removeEventListener('error', events.onError);
 	}
@@ -102,15 +109,20 @@ var play = function (id) {
 			audioElement.currentTime = Math.max((song.audio.starttime / 1000), 0);
 		},
 		onPlay: function ( ) {
+			console.log('PLAYING EVENT', currentState);
+			if (currentState === 'playing') { return; } // Sometimes a canPlay event is sent twice
 			setState('playing');
 			pubsub.publish('audioPlaying', id);
 			audioElement.play();
 		},
+		onEnd: function ( ) {
+			console.log('ENDED', id);
+			stop(id);
+			moveOn();
+		},
 		onStop: function ( ) {
-			if (currentState !== 'playing') { return; }
 			removeEventListeners();
-			stop();
-			moveOn(direction);
+			audioElement.src = '';
 		},
 		onError: function (e) {
 			switch (e.target.error.code) {
@@ -133,7 +145,7 @@ var play = function (id) {
 
 			removeEventListeners();
 			pubsub.publish('audioFailedLoading', id);
-			moveOn(direction);
+			moveOn();
 		},
 		whilePlaying: function ( ) {
 			if (currentState !== 'playing') { return; }
@@ -148,7 +160,8 @@ var play = function (id) {
 
 	audioElement.addEventListener('loadedmetadata', events.onLoad, false);
 	audioElement.addEventListener('canplay', events.onPlay, false);
-	audioElement.addEventListener('ended', events.onStop, false);
+	audioElement.addEventListener('ended', events.onEnd, false);
+	audioElement.addEventListener('stopped', events.onStop, false);
 	audioElement.addEventListener('timeupdate', events.whilePlaying, false);
 	audioElement.addEventListener('error', events.onError, false);
 };
@@ -161,6 +174,7 @@ var pause = function (id) {
 };
 
 var resume = function (id) {
+	console.log('Resuming', id);
 	setState('playing');
 	pubsub.publish('audioResumed', id);
 	audioElement.play();
@@ -177,9 +191,7 @@ var previous = function (acc) {
 };
 
 var stop = function (id) {
-	if (!id) { id = currentId; }
-	currentId = '';
-
+	if (!id) { id = currentId; currentId = null; }
 	setState('stopped');
 	pubsub.publish('audioStopped', id);
 	destroy(id);
@@ -193,12 +205,14 @@ var stopAll = function ( ) {
 var destroy = function (id) {
 	if (audioElement) {
 		audioElement.pause();
+		utils.simulateEvent(audioElement, 'stopped');
 	}
 };
 
 // Export interface
 module.exports = {
 	getState: getState,
+	getCurrentId: getCurrentId,
 	setVolume: setVolume,
 	getVolume: getVolume,
 	toggleState: toggleState,

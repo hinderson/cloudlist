@@ -3,6 +3,31 @@
 var utils = {};
 
 utils = {
+	get: function (url) {
+		return new Promise(function (resolve, reject) {
+			var req = new XMLHttpRequest();
+			req.open('GET', url);
+
+			req.onload = function ( ) {
+				if (req.status === 200) {
+					resolve(req.response);
+				} else {
+					reject(Error(req.statusText));
+				}
+			};
+
+			req.onerror = function ( ) {
+				reject(Error('Network Error'));
+			};
+
+			req.send();
+		});
+	},
+
+	getJSON: function (url) {
+		return utils.get(url).then(JSON.parse);
+	},
+
 	forEach: function (array, callback, scope) {
 		for (var i = 0, len = array.length; i < len; i++) {
 			callback.call(scope, i, array[i]);
@@ -198,12 +223,13 @@ utils = {
 	// Uses fractional values to determine if an element overflows its container
 	isOverflowed: function (element) {
 		var rect = element.getBoundingClientRect();
-		var scrollHeight = element.scrollHeight + (parseInt(rect.height) - rect.height);
-		var scrollWidth  = element.scrollWidth + (parseInt(rect.width) - rect.width);
-		return scrollHeight > rect.height || scrollWidth > rect.width;
+		var scrollHeight = parseInt(element.scrollHeight + (parseInt(rect.height) - rect.height));
+		var scrollWidth  = parseInt(element.scrollWidth + (parseInt(rect.width) - rect.width));
+
+		return scrollHeight > parseInt(rect.height) || scrollWidth > parseInt(rect.width);
 	},
 
-	simulateMouseEvent: function (element, eventName) {
+	simulateEvent: function (element, eventName) {
 		var evt;
 		if (document.createEvent) {
             evt = document.createEvent('HTMLEvents');
