@@ -33,6 +33,23 @@ module.exports = function (router) {
 		});
 	});
 
+	// Best songs of 2015 (without user name): Single song
+	router.get('/2015/:permalink', function (req, res, next) {
+		collections.getOne({ 'permalink': '2015' }, function (result) {
+			if (!result) return next();
+
+			// Render template
+			var single = utils.findByKey(result.songs, 'permalink', req.params.permalink);
+			var template = result.collection.template;
+			res.render('templates/' + template, {
+				path: '2015',
+				collection: result.collection,
+				songs: result.songs,
+				single: single
+			});
+		});
+	});
+
 	// Best songs of 2014 (without user name)
 	router.get('/best-songs-of-2014', function (req, res, next) {
 		collections.getOne({ 'permalink': 'best-songs-of-2014' }, function (result) {
