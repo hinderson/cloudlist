@@ -12,7 +12,7 @@ var jsonpClient = require('jsonp-client');
 var config = require('config');
 
 // Graphicsmagick
-var gm = require('gm');
+var gm = require('gm').subClass({imageMagick: true});
 
 // FFMPEG
 var ffmpeg = require('fluent-ffmpeg');
@@ -46,13 +46,12 @@ songs = {
 		var songTitle = args.title || null;
 		var songAlbum = args.album || null;
 		var songDuration = null;
-		var songImage = files.image ? files.image.name : null;
-		var songCover;
 		var audioUrl = files.audio ? files.audio.name : null;
 		var streamUrl = args.soundcloud || null;
 		var startTime = args.starttime || 0;
 		var endTime = args.endtime;
 		var resolvedUrl = null;
+		var gradientPlaceholder = args.gradientplaceholder || null;
 
 		var tempCoverPath = files.image ? files.image.path : null;
 		var tempFilename = files.image ? files.image.name : null;
@@ -65,7 +64,6 @@ songs = {
 		songAlbum && songAlbum.trim();
 
 		function determineAudioSource (callback) {
-
 			// First resolve the URL if it's Soundcloud
 			// Be sure to check for // in the beginning so we don't return true on api.soundcloud
 			if (streamUrl && streamUrl.indexOf('//soundcloud.com') > -1) {
@@ -85,9 +83,7 @@ songs = {
 
 					callback(null);
 				});
-
 			} else if (audioUrl) {
-
 				// Analyze audio duration and move the file
 				var tempAudioPath = files.audio.path;
 				var targetAudioPath = './client/media/audio/' + files.audio.name;
@@ -110,11 +106,8 @@ songs = {
 						});
 					});
 				});
-
 			} else {
-
 				callback(null);
-
 			}
 		}
 
@@ -146,128 +139,195 @@ songs = {
 		}
 
 		function identifyCoverType (callback) {
-			if (!tempCoverPath) {
-				return callback(null);
-			}
+			if (!tempCoverPath) { return callback(null); }
 
-			// First check if we're dealing with an image or a video
 			var ext = path.extname(tempCoverPath);
-			if (ext !== '.mp4') {
-				var filename = ext ? tempFilename.replace(ext, '.jpg') : (tempFilename + '.jpg'); // If there is no extension
-				targetCoverPath = './client/media/img/' + filename;
+			var filename = ext ? tempFilename.replace(ext, (ext === '.gif' ? '.gif' : '.jpg')) : (tempFilename + (ext === '.gif' ? '.gif' : '.jpg')); // If there is no extension
+			targetCoverPath = './client/media/img/' + filename;
 
-				// Resize img
-				gm(tempCoverPath).size(function (err, sizes) {
-
-					// Determine size
-					var width;
-					var height;
-					if (sizes.width > sizes.height) {
-						width = sizes.width < 400 ? null : 400;
-						height = 260;
-					} else {
-						width = 280;
-						height = sizes.height < 400 ? null : 400;
-					}
-
+			async.waterfall([
+			    function (next) {
+					// Create large (or maybe medium?) cover
 					gm(tempCoverPath)
-						.resize(width, height) // Automatically keeps its ratio
+						.resize(400, 400) // Max 400px on either side, but otherwise automatically keeps its aspect ratio
 						.noProfile()
-						.setFormat('jpg')
+						.setFormat(ext === '.gif' ? 'gif' : 'jpg')
 						.quality(90)
 						.write(tempCoverPath, function (err) {
 							if (err) throw err;
 
-							gm(tempCoverPath).identify(function (err, identify) {
+							return next(null);
+						});
+			    },
+			    function (next) {
+					// Identify the image
+					gm(tempCoverPath).identify(function (err, identify) {
+						if (err) throw err;
+
+						return next(null, identify);
+					});
+			    },
+				function (identify, next) {
+					// Identifies the dominant color of the image
+					gm(tempCoverPath).identify('%[pixel:s]', function (err, dominantColor) {
+						if (err) throw err;
+
+						// Determines if contrast should be dark or bright
+						function getContrastYIQ (rgb) {
+							var r = rgb[0];
+							var g = rgb[1];
+							var b = rgb[2];
+							var yiq = ((r*299)+(g*587)+(b*114))/1000;
+							return (yiq >= 128) ? 'dark' : 'bright';
+						}
+
+						// Darkens or brightens the original color
+						function luminance (c, n, i, d) {
+							for (i=3;i--;c[i]=d<0?0:d>255?255:d|0)d=c[i]+n;
+							return c;
+						}
+
+						var rgb = dominantColor
+							.replace('srgb(', '')
+							.replace(')', '')
+							.split(',').map(function (x) {
+								return parseInt(x);
+							});
+
+						var contrast = getContrastYIQ(rgb.slice(0));
+
+						identify.primaryColor = rgb;
+						identify.secondaryColor = luminance(rgb.slice(0), contrast === 'dark' ? -160 : 160);
+						identify.colorContrast = contrast;
+						return next(null, identify);
+					});
+				},
+				function (identify, next) {
+					// Create placeholder
+					var placeholderFilename = crypto.randomBytes(16).toString('hex') + '.jpg';
+					var placeholderFile = './client/media/img/' + placeholderFilename;
+					gm(tempCoverPath)
+						.resize(30, 30) // Max 30px on either height or width
+						.setFormat('jpg')
+						.quality(90)
+						.write(placeholderFile, function (err) {
+							if (err) throw err;
+
+							gm(placeholderFile).identify(function (err, placeholder) {
 								if (err) throw err;
 
-								songCover = {
-									format: identify.format,
-									filename: filename,
-									width: identify.size.width,
-									height: identify.size.height,
+								identify.placeholder = {
+									filename: placeholderFilename,
+									width: placeholder.size.width,
+									height: placeholder.size.height,
 									filesize: identify.Filesize
 								};
 
-								callback(null);
+								next(null, identify);
 							});
 						});
-				});
-			} else { // Upload mp4
-				targetCoverPath = './client/media/video/' + files.image.name;
-				var screenshotFolder = './client/media/img/';
+				}
+			], function (err, identify) {
+				if (err) throw err;
 
-				// Take screenshot
-				var screenshot;
-				ffmpeg(tempCoverPath)
-					.screenshots({
-						filename: '%b', // Expression means input basename (filename w/o extension)
-						count: 1,
-						timemarks: [ '50%' ], // The point at which to take the screenshot
-						folder: screenshotFolder // Output path
-					})
-					.on('filenames', function (filenames) {
-						screenshot = filenames;
-					})
-					.on('end', function ( ) {
+				var songCover = {
+					format: identify.format,
+					filename: filename,
+					width: identify.size.width,
+					height: identify.size.height,
+					filesize: identify.Filesize,
+					placeholder: identify.placeholder,
+					colors: {
+						primary: identify.primaryColor,
+						secondary: identify.secondaryColor,
+						contrast: identify.colorContrast,
+						gradient: gradientPlaceholder
+					}
+				};
 
-						var newScreenshot = screenshot[0].replace(path.extname(screenshot[0]), '.jpg');
-						var tempScreenshot = screenshotFolder + screenshot[0];
-						var targetScreenshot = screenshotFolder + newScreenshot;
+				return callback(null, songCover);
+			});
 
-						// Convert PNG screenshot to JPG
-						gm(tempScreenshot)
-							.setFormat('jpg')
-							.quality(90)
-							.write(tempScreenshot, function (err) {
+			/*
+			// Upload mp4
+			targetCoverPath = './client/media/video/' + files.image.name;
+			var screenshotFolder = './client/media/img/';
+
+			// Take screenshot
+			var screenshot;
+			ffmpeg(tempCoverPath)
+				.screenshots({
+					filename: '%b', // Expression means input basename (filename w/o extension)
+					count: 1,
+					timemarks: [ '50%' ], // The point at which to take the screenshot
+					folder: screenshotFolder // Output path
+				})
+				.on('filenames', function (filenames) {
+					screenshot = filenames;
+				})
+				.on('end', function ( ) {
+
+					var newScreenshot = screenshot[0].replace(path.extname(screenshot[0]), '.jpg');
+					var tempScreenshot = screenshotFolder + screenshot[0];
+					var targetScreenshot = screenshotFolder + newScreenshot;
+
+					// Convert PNG screenshot to JPG
+					gm(tempScreenshot)
+						.setFormat('jpg')
+						.quality(90)
+						.write(tempScreenshot, function (err) {
+							if (err) throw err;
+
+							// Rename the temporary PNG file
+							fs.rename(tempScreenshot, targetScreenshot, function (err) {
 								if (err) throw err;
 
-								// Rename the temporary PNG file
-								fs.rename(tempScreenshot, targetScreenshot, function (err) {
+								// Delete the temporary file
+								fs.unlink(tempScreenshot, function() {
 									if (err) throw err;
 
-									// Delete the temporary file
-									fs.unlink(tempScreenshot, function() {
+									// Read metadata
+									ffmpeg.ffprobe(tempCoverPath, function (err, metadata) {
 										if (err) throw err;
 
-										// Read metadata
-										ffmpeg.ffprobe(tempCoverPath, function (err, metadata) {
-											if (err) throw err;
+										var songCover = {
+											format: 'MP4',
+											filename: songImage,
+											width: metadata.streams[0].width,
+											height: metadata.streams[0].height,
+											filesize: metadata.format.size,
+											screenshot: newScreenshot
+										};
 
-											songCover = {
-												format: 'MP4',
-												src: songImage,
-												width: metadata.streams[0].width,
-												height: metadata.streams[0].height,
-												filesize: metadata.format.size,
-												screenshot: newScreenshot
-											};
-
-											callback(null);
-										});
+										callback(null, songCover);
 									});
-
 								});
 
 							});
-					});
-			}
+
+						});
+				});
+				*/
 		}
 
 		function processCover (callback) {
-			if (!tempCoverPath) {
-				return callback(null);
-			}
+			if (!tempCoverPath) { return callback(null); }
 
+			// Rename temporary file
 			fs.rename(tempCoverPath, targetCoverPath, function (err) {
 				if (err) throw err;
 
-				// Delete the temporary file
-				fs.unlink(tempCoverPath, function() {
-					if (err) throw err;
+				// Convert gif to video
+				if (path.extname(targetCoverPath) === '.gif') {
+					ffmpeg(targetCoverPath)
+						.videoBitrate('2048k')
+						.save('./client/media/video/' + crypto.randomBytes(16).toString('hex') + '.mp4')
+						.on('end', function ( ) {
+							console.log('Finished processing video gif', tempFilename + '.mp4');
+						});
+				}
 
-					callback(null);
-				});
+				return callback(null);
 			});
 		}
 
@@ -282,18 +342,10 @@ songs = {
 				songFeatured = songFeatured.split(/\s*,\s*/);
 			}
 
-			callback(null);
+			return callback(null);
 		}
 
-		// Main async chain
-		async.series([
-			determineAudioSource,
-			processImageSearchResults,
-			identifyCoverType,
-			processCover,
-			formatInputFields
-		],
-		function (err) {
+		function postToDb (err, songCover) {
 			if (err) throw err;
 
 			var slugs = {
@@ -316,7 +368,7 @@ songs = {
 				},
 				'available': true,
 				'featuredartist': songFeatured,
-				'covers': [songCover],
+				'covers': [songCover[2]],
 				'slugs': {
 					'album': slugs.album,
 					'artist': slugs.artist,
@@ -354,7 +406,16 @@ songs = {
 					}
 				});
 			});
-		});
+		}
+
+		// Main async chain
+		async.series([
+			determineAudioSource,
+			processImageSearchResults,
+			identifyCoverType,
+			processCover,
+			formatInputFields
+		], postToDb);
 	},
 
 	update: function (id, args, result) {
@@ -396,6 +457,10 @@ songs = {
 					var source = song.covers[0].filename;
 					var ext = path.extname(source).slice(1);
 					fs.unlink('./client/media/' +  (ext === 'mp4' ? 'video/' : 'img/') + song.covers[0].filename);
+
+					if (song.covers[0].placeholder) {
+						fs.unlink('./client/media/img/' + song.covers[0].placeholder.filename);
+					}
 				}
 
 				if (song.audio && song.audio.url && song.audio.source !== 'soundcloud') {
