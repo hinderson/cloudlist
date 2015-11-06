@@ -198,6 +198,16 @@ html, body {
 	background: #f3f3f3;
 }
 
+.collection .cover .canvas {
+	display: block;
+	transition: visibility 0s linear 500ms, opacity 100ms 400ms;
+}
+
+.collection .cover-loaded .canvas {
+	visibility: hidden;
+	opacity: 0;
+}
+
 .best-songs-of-2015 .collection ol:hover .cover-loaded img,
 .best-songs-of-2015 .collection ol:focus .cover-loaded img {
 	transition: opacity 0.2s ease-out;
@@ -206,6 +216,17 @@ html, body {
 a,
 a:visited {
 	color: #000;
+}
+
+.collection .loading a[data-contrast="bright"],
+.collection .playing a[data-contrast="bright"],
+.collection .paused a[data-contrast="bright"] {
+	color: #fff;
+}
+
+.collection a[data-contrast="bright"] svg.state-playing,
+.collection a[data-contrast="bright"] svg.state-paused {
+	fill: #fff;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

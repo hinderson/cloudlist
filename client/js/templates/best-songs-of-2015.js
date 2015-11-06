@@ -90,17 +90,11 @@ function loading (id) {
 	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
 }
 
-function playing ( ) {
-	main.cache.elems.playBtn.classList.add('playing');
-}
-
 function paused (id) {
 	// Change opacity of cover color
 	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
 	var rgb = collection.getItem(id).covers[0].colors.primary;
 	elemLink.style.background = 'rgba(' + rgb + ', 0.45)';
-
-	main.cache.elems.playBtn.classList.remove('playing');
 }
 
 function resume (id) {
@@ -108,25 +102,20 @@ function resume (id) {
 	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
 	var rgb = collection.getItem(id).covers[0].colors.primary;
 	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
-
-	main.cache.elems.playBtn.classList.add('playing');
 }
 
 function stopped (id) {
 	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
 	elemLink.removeAttribute('style');
-
-	main.cache.elems.playBtn.classList.remove('playing');
 }
 
+main.init();
 cacheElems();
 registerEvents();
 placeholders.lazyLoad();
-main.init();
 
 pubsub.subscribe('scrolling', updateHero);
 pubsub.subscribe('audioLoading', loading);
-pubsub.subscribe('audioPlaying', playing);
 pubsub.subscribe('audioPaused', paused);
 pubsub.subscribe('audioStopped', stopped);
 pubsub.subscribe('audioResumed', resume);

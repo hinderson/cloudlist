@@ -411,10 +411,11 @@
 }
 
 /* States */
+.collection .loading a,
 .collection .playing a {
 	color: #000;
-	-webkit-transition: background 0.6s;
-	transition: background 0.6s;
+	-webkit-transition: background 0.45s;
+	transition: background 0.45s;
 }
 
 .collection .paused a {
@@ -481,11 +482,6 @@
 	display: none;
 }
 
-.collection .cover .canvas {
-	display: block;
-	transition: visibility 0s linear 500ms, opacity 100ms 400ms;
-}
-
 .collection .cover img {
 	display: block;
 	position: absolute;
@@ -499,11 +495,6 @@
 .collection .cover-loaded img {
 	visibility: visible;
 	opacity: 1;
-}
-
-.collection .cover-loaded .canvas {
-	visibility: hidden;
-	opacity: 0;
 }
 
 @media (max-width: 685px) {

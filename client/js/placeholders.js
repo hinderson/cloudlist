@@ -61,10 +61,10 @@ var isPartiallyInViewport = function (element, offset) {
 
 var loadVisiblePlaceholders = function ( ) {
 	utils.forEach(unloadedItems, function (index, element) {
-		if (!element || !collection.getAllItems()) { return; }
+		if (!element) { return; }
 
 		if (isPartiallyInViewport(element)) {
-            loadPlaceholder(element);
+            createPlaceholder(element);
 
 			delete unloadedItems[index];
             if (index === unloadedItems.length - 1) {
@@ -75,7 +75,7 @@ var loadVisiblePlaceholders = function ( ) {
 	});
 };
 
-var loadPlaceholder = function (element) {
+var createPlaceholder = function (element) {
     var id = element.getAttribute('data-id');
     var coverElem = element.querySelector('.cover');
     var cover = collection.getItem(id).covers[0];
@@ -108,8 +108,11 @@ var lazyLoad = function ( ) {
     var nodeList = document.querySelectorAll('.collection ol li');
     unloadedItems = Array.prototype.slice.call(nodeList);
 
-    loadVisiblePlaceholders();
-	addEventListeners();
+	// Wait for collection to load
+	collection.getCollection.then(function ( ) {
+		loadVisiblePlaceholders();
+		addEventListeners();
+	});
 };
 
 module.exports = {

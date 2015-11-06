@@ -282,18 +282,20 @@ module.exports = {
 	findOverflowingElements: function ( ) {
 		var elems = c.elems.scrollableOverflowElems;
 		utils.forEach(elems, function (index, item) {
-			if (utils.isOverflowed(item)) {
-				item.setAttribute('data-char-count', item.firstChild.textContent.length);
-				item.classList.add('overflow');
-			} else {
-				item.removeAttribute('data-char-count');
-				item.classList.remove('overflow');
-			}
+			utils.requestAnimFrame.call(window, function ( ) {
+				if (utils.isOverflowed(item)) {
+					item.setAttribute('data-char-count', item.firstChild.textContent.length);
+					item.classList.add('overflow');
+				} else {
+					item.removeAttribute('data-char-count');
+					item.classList.remove('overflow');
+				}
+			});
 		});
 	},
 
 	toggleStickyHeader: function ( ) {
-		var scrollPosition = lastScrollY || window.pageYOffset;
+		var scrollPosition = lastScrollY;
 		if (scrollPosition > c.collectionTop) {
 			c.elems.HTML.classList.add('sticky-header');
 		} else {

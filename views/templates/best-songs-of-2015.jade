@@ -37,13 +37,13 @@ block content
 				- song = structureSong(song);
 
 				li(class=song.available === true ? undefined : "unavailable", data-id="#{obfuscatedId}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
-					a(href="#{config.host.protocol}://#{config.host.name}/#{path}/#{song.permalink}/")
+					a(href="#{config.host.protocol}://#{config.host.name}/#{path}/#{song.permalink}/", data-contrast="#{song.covers[0].colors.contrast}")
 						div.col.index #{index+1}
 						div.col.title
 							span #{song.title}
 						div.col.artist
 							span #{song.combinedartist}
 						div.col.time #{song.duration}
-					div.cover(style="background: rgb(#{song.covers[0].colors.primary});", data-contrast="#{song.covers[0].colors.contrast}")
+					div.cover(style="background: rgb(#{song.covers[0].colors.primary});")
 	footer.go-to-top
 		a(href="#top") Top ↑
