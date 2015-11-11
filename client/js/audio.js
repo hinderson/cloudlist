@@ -6,11 +6,6 @@ var config = require('./config.js');
 var pubsub = require('./pubsub.js');
 var collection = require('./data/collection.js');
 
-// WebAudio basics
-var context = new (window.AudioContext || window.webkitAudioContext)(); // jshint ignore:line
-var audioElement;
-var gainNode;
-
 // Settings
 var settings = {
 	key: config.settings.soundCloudKey,
@@ -23,6 +18,11 @@ var settings = {
 // State
 var currentState = 'idle';
 var currentId;
+
+// WebAudio basics
+var context = new (window.AudioContext || window.webkitAudioContext)(); // jshint ignore:line
+var audioElement;
+var gainNode;
 
 var getState = function ( ) {
 	return currentState;
@@ -85,15 +85,6 @@ var play = function (id) {
 
 	// Load URL
 	audioElement.src = url;
-	audioElement.load();
-
-	function moveOn ( ) {
-		if (direction === 'forwards') {
-			next();
-		} else {
-			previous();
-		}
-	}
 
 	function removeEventListeners ( ) {
 		audioElement.removeEventListener('loadedmetadata', events.onLoad);
@@ -118,34 +109,46 @@ var play = function (id) {
 		onEnd: function ( ) {
 			console.log('ENDED', id);
 			stop(id);
-			moveOn();
+			next();
 		},
 		onStop: function ( ) {
 			removeEventListeners();
 			audioElement.src = '';
 		},
 		onError: function (e) {
+			function fail ( ) {
+				removeEventListeners();
+				pubsub.publish('audioFailedLoading', id);
+				if (direction === 'forwards') {
+					next();
+				} else {
+					previous();
+				}
+			}
+
 			switch (e.target.error.code) {
 				case e.target.error.MEDIA_ERR_ABORTED:
 					console.log('You aborted the video playback.', url);
+					fail();
 					break;
 				case e.target.error.MEDIA_ERR_NETWORK:
 					console.log('A network error caused the audio download to fail.', url);
+					// TODO: Improve resume functionality in case of a network error
+					play(id);
 					break;
 				case e.target.error.MEDIA_ERR_DECODE:
 					console.log('The audio playback was aborted due to a corruption problem or because the video used features your browser did not support.', url);
+					fail();
 					break;
 				case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-					console.log('The video audio not be loaded, either because the server or network failed or because the format is not supported.', url);
+					console.log('The audio could not be loaded, either because the server or network failed or because the format is not supported.', url);
+					fail();
 					break;
 				default:
 					console.log('An unknown error occurred.', url);
+					fail();
 					break;
 			}
-
-			removeEventListeners();
-			pubsub.publish('audioFailedLoading', id);
-			moveOn();
 		},
 		whilePlaying: function ( ) {
 			if (currentState !== 'playing') { return; }
@@ -194,19 +197,15 @@ var stop = function (id) {
 	if (!id) { id = currentId; currentId = null; }
 	setState('stopped');
 	pubsub.publish('audioStopped', id);
-	destroy(id);
+	if (audioElement) {
+		audioElement.pause();
+		utils.simulateEvent(audioElement, 'stopped');
+	}
 };
 
 var stopAll = function ( ) {
 	var items = collection.getCollectionOrder();
 	items.forEach(stop);
-};
-
-var destroy = function (id) {
-	if (audioElement) {
-		audioElement.pause();
-		utils.simulateEvent(audioElement, 'stopped');
-	}
 };
 
 // Export interface
