@@ -167,6 +167,11 @@ collections = {
 			var targetPath = './client/media/img/';
 			var covers = [];
 
+			if (result.songs.length < 4) {
+				// Don't create montage if there's less than 4 covers in the collection
+				return;
+			}
+
 			var slicedArray = result.songs.slice(0, 4);
 			async.eachSeries(slicedArray, function (song, callback) {
 				var cover = song.covers[0].filename;
@@ -214,7 +219,7 @@ collections = {
 					// Add watermark
 					im.composite([
 						'-gravity', 'center',
-						'./client/build/img/cloudlist-watermark.png', tempPath + generatedFilename,
+						'./client/img/cloudlist-watermark.png', tempPath + generatedFilename,
 						targetPath + generatedFilename
 					], function (err) {
 						if (err) return console.log(err);
