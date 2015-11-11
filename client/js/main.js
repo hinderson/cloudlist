@@ -35,10 +35,12 @@ var itemHoverHandler = function (e) {
 					target.parentNode.classList.contains('loading'))) {
 						this.showItemCover(target);
 					}
+				pubsub.publish('itemMouseover', target);
 			}
 			break;
 		case 'mouseout':
 			this.scrollOverflowingText(target, true);
+			pubsub.publish('itemMouseout', target);
 			break;
 	}
 };
@@ -484,65 +486,58 @@ module.exports = {
 	},
 
 	showItemCover: function (target) {
-		if (this.viewportWidth < 685) { return; }
+		if (this.viewportWidth < 685 || !collection.getAllItems()) { return; }
 
-		var loadItemCover = function (target) {
-			target.coverPromise = target.coverPromise || new Promise(function (resolve, reject) {
-				var parentNode = target.parentNode;
-				var id = parentNode.getAttribute('data-id');
-				var item = collection.getItem(id).covers[0];
-				var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
-				var cdn = s.cdn + '/' + format + '/';
-				var coverContainer = parentNode.querySelector('.cover');
-				var cover = format === 'video' ? document.createElement(format) : new Image();
+		var parentNode = target.parentNode;
+		var id = parentNode.getAttribute('data-id');
 
-				cover.setAttribute('width', item.width);
-				cover.setAttribute('height', item.height);
+		var loadItemCover = function (item) {
+			var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
+			var cdn = s.cdn + '/' + format + '/';
+			var coverContainer = parentNode.querySelector('.cover');
+			var cover = format === 'video' ? document.createElement(format) : new Image();
 
-				if (format === 'video') {
-					cover.setAttribute('muted', '');
-					cover.setAttribute('autoplay', true);
-					cover.setAttribute('loop', true);
-					cover.setAttribute('src', cdn + item.filename);
+			cover.setAttribute('width', item.width);
+			cover.setAttribute('height', item.height);
+
+			if (format === 'video') {
+				cover.setAttribute('muted', '');
+				cover.setAttribute('autoplay', true);
+				cover.setAttribute('loop', true);
+				cover.setAttribute('src', cdn + item.filename);
+				utils.requestAnimFrame.call(window, function ( ) {
+					coverContainer.appendChild(cover);
+				});
+			} else {
+				cover.setAttribute('src', cdn + (item.screenshot ? item.screenshot : item.filename));
+				cover.setAttribute('alt', '');
+				cover.onload = function ( ) {
 					utils.requestAnimFrame.call(window, function ( ) {
 						coverContainer.appendChild(cover);
+						setTimeout(function ( ) {
+							coverContainer.classList.add('cover-loaded');
+						}, 10);
 					});
-				} else {
-					cover.setAttribute('src', cdn + (item.screenshot ? item.screenshot : item.filename));
-					cover.setAttribute('alt', '');
-					cover.onload = function ( ) {
-						utils.requestAnimFrame.call(window, function ( ) {
-							coverContainer.appendChild(cover);
-							setTimeout(function ( ) {
-								coverContainer.classList.add('cover-loaded');
-							}, 10);
-						});
-					};
-				}
+				};
+			}
 
-				resolve(id);
-			});
-
-			return target.coverPromise;
+			target.coverLoaded = true;
 		};
 
-		var randomCoverPosition = function (id) {
-			var cover = collection.getItem(id).covers[0];
-			var topPos = Math.floor(Math.random() * (-(cover.height - 100) - (-30)) + (- 30));
+		var randomCoverPosition = function (item) {
+			var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
 			var margin = (4 / 100) * this.viewportWidth; // The number 4 here is the percentage
 			var leftMin = margin;
-			var leftMax = (this.viewportWidth - cover.width) - margin;
+			var leftMax = (this.viewportWidth - item.width) - margin;
 			var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
 
-			utils.requestAnimFrame.call(window, function ( ) {
-				var coverContainer = target.parentNode.querySelector('[data-id="' + id + '"] .cover');
-				coverContainer.style.cssText = coverContainer.style.cssText + 'top: ' + topPos +'px; left: ' + leftPos +'px';
-			});
+			var coverContainer = target.parentNode.querySelector('[data-id="' + id + '"] .cover');
+			coverContainer.style.cssText = coverContainer.style.cssText + 'top: ' + topPos +'px; left: ' + leftPos +'px';
 		}.bind(this);
 
-		collection.getCollection.then(function ( ) {
-			loadItemCover(target).then(randomCoverPosition);
-		});
+		var item = collection.getItem(id).covers[0];
+		randomCoverPosition(item);
+		target.coverLoaded || loadItemCover(item);
 	},
 
 	setupAudio: function ( ) {
