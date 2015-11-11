@@ -35,7 +35,8 @@
     "simple-imagemagick": "~0.2.2",
     "shortid": "~2.2.2",
     "config": "~1.15.0",
-    "dominant-color": "0.0.1"
+    "dominant-color": "0.0.1",
+    "bluebird": "~3.0.5"
   },
   "devDependencies": {
     "gulp": "~3.8.11",

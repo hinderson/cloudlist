@@ -1,6 +1,7 @@
 'use strict';
 
 // Requires
+var Promise = require('bluebird');
 var utils = require('../utils.js');
 var config = require('../config.js');
 
