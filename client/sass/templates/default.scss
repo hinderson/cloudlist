@@ -180,6 +180,7 @@
 
 
 /* Palettes */
+.color-0.loading a,
 .color-0.playing a {
 	background: rgba(255, 234, 220, 0.85);
 }
@@ -188,6 +189,7 @@
 	background: rgba(255, 234, 220, 0.55);
 }
 
+.color-1.loading a,
 .color-1.playing a {
 	background: rgba(219, 243, 208, 0.85);
 }
@@ -196,6 +198,7 @@
 	background: rgba(219, 243, 208, 0.55);
 }
 
+.color-2.loading a,
 .color-2.playing a {
 	background: rgba(255, 246, 222, 0.85);
 }
@@ -204,6 +207,7 @@
 	background: rgba(255, 246, 222, 0.55);
 }
 
+.color-3.loading a,
 .color-3.playing a {
 	background: rgba(212, 223, 243, 0.85);
 }
@@ -212,6 +216,7 @@
 	background: rgba(212, 223, 243, 0.55);
 }
 
+.color-4.loading a,
 .color-4.playing a {
 	background: rgba(255, 241, 181, 0.85);
 }
@@ -220,6 +225,7 @@
 	background: rgba(255, 241, 181, 0.55);
 }
 
+.color-5.loading a,
 .color-5.playing a {
 	background: rgba(194, 206, 202, 0.85);
 }
@@ -228,6 +234,7 @@
 	background: rgba(194, 206, 202, 0.45);
 }
 
+.color-6.loading a,
 .color-6.playing a {
 	background: rgba(229, 214, 212, 0.85);
 }
@@ -236,6 +243,7 @@
 	background: rgba(229, 214, 212, 0.45);
 }
 
+.color-7.loading a,
 .color-7.playing a {
 	background: rgba(214, 220, 205, 0.85);
 }
@@ -244,5 +252,7 @@
 	background: rgba(214, 220, 205, 0.45);
 }
 
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
