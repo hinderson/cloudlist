@@ -18,6 +18,7 @@ var settings = {
 // State
 var currentState = 'idle';
 var currentId;
+var currentPausedTime;
 
 // WebAudio basics
 var context = new (window.AudioContext || window.webkitAudioContext)(); // jshint ignore:line
@@ -60,7 +61,7 @@ var toggleState = function (id) {
 	}
 };
 
-var play = function (id) {
+var play = function (id, time) {
 	var direction = collection.getItemPosition(currentId) - collection.getItemPosition(id) === 1 ? 'backwards' : 'forwards';
 	// First stop the currently playing sound, if any
 	if (currentId) { stop(currentId); }
@@ -97,13 +98,15 @@ var play = function (id) {
 
 	var events = {
 		onLoad: function ( ) {
-			audioElement.currentTime = Math.max((song.audio.starttime / 1000), 0);
+			audioElement.currentTime = time || Math.max((song.audio.starttime / 1000), 0);
 		},
 		onPlay: function ( ) {
 			console.log('PLAYING EVENT', currentState);
 			if (currentState === 'playing') { return; } // Sometimes a canPlay event is sent twice
 			setState('playing');
 			pubsub.publish('audioPlaying', id);
+			time && pubsub.publish('forceCollectionRepaint'); // Force a repaint if custom starttime is given
+			currentPausedTime = 0;
 			audioElement.play();
 		},
 		onEnd: function ( ) {
@@ -133,8 +136,11 @@ var play = function (id) {
 					break;
 				case e.target.error.MEDIA_ERR_NETWORK:
 					console.log('A network error caused the audio download to fail.', url);
-					// TODO: Improve resume functionality in case of a network error
-					play(id);
+					if (currentPausedTime > 2) {
+						play(id, currentPausedTime);
+					} else {
+						fail();
+					}
 					break;
 				case e.target.error.MEDIA_ERR_DECODE:
 					console.log('The audio playback was aborted due to a corruption problem or because the video used features your browser did not support.', url);
@@ -173,6 +179,7 @@ var pause = function (id) {
 	if (!id) { id = currentId; }
 	setState('paused');
 	pubsub.publish('audioPaused', id);
+	currentPausedTime = audioElement.currentTime;
 	audioElement.pause();
 };
 
