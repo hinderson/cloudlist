@@ -1,5 +1,7 @@
 'use strict';
 
+var Promise = require('bluebird');
+
 var utils = {};
 
 utils = {
@@ -27,7 +29,7 @@ utils = {
 	getJSON: function (url) {
 		return utils.get(url).then(JSON.parse);
 	},
-
+	
 	forEach: function (array, callback, scope) {
 		for (var i = 0, len = array.length; i < len; i++) {
 			callback.call(scope, i, array[i]);
