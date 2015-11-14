@@ -453,7 +453,9 @@
 }
 
 .collection ol:hover .cover-loaded img,
-.collection ol:focus .cover-loaded img {
+.collection ol:focus .cover-loaded img,
+.collection ol:hover .cover-loaded video,
+.collection ol:focus .cover-loaded video {
 	opacity: 0.4;
 }
 
@@ -469,7 +471,12 @@
 .collection .paused .cover-loaded img,
 .collection .loading .cover-loaded img,
 .collection li:hover .cover-loaded img,
-.collection li:focus .cover-loaded img {
+.collection li:focus .cover-loaded img,
+.collection .playing .cover-loaded video,
+.collection .paused .cover-loaded video,
+.collection .loading .cover-loaded video,
+.collection li:hover .cover-loaded video,
+.collection li:focus .cover-loaded video {
 	opacity: 1;
 }
 
@@ -482,7 +489,8 @@
 	display: none;
 }
 
-.collection .cover img {
+.collection .cover img,
+.collection .cover video {
 	display: block;
 	position: absolute;
 	top: 0;
@@ -492,7 +500,8 @@
 	transition: visibility 0s linear 0s, opacity 0.15s linear 0s;
 }
 
-.collection .cover-loaded img {
+.collection .cover-loaded img,
+.collection .cover-loaded video {
 	visibility: visible;
 	opacity: 1;
 }

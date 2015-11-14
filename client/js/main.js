@@ -492,33 +492,34 @@ module.exports = {
 		var id = parentNode.getAttribute('data-id');
 
 		var loadItemCover = function (item) {
-			var format = (item.format === 'MP4' && utils.canPlayMP4()) ? 'video' : 'img';
+			var format = item.format === 'MP4' || item.format === 'GIF' ? 'video' : 'img';
 			var cdn = s.cdn + '/' + format + '/';
 			var coverContainer = parentNode.querySelector('.cover');
 			var cover = format === 'video' ? document.createElement(format) : new Image();
 
-			cover.setAttribute('width', item.width);
-			cover.setAttribute('height', item.height);
-
-			if (format === 'video') {
-				cover.setAttribute('muted', '');
-				cover.setAttribute('autoplay', true);
-				cover.setAttribute('loop', true);
-				cover.setAttribute('src', cdn + item.filename);
+			function appendCover ( ) {
+				cover.removeEventListener('canplay', appendCover);
 				utils.requestAnimFrame.call(window, function ( ) {
 					coverContainer.appendChild(cover);
+					setTimeout(function ( ) {
+						coverContainer.classList.add('cover-loaded');
+					}, 10);
 				});
+			}
+
+			cover.setAttribute('width', item.width);
+			cover.setAttribute('height', item.height);
+			cover.setAttribute('src', cdn + (item.format === 'GIF' ? item.video.filename : item.filename));
+
+			if (format === 'video' || item.format === 'GIF') {
+				cover.load();
+				cover.play();
+				cover.setAttribute('muted', '');
+				cover.setAttribute('loop', true);
+				cover.addEventListener('canplay', appendCover);
 			} else {
-				cover.setAttribute('src', cdn + (item.screenshot ? item.screenshot : item.filename));
 				cover.setAttribute('alt', '');
-				cover.onload = function ( ) {
-					utils.requestAnimFrame.call(window, function ( ) {
-						coverContainer.appendChild(cover);
-						setTimeout(function ( ) {
-							coverContainer.classList.add('cover-loaded');
-						}, 10);
-					});
-				};
+				cover.onload = appendCover;
 			}
 
 			target.coverLoaded = true;

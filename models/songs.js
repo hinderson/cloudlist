@@ -149,7 +149,7 @@ songs = {
 			    function (next) {
 					// Create large (or maybe medium?) cover
 					gm(tempCoverPath)
-						.resize(400, 400) // Max 400px on either side, but otherwise automatically keeps its aspect ratio
+						.resize(435, 420) // Max 435px on either side, but otherwise automatically keeps its aspect ratio
 						.noProfile()
 						.setFormat(ext === '.gif' ? 'gif' : 'jpg')
 						.quality(90)
@@ -161,7 +161,7 @@ songs = {
 			    },
 			    function (next) {
 					// Identify the image
-					gm(tempCoverPath).identify(function (err, identify) {
+					gm(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath).identify(function (err, identify) {
 						if (err) throw err;
 
 						return next(null, identify);
@@ -169,7 +169,7 @@ songs = {
 			    },
 				function (identify, next) {
 					// Identifies the dominant color of the image
-					gm(tempCoverPath).identify('%[pixel:s]', function (err, dominantColor) {
+					gm(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath).identify('%[pixel:s]', function (err, dominantColor) {
 						if (err) throw err;
 
 						// Determines if contrast should be dark or bright
@@ -206,7 +206,7 @@ songs = {
 					// Create placeholder
 					var placeholderFilename = crypto.randomBytes(16).toString('hex') + '.jpg';
 					var placeholderFile = './client/media/img/' + placeholderFilename;
-					gm(tempCoverPath)
+					gm(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath)
 						.resize(30, 30) // Max 30px on either height or width
 						.setFormat('jpg')
 						.quality(90)
@@ -220,7 +220,7 @@ songs = {
 									filename: placeholderFilename,
 									width: placeholder.size.width,
 									height: placeholder.size.height,
-									filesize: identify.Filesize
+									filesize: placeholder.Filesize
 								};
 
 								next(null, identify);
@@ -319,15 +319,41 @@ songs = {
 
 				// Convert gif to video
 				if (path.extname(targetCoverPath) === '.gif') {
+					var videoFileName = crypto.randomBytes(16).toString('hex') + '.mp4';
 					ffmpeg(targetCoverPath)
+						.size('100%') // Needs explicit size to work with -pix_fmt
+						.noAudio()
 						.videoBitrate('2048k')
-						.save('./client/media/video/' + crypto.randomBytes(16).toString('hex') + '.mp4')
-						.on('end', function ( ) {
-							console.log('Finished processing video gif', tempFilename + '.mp4');
-						});
-				}
+						.outputOptions('-pix_fmt yuv420p')
+						.save('./client/media/video/' + videoFileName)
+						.on('error', function (err, stdout, stderr) {
+							if (err) throw err;
+							return callback(null);
+						})
+						.on('end', function () {
+							console.log('Finished processing video gif', videoFileName);
 
-				return callback(null);
+							ffmpeg.ffprobe('./client/media/video/' + videoFileName, function (err, metadata) {
+								if (err) throw err;
+
+								function humanFileSize (size) {
+									var i = Math.floor( Math.log(size) / Math.log(1024) );
+									return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ['B', 'KB', 'MB', 'GB', 'TB'][i];
+								}
+
+								var videoSchema = {
+						            filename: videoFileName,
+									width: metadata.streams[0].width,
+									height: metadata.streams[0].height,
+									filesize: humanFileSize(metadata.format.size),
+						            screenshot: 'asdasd.jpg'
+								};
+								return callback(null, videoSchema);
+							});
+						});
+				} else {
+					return callback(null);
+				}
 			});
 		}
 
@@ -378,6 +404,10 @@ songs = {
 				'tags': null,
 				'title': songTitle
 			};
+
+			if (songCover[3]) {
+				song.covers[0].video = songCover[3];
+			}
 
 			// Submit to the DB
 			db.collection('songs').insert(song, function (err, doc) {

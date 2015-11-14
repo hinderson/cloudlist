@@ -231,7 +231,9 @@ html, body {
 }
 
 .best-songs-of-2015 .collection ol:hover .cover-loaded img,
-.best-songs-of-2015 .collection ol:focus .cover-loaded img {
+.best-songs-of-2015 .collection ol:focus .cover-loaded img,
+.best-songs-of-2015 .collection ol:hover .cover-loaded video,
+.best-songs-of-2015 .collection ol:focus .cover-loaded video {
 	transition: opacity 0.2s ease-out;
 }
 
