@@ -247,67 +247,6 @@ songs = {
 
 				return callback(null, songCover);
 			});
-
-			/*
-			// Upload mp4
-			targetCoverPath = './client/media/video/' + files.image.name;
-			var screenshotFolder = './client/media/img/';
-
-			// Take screenshot
-			var screenshot;
-			ffmpeg(tempCoverPath)
-				.screenshots({
-					filename: '%b', // Expression means input basename (filename w/o extension)
-					count: 1,
-					timemarks: [ '50%' ], // The point at which to take the screenshot
-					folder: screenshotFolder // Output path
-				})
-				.on('filenames', function (filenames) {
-					screenshot = filenames;
-				})
-				.on('end', function ( ) {
-
-					var newScreenshot = screenshot[0].replace(path.extname(screenshot[0]), '.jpg');
-					var tempScreenshot = screenshotFolder + screenshot[0];
-					var targetScreenshot = screenshotFolder + newScreenshot;
-
-					// Convert PNG screenshot to JPG
-					gm(tempScreenshot)
-						.setFormat('jpg')
-						.quality(90)
-						.write(tempScreenshot, function (err) {
-							if (err) throw err;
-
-							// Rename the temporary PNG file
-							fs.rename(tempScreenshot, targetScreenshot, function (err) {
-								if (err) throw err;
-
-								// Delete the temporary file
-								fs.unlink(tempScreenshot, function() {
-									if (err) throw err;
-
-									// Read metadata
-									ffmpeg.ffprobe(tempCoverPath, function (err, metadata) {
-										if (err) throw err;
-
-										var songCover = {
-											format: 'MP4',
-											filename: songImage,
-											width: metadata.streams[0].width,
-											height: metadata.streams[0].height,
-											filesize: metadata.format.size,
-											screenshot: newScreenshot
-										};
-
-										callback(null, songCover);
-									});
-								});
-
-							});
-
-						});
-				});
-				*/
 		}
 
 		function processCover (callback) {
@@ -317,44 +256,55 @@ songs = {
 			fs.rename(tempCoverPath, targetCoverPath, function (err) {
 				if (err) throw err;
 
-				// Convert gif to video
-				if (path.extname(targetCoverPath) === '.gif') {
-					var videoFileName = crypto.randomBytes(16).toString('hex') + '.mp4';
-					ffmpeg(targetCoverPath)
-						.size('100%') // Needs explicit size to work with -pix_fmt
-						.noAudio()
-						.videoBitrate('2048k')
-						.outputOptions('-pix_fmt yuv420p')
-						.save('./client/media/video/' + videoFileName)
-						.on('error', function (err, stdout, stderr) {
-							if (err) throw err;
-							return callback(null);
-						})
-						.on('end', function () {
-							console.log('Finished processing video gif', videoFileName);
+				return callback(null);
+			});
+		}
 
-							ffmpeg.ffprobe('./client/media/video/' + videoFileName, function (err, metadata) {
+		function processCoverVideo (callback) {
+			if (path.extname(targetCoverPath) !== '.gif') { return callback(null); }
+
+			var videoFileName = crypto.randomBytes(16).toString('hex') + '.mp4';
+			ffmpeg(targetCoverPath)
+				.size('100%') // Needs explicit size to work with -pix_fmt
+				.noAudio()
+				.videoBitrate('2048k')
+				.outputOptions('-pix_fmt yuv420p') // Needed to work in Quicktime
+				.save('./client/media/video/' + videoFileName)
+				.on('error', function (err, stdout, stderr) {
+					if (err) throw err;
+					return callback(null);
+				})
+				.on('end', function ( ) {
+					console.log('Finished processing video gif', videoFileName);
+
+					ffmpeg.ffprobe('./client/media/video/' + videoFileName, function (err, metadata) {
+						if (err) throw err;
+
+						function humanFileSize (size) {
+							var i = Math.floor( Math.log(size) / Math.log(1024) );
+							return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ['B', 'KB', 'MB', 'GB', 'TB'][i];
+						}
+
+						// Create screenshot
+						var screenshotFilename = crypto.randomBytes(16).toString('hex') + '.jpg';
+						gm(targetCoverPath + '[0]')
+							.resize(435, 420)
+							.setFormat('jpg')
+							.quality(90)
+							.write('./client/media/img/' + screenshotFilename, function (err) {
 								if (err) throw err;
 
-								function humanFileSize (size) {
-									var i = Math.floor( Math.log(size) / Math.log(1024) );
-									return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ['B', 'KB', 'MB', 'GB', 'TB'][i];
-								}
-
 								var videoSchema = {
-						            filename: videoFileName,
+									filename: videoFileName,
 									width: metadata.streams[0].width,
 									height: metadata.streams[0].height,
 									filesize: humanFileSize(metadata.format.size),
-						            screenshot: 'asdasd.jpg'
+									screenshot: screenshotFilename
 								};
 								return callback(null, videoSchema);
 							});
-						});
-				} else {
-					return callback(null);
-				}
-			});
+					});
+				});
 		}
 
 		function formatInputFields (callback) {
@@ -405,8 +355,8 @@ songs = {
 				'title': songTitle
 			};
 
-			if (songCover[3]) {
-				song.covers[0].video = songCover[3];
+			if (songCover[4]) {
+				song.covers[0].video = songCover[4];
 			}
 
 			// Submit to the DB
@@ -444,6 +394,7 @@ songs = {
 			processImageSearchResults,
 			identifyCoverType,
 			processCover,
+			processCoverVideo,
 			formatInputFields
 		], postToDb);
 	},
@@ -490,6 +441,11 @@ songs = {
 
 					if (song.covers[0].placeholder) {
 						fs.unlink('./client/media/img/' + song.covers[0].placeholder.filename);
+					}
+
+					if (song.covers[0].video) {
+						fs.unlink('./client/media/video/' + song.covers[0].video.filename);
+						fs.unlink('./client/media/img/' + song.covers[0].video.screenshot);
 					}
 				}
 
