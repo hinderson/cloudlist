@@ -548,5 +548,5 @@ var gradify = function (image) {
 		return false;
 	}, false);
 
-		var slip = new Slip(collection);
+		new Slip(collection);
 })();

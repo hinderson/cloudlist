@@ -10,6 +10,8 @@ var async = require('async');
 var ObjectId = require('mongoskin').ObjectID;
 var jsonpClient = require('jsonp-client');
 var config = require('config');
+var execFile = require('child_process').execFile;
+var gifsicle = require('gifsicle');
 
 // Graphicsmagick
 var gm = require('gm').subClass({imageMagick: true});
@@ -71,7 +73,7 @@ songs = {
 					if (err) throw err;
 
 					// Update resolved URL variable
-					resolvedUrl = data.stream_url;
+					resolvedUrl = data.stream_url.split('?')[0]; // Remove eventual query string from URL
 
 					if (!resolvedUrl) {
 						console.log('Stream url not found');
@@ -146,18 +148,44 @@ songs = {
 			targetCoverPath = './client/media/img/' + filename;
 
 			async.waterfall([
-			    function (next) {
+				function (next) {
+					// Identify orientation
+					gm(tempCoverPath).identify(function (err, identify) {
+						if (err) throw err;
+
+						var orientation = identify.size.width > identify.size.height ? 'horizontal' : 'vertical';
+						return next(null, orientation);
+					});
+				},
+			    function (orientation, next) {
 					// Create large (or maybe medium?) cover
-					gm(tempCoverPath)
-						.resize(435, 420) // Max 435px on either side, but otherwise automatically keeps its aspect ratio
-						.noProfile()
-						.setFormat(ext === '.gif' ? 'gif' : 'jpg')
-						.quality(90)
-						.write(tempCoverPath, function (err) {
+					var width = orientation === 'horizontal' ? 452 : 306;
+					var height = orientation === 'horizontal' ? 282 : 414;
+
+					if (path.extname(targetCoverPath) === '.gif') {
+						execFile(gifsicle, ['--resize-fit-' + (orientation === 'horizontal' ? 'width' : 'height'), orientation === 'horizontal' ? width : height, '-o', tempCoverPath, tempCoverPath], function (err) {
 							if (err) throw err;
 
-							return next(null);
+							execFile(gifsicle, ['--crop', width + 'x' + height, '-o', tempCoverPath, tempCoverPath], function (err) {
+								if (err) throw err;
+
+								return next(null);
+							});
 						});
+					} else {
+						gm(tempCoverPath)
+							.resize(width, height, '^')
+							.gravity('Center')
+							.crop(width, height)
+							.noProfile()
+							.setFormat('jpg')
+							.quality(90)
+							.write(tempCoverPath, function (err) {
+								if (err) throw err;
+
+								return next(null);
+							});
+					}
 			    },
 			    function (next) {
 					// Identify the image
@@ -171,6 +199,8 @@ songs = {
 					// Identifies the dominant color of the image
 					gm(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath).identify('%[pixel:s]', function (err, dominantColor) {
 						if (err) throw err;
+
+						console.log(dominantColor);
 
 						// Determines if contrast should be dark or bright
 						function getContrastYIQ (rgb) {
@@ -187,10 +217,12 @@ songs = {
 							return c;
 						}
 
+						// Output can be either srgb or srgba
 						var rgb = dominantColor
-							.replace('srgb(', '')
-							.replace(')', '')
-							.split(',').map(function (x) {
+							.split('(')[1]
+							.split(')')[0]
+							.split(',', 3)
+							.map(function (x) {
 								return parseInt(x);
 							});
 
@@ -272,6 +304,7 @@ songs = {
 				.save('./client/media/video/' + videoFileName)
 				.on('error', function (err, stdout, stderr) {
 					if (err) throw err;
+
 					return callback(null);
 				})
 				.on('end', function ( ) {
@@ -288,7 +321,6 @@ songs = {
 						// Create screenshot
 						var screenshotFilename = crypto.randomBytes(16).toString('hex') + '.jpg';
 						gm(targetCoverPath + '[0]')
-							.resize(435, 420)
 							.setFormat('jpg')
 							.quality(90)
 							.write('./client/media/img/' + screenshotFilename, function (err) {
