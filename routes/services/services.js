@@ -4,6 +4,7 @@
 var async = require('async');
 var utils = require('../../utils/utils');
 var url = require('url');
+var json2csv = require('json2csv');
 
 // Hashid
 var Hashids = require('hashids');
@@ -149,7 +150,6 @@ module.exports = function (router) {
 			users.getOne({ 'id': result.collection.owner }, function (user) {
 
 				var spotifySongs = [];
-				var spotifyAccount = 'cloudlist.io';
 				var playlistTitle = 'Cloudlist.io: ' + result.collection.title + ' by ' + user.name.first + ' ' + user.name.last;
 
 				// Retrieve an access token and a refresh token
@@ -181,16 +181,20 @@ module.exports = function (router) {
 								});
 
 						}, function (err) {
-							spotifyApi.createPlaylist(spotifyAccount, playlistTitle, { 'public' : true })
-								.then(function (data) {
-									spotifyApi.addTracksToPlaylist(spotifyAccount, data.body.id, spotifySongs);
+							spotifyApi.getMe().then(function (data) {
+								var spotifyAccount = data.body.id;
 
-									var publicPlaylistUrl = data.body.external_urls.spotify;
-									res.redirect(publicPlaylistUrl);
-								})
-								.catch(function (err) {
-									console.error(err);
-								});
+								spotifyApi.createPlaylist(spotifyAccount, playlistTitle, { 'public' : true })
+									.then(function (data) {
+										spotifyApi.addTracksToPlaylist(spotifyAccount, data.body.id, spotifySongs);
+
+										var publicPlaylistUrl = data.body.external_urls.spotify;
+										res.redirect(publicPlaylistUrl);
+									})
+									.catch(function (err) {
+										console.error(err);
+									});
+							});
 						});
 					})
 					.catch(function (err) {
@@ -201,10 +205,26 @@ module.exports = function (router) {
 
 	});
 
-
-	// TEMP: Not used
 	router.get('/create-covers-montage/:id', function (req, res) {
 		collections.createCoversMontage(req.params.id);
+	});
+
+	router.get('/download-as-csv', function (req, res) {
+		var id = hashids.decodeHex(req.query.id);
+		var fields = ['artist', 'featuredartist', 'title', 'album'];
+		var fieldNames = ['Artist Name', 'Featured Artist', 'Track Name', 'Album Name'];
+
+		collections.getOne({ 'id': id }, function (data) {
+			json2csv({ data: data.songs, fields: fields, fieldNames: fieldNames }, function (err, csv) {
+				if (err) throw err;
+
+				res.setHeader('Content-disposition', 'attachment; filename=' + data.collection.title + '.csv');
+				res.setHeader('Content-type', 'text/plain');
+				res.charset = 'UTF-8';
+				res.write(csv);
+				res.end();
+			});
+		});
 	});
 
 };

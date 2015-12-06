@@ -24,23 +24,15 @@ h4,
 h5,
 h6 {
 	margin:0 0 20px;
-	-moz-hyphens:auto;
-	-ms-hyphens:auto;
-	-webkit-hyphens:auto;
 	hyphens:auto;
-	-webkit-text-stroke:1px transparent;
 	text-rendering:optimizeLegibility;
 }
+
 h1 {
 	font-weight:normal;
 	text-align:center;
 }
+
 h2 {
 	font-weight:normal;
-}
-p {
-
-}
-p + p {
-
 }

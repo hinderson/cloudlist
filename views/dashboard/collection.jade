@@ -1,3 +1,4 @@
+- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
 doctype html
 html(lang="en-US")
 	head
@@ -18,8 +19,6 @@ html(lang="en-US")
 						option(selected=collection.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
 						option(selected=collection.template == "best-songs-of-2015", value="best-songs-of-2015") Best Songs of 2015
 					input(type="submit", value="OK")
-					button#spotify Export to Spotify playlist
-				- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
 				div.collection(data-id="#{obfuscatedCollectionId}")
 					div.collection-title
 						span(contenteditable) #{collection.title}

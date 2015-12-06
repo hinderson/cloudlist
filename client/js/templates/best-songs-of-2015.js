@@ -80,7 +80,7 @@ function updateHero (lastScrollY) {
 	}
 
 	updateParallax(lastScrollY);
-	//TEMP: blurHero(lastScrollY);
+	blurHero(lastScrollY);
 }
 
 function loading (id) {

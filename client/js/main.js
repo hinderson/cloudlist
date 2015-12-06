@@ -158,65 +158,80 @@ module.exports = {
 	},
 
 	registerEvents: function ( ) {
-		c.elems.collection.addEventListener('click', utils.delegate(utils.criteria.hasTagName('a'), itemClickHandler), false);
+		c.elems.collection.addEventListener('click', utils.delegate(utils.criteria.hasTagName('a'), itemClickHandler));
 
-		c.elems.collection.addEventListener('mouseover', utils.delegate(utils.criteria.hasTagName('a'), itemHoverHandler.bind(this)), false);
+		c.elems.collection.addEventListener('mouseover', utils.delegate(utils.criteria.hasTagName('a'), itemHoverHandler.bind(this)));
 
-		c.elems.collection.addEventListener('mouseout', utils.delegate(utils.criteria.hasTagName('a'), itemHoverHandler.bind(this)), false);
+		c.elems.collection.addEventListener('mouseout', utils.delegate(utils.criteria.hasTagName('a'), itemHoverHandler.bind(this)));
 
-		c.elems.sort.addEventListener('click', utils.delegate(utils.criteria.hasTagNames(['span', 'strong']), sortClickHandler), false);
+		c.elems.sort.addEventListener('click', utils.delegate(utils.criteria.hasTagNames(['span', 'strong']), sortClickHandler));
 
-		c.elems.fullscreen.addEventListener('click', this.toggleFullscreen, false);
+		c.elems.fullscreen.addEventListener('click', this.toggleFullscreen);
 
 		c.elems.playStateBtn.addEventListener('click', function ( ) {
 			audio.toggleState();
-		}, false);
+		});
 
-		c.elems.infoBtn.addEventListener('click', this.toggleDialog, false);
+		c.elems.infoBtn.addEventListener('click', this.toggleDialog);
 
 		c.elems.dialogOverlay.addEventListener('click', function ( ) {
 			c.elems.HTML.classList.remove('overlay');
-		}, false);
+		});
 
 		c.elems.closeDialog.addEventListener('click', function ( ) {
 			c.elems.HTML.classList.remove('overlay');
-		}, false);
+		});
 
 		c.elems.volume.addEventListener('input', function (e) {
   			var fraction = parseInt(e.target.value) / parseInt(e.target.max);
 			audio.setVolume(fraction * fraction);
-		}.bind(this), false);
+		}.bind(this));
 
 		c.elems.goToTop.addEventListener('click', function (e) {
 			e.preventDefault();
 			this.scrollToPosition(0, 400);
-		}.bind(this), false);
+		}.bind(this));
 
 		c.elems.collectionSubTitle.addEventListener('click', function (e) {
 			this.scrollToPosition(0, 400);
-		}.bind(this), false);
+		}.bind(this));
 
-		document.addEventListener('mousemove', function (e) {
-			this.storeMousePosition(e.x, e.y);
-		}.bind(this), false);
-
-		window.addEventListener('scroll', function (e) {
-			this.scrollEvent();
-		}.bind(this), false);
-
-		window.addEventListener('resize', function (e) {
-			this.resizeEvent();
-		}.bind(this), false);
+		document.addEventListener('mousemove', this.storeMousePosition.bind(this));
+		window.addEventListener('scroll', this.scrollEvent.bind(this));
+		window.addEventListener('resize', this.resizeEvent.bind(this));
 
 		// Window focus
 		var visibilityChange = utils.getVisibilityVendor().visibilityChange;
 		document.addEventListener(visibilityChange, this.handleVisibilityChange, false);
+
+		// Analytics tracking
+		document.querySelector('.export-options .export-to-spotify').addEventListener('click', function ( ) {
+			/* jshint ignore:start */
+			ga('send', {
+				hitType: 'event',
+				eventCategory: 'Export',
+				eventAction: 'spotify',
+				eventLabel: ''
+			});
+			/* jshint ignore:end */
+		});
+
+		document.querySelector('.export-options .download-csv').addEventListener('click', function ( ) {
+			/* jshint ignore:start */
+			ga('send', {
+				hitType: 'event',
+				eventCategory: 'Export',
+				eventAction: 'csv',
+				eventLabel: ''
+			});
+			/* jshint ignore:end */
+		});
 	},
 
-	storeMousePosition: utils.debounce(function (x, y) {
+	storeMousePosition: utils.debounce(function (e) {
 		c.mousePosition = {
-			x: x,
-			y: y
+			x: e.x,
+			y: e.y
 		};
 	}, 150),
 
@@ -259,14 +274,26 @@ module.exports = {
 	},
 
 	resizeEvent: utils.debounce(function ( ) {
+		var prevWidth = this.viewportWidth;
+		var prevHeight = this.viewportHeight;
+
 		// Set new viewport dimensions
 		this.viewportWidth = window.innerWidth;
 		this.viewportHeight = window.innerHeight;
 
 		// Remove or add overflowing text and reposition cover on currently playing item
 		if (c.elems.currentItem !== null) {
-			this.showItemCover(c.elems.currentItem.firstChild);
+			var widthDiff = Math.abs(prevWidth - this.viewportWidth);
+			var heightDiff = Math.abs(prevHeight - this.viewportHeight);
+
+			// Only reflow/reposition element if the diff between
+			// previous size and new is more than 40px
+			if (widthDiff >= 40 || heightDiff >= 40) {
+				this.showItemCover(c.elems.currentItem.firstChild);
+			}
+
 			this.scrollOverflowingText(c.elems.currentItem.firstChild, true, true);
+
 			setTimeout(function ( ) {
 				this.findOverflowingElements();
 				this.scrollOverflowingText(c.elems.currentItem.firstChild, false, true);
@@ -386,8 +413,8 @@ module.exports = {
 				// Fullscreen
 				case 16: // Alt
 				case 70: // F
-					e.preventDefault();
 					if (keys[16] && keys[70]) {
+						e.preventDefault();
 						this.toggleFullscreen();
 					}
 					break;

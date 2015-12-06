@@ -10,9 +10,9 @@ var collection = require('./data/collection.js');
 var settings = {
 	key: config.settings.soundCloudKey,
 	path: config.settings.cdn + '/audio/',
-	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 9.0) || 9.0, // Default value is always 9
-	repeat: true,
-	shuffle: false,
+	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 9.0) || 9.0,
+	repeat: (utils.isLocalStorageAllowed() ? window.localStorage.volume : true) || true,
+	shuffle: (utils.isLocalStorageAllowed() ? window.localStorage.volume : false) || false,
 };
 
 // State
@@ -108,6 +108,15 @@ var play = function (id, time) {
 			time && pubsub.publish('forceCollectionRepaint'); // Force a repaint if custom starttime is given
 			currentPausedTime = 0;
 			audioElement.play();
+
+			/* jshint ignore:start */
+			ga('send', {
+				hitType: 'event',
+				eventCategory: 'Tracks',
+				eventAction: 'play',
+				eventLabel: song.title
+			});
+			/* jshint ignore:end */
 		},
 		onEnd: function ( ) {
 			console.log('ENDED', id);

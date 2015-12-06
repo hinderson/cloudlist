@@ -160,10 +160,10 @@ songs = {
 			    function (orientation, next) {
 					// Create large (or maybe medium?) cover
 					var width = orientation === 'horizontal' ? 452 : 306;
-					var height = orientation === 'horizontal' ? 282 : 414;
+					var height = orientation === 'horizontal' ? 282 : 407;
 
 					if (path.extname(targetCoverPath) === '.gif') {
-						execFile(gifsicle, ['--resize-fit-' + (orientation === 'horizontal' ? 'width' : 'height'), orientation === 'horizontal' ? width : height, '-o', tempCoverPath, tempCoverPath], function (err) {
+						execFile(gifsicle, ['--resize-' + (width > height ? 'width' : 'height'), (width > height ? width : height), '-o', tempCoverPath, tempCoverPath], function (err) {
 							if (err) throw err;
 
 							execFile(gifsicle, ['--crop', width + 'x' + height, '-o', tempCoverPath, tempCoverPath], function (err) {
@@ -200,8 +200,6 @@ songs = {
 					gm(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath).identify('%[pixel:s]', function (err, dominantColor) {
 						if (err) throw err;
 
-						console.log(dominantColor);
-
 						// Determines if contrast should be dark or bright
 						function getContrastYIQ (rgb) {
 							var r = rgb[0];
@@ -217,14 +215,19 @@ songs = {
 							return c;
 						}
 
-						// Output can be either srgb or srgba
-						var rgb = dominantColor
-							.split('(')[1]
-							.split(')')[0]
-							.split(',', 3)
-							.map(function (x) {
-								return parseInt(x);
-							});
+						// Output can be either srgb or srgba (or in rare cases just a keyword, e.g. "black")
+						var rgb;
+						if (dominantColor !== 'black') {
+							rgb = dominantColor
+								.split('(')[1]
+								.split(')')[0]
+								.split(',', 3)
+								.map(function (x) {
+									return parseInt(x);
+								});
+						} else {
+							rgb = [10, 10, 10]; // Not pitch-black
+						}
 
 						var contrast = getContrastYIQ(rgb.slice(0));
 

@@ -438,9 +438,6 @@ var gradify = function (image) {
 		e.addEventListener('click', deleteSong, false);
 	});
 
-	var authenticateSpotifyUserBtn = document.querySelector('#spotify');
-	authenticateSpotifyUserBtn.addEventListener('click', createSpotifyPlaylist, false);
-
 	document.querySelector('input[name="artist"]').onchange = function (e) {
 		fetchArtistImages(this.value);
 	};

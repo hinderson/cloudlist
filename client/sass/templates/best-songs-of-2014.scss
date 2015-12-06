@@ -23,14 +23,110 @@
 	font-size: 5em;
 	margin: 4rem 0 5rem 0;
 }
+
 @media (max-width: 900px) {
 	.collection-title { font-size: 4em; }
 }
+
 @media (max-width: 700px) {
 	.collection-title { font-size: 3em; margin-top: 5rem; }
 }
+
 @media (max-width: 600px) {
 	.collection-title { font-size: 2em; margin-top: 6rem; }
+}
+
+.collection-title div,
+.collection-title span {
+	display: inline-block;
+}
+
+.collection-title div[data-string="2014"] {
+	font-size: 1.2em;
+}
+
+.collection-title div {
+	margin: 0 0.1em;
+}
+
+.animate.collection-title div,
+.animate.collection-title span {
+	transform: translate3d(0, 0, 0);
+	transition: all 1.2s;
+}
+
+.animate.collection-title span {
+	margin: 0 0.05em;
+}
+
+.animate.collection-title span:nth-child(1) {
+	transform: translate3d(0, 20px, 0);
+}
+
+.animate.collection-title span:nth-child(2) {
+	transform: translate3d(0, 42px, 0);
+}
+
+.animate .collection-title span:nth-child(3) {
+	transform: translate3d(0, -5px, 0);
+}
+
+.animate.collection-title span:nth-child(4) {
+	transform: translate3d(0, 45px, 0);
+}
+
+.animate.collection-title span:nth-child(5) {
+	transform: translate3d(0, -15px, 0);
+}
+
+.animate.collection-title span:nth-child(6) {
+	transform: translate3d(0, 45px, 0);
+}
+
+.animate.collection-title span:nth-child(7) {
+	transform: translate3d(0, -12px, 0);
+}
+
+.animate.collection-title span:nth-child(8) {
+	transform: translate3d(0, 40px, 0);
+}
+
+@media (max-width: 685px) {
+	.animate.collection-title div {
+		margin: 0 0.4em;
+	}
+
+	.animate.collection-title span:nth-child(1) {
+		transform: translate3d(0, 10px, 0);
+	}
+
+	.animate.collection-title span:nth-child(2) {
+		transform: translate3d(0, 22px, 0);
+	}
+
+	.animate .collection-title span:nth-child(3) {
+		transform: translate3d(0, -5px, 0);
+	}
+
+	.animate.collection-title span:nth-child(4) {
+		transform: translate3d(0, 25px, 0);
+	}
+
+	.animate.collection-title span:nth-child(5) {
+		transform: translate3d(0, -5px, 0);
+	}
+
+	.animate.collection-title span:nth-child(6) {
+		transform: translate3d(0, 15px, 0);
+	}
+
+	.animate.collection-title span:nth-child(7) {
+		transform: translate3d(0, -3px, 0);
+	}
+
+	.animate.collection-title span:nth-child(8) {
+		transform: translate3d(0, 20px, 0);
+	}
 }
 
 /* Palettes */
