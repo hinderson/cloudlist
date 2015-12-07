@@ -97,7 +97,8 @@ module.exports = {
 
 	cache: {
 		elems: {
-			HTML: document.getElementsByTagName('html')[0],
+			HTML: document.documentElement || document.body,
+			body: document.getElementsByTagName('body')[0],
 			heroContent: document.getElementsByClassName('hero-inner')[0],
 			collectionHeader: document.getElementsByClassName('collection-header')[0],
 			collectionTitle: document.getElementsByClassName('collection-title')[0],

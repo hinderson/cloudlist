@@ -7,30 +7,23 @@
 	src: local("Helvetica Neue"), url("/fonts/bcf54343-d033-41ee-bbd7-2b77df3fe7ba-03.woff") format("woff");
 }
 
-@font-face {
-	font-family: "Suisse Intl";
-	font-weight: normal;
-	font-style: normal;
-	src: url("/fonts/SuisseIntl-Regular-WebS.woff2") format("woff2");
-}
-
 @import "../base";
 
 body {
-	background: #f1f1f1;
+	background: #f2f2f2;
+	transition: background 0.7s ease;
 }
 
 .main-header .logo {
-	fill: #222;
+	fill: #212121;
 	width: 92px;
 }
 
 .play-state svg,
 .info-toggle svg,
 .fullscreen svg {
-	fill: #444;
+	fill: #212121;
 }
-
 
 .volume-slider {
 	width: 75px;
@@ -39,8 +32,8 @@ body {
 }
 
 .volume-slider::-moz-range-thumb {
-	width: 15px;
-	height: 15px;
+	width: 14px;
+	height: 14px;
 	border-radius: 50%;
 	box-shadow: none;
 	background: #f0f0f2;
@@ -53,11 +46,11 @@ body {
 }
 
 .volume-slider::-webkit-slider-thumb {
-	width: 16px;
-	height: 16px;
+	width: 15px;
+	height: 15px;
 	border-radius: 50%;
 	box-shadow: none;
-	background: #444;
+	background: #212121;
 	-webkit-appearance: none;
 	cursor: pointer;
 }
@@ -170,8 +163,8 @@ body {
 }
 
 .col.time {
-	width: 10%;
-	max-width: 120px;
+	width: 9%;
+	max-width: 110px;
 }
 
 
@@ -372,7 +365,7 @@ a:visited {
 
 .go-to-top a {
 	display: inline-block;
-	color: #444;
+	color: #212121;
 	transform: rotate(90deg);
 	font-size: 25px;
 }

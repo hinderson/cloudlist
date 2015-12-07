@@ -88,6 +88,10 @@ function loading (id) {
 	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
 	var rgb = collection.getItem(id).covers[0].colors.primary;
 	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
+
+	// Change background color
+	var contrastOpacity = collection.getItem(id).covers[0].colors.contrast === 'dark' ? 0.53 : 0.85;
+	main.cache.elems.body.style.background = 'rgba(' + rgb + ', ' + contrastOpacity + ')';
 }
 
 function paused (id) {
