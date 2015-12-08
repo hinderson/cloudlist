@@ -13,6 +13,7 @@ var settings = {
 	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 9.0) || 9.0,
 	repeat: (utils.isLocalStorageAllowed() ? window.localStorage.volume : true) || true,
 	shuffle: (utils.isLocalStorageAllowed() ? window.localStorage.volume : false) || false,
+	direction: 'forwards'
 };
 
 // State
@@ -21,9 +22,7 @@ var currentId;
 var currentPausedTime;
 
 // WebAudio basics
-var context = new (window.AudioContext || window.webkitAudioContext)(); // jshint ignore:line
 var audioElement;
-var gainNode;
 
 var getState = function ( ) {
 	return currentState;
@@ -39,7 +38,7 @@ var setState = function (state) {
 
 var setVolume = function (volume) {
 	if (currentId) {
-		gainNode.gain.value = volume;
+		audioElement.volume = volume;
 	}
 	window.localStorage.volume = volume;
 	settings.volume = volume;
@@ -62,7 +61,6 @@ var toggleState = function (id) {
 };
 
 var play = function (id, time) {
-	var direction = collection.getItemPosition(currentId) - collection.getItemPosition(id) === 1 ? 'backwards' : 'forwards';
 	// First stop the currently playing sound, if any
 	if (currentId) { stop(currentId); }
 	currentId = id;
@@ -74,15 +72,9 @@ var play = function (id, time) {
 	pubsub.publish('audioLoading', id);
 
 	audioElement = new Audio();
-	audioElement.crossOrigin = 'anonymous';
-	gainNode = context.createGain();
-	var source = context.createMediaElementSource(audioElement);
-
-	source.connect(gainNode);
-	gainNode.connect(context.destination);
 
 	// Set initial volume
-	gainNode.gain.value = settings.volume;
+	audioElement.volume = settings.volume;
 
 	// Load URL
 	audioElement.src = url;
@@ -131,7 +123,7 @@ var play = function (id, time) {
 			function fail ( ) {
 				removeEventListeners();
 				pubsub.publish('audioFailedLoading', id);
-				if (direction === 'forwards') {
+				if (settings.direction === 'forwards') {
 					next();
 				} else {
 					previous();
@@ -157,7 +149,8 @@ var play = function (id, time) {
 					break;
 				case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
 					console.log('The audio could not be loaded, either because the server or network failed or because the format is not supported.', url);
-					fail();
+					audioElement.load();
+					//fail();
 					break;
 				default:
 					console.log('An unknown error occurred.', url);
@@ -201,11 +194,13 @@ var resume = function (id) {
 
 var next = function () {
 	if (!currentId) { return false; }
+	settings.direction = 'forwards';
 	play(collection.getNextItem(currentId).id);
 };
 
 var previous = function (acc) {
 	if (!currentId) { return false; }
+	settings.direction = 'backwards';
 	play(collection.getPreviousItem(currentId).id);
 };
 
