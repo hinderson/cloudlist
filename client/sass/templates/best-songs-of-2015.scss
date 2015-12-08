@@ -11,7 +11,7 @@
 
 body {
 	background: #f2f2f2;
-	transition: background 0.7s ease;
+	transition: background 0.6s ease;
 }
 
 .main-header .logo {
@@ -354,20 +354,18 @@ a:visited {
 	background: rgba(0, 0, 0, 0.1);
 }
 
-.collection svg.state-playing,
-.collection svg.state-paused {
-	width: 17px;
-}
-
 .col.index {
 	width: 9%;
 }
 
 .go-to-top a {
-	display: inline-block;
 	color: #212121;
-	transform: rotate(90deg);
-	font-size: 25px;
+}
+
+.go-to-top svg {
+	display: inline-block;
+	width: 19px;
+    fill: #fff;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

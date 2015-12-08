@@ -444,12 +444,20 @@
 
 .collection svg.state-playing,
 .collection svg.state-paused {
+	display: none;
 	position: absolute;
-	display: inline-block;
 	height: 100%;
 	width: 16px;
 	z-index: 2;
 	fill: #000;
+}
+
+.collection .playing svg.state-playing {
+	display: inline-block;
+}
+
+.collection .paused svg.state-paused {
+	display: inline-block;
 }
 
 @media (max-width: 685px) {
@@ -578,6 +586,8 @@
 }
 
 .go-to-top {
+	position: relative;
+	z-index: 1;
 	text-align: center;
 	margin-bottom: 60px;
 }
@@ -725,6 +735,7 @@ html.overlay {
 		height: auto;
 		vertical-align: middle;
 		margin-right: 10px;
+		fill: #333;
 	}
 
 	a {

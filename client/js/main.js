@@ -574,7 +574,7 @@ module.exports = {
 		c.elems.volume.value = audio.getVolume() * 100;
 
 		// Private variables
-		var elem, currentProgress, progressBar, iconState, position, percent;
+		var elem, currentProgress, progressBar, position, percent;
 
 		pubsub.subscribe('audioLoading', function (id) {
 			elem = c.elems.collection.querySelector('[data-id="' + id + '"]');
@@ -648,13 +648,6 @@ module.exports = {
 				elemLink.appendChild(progressBar);
 			});
 
-			// Insert play icon
-			iconState = utils.createSVGFragment('icon-audio-playing', '0 0 73.784 58.753');
-			iconState.setAttribute('class', 'state-playing');
-			utils.requestAnimFrame.call(window, function ( ) {
-				elemLink.insertBefore(iconState, elemLink.firstChild);
-			});
-
 			// Set global state
 			c.elems.playStateBtn.classList.add('playing');
 		});
@@ -662,11 +655,6 @@ module.exports = {
 		pubsub.subscribe('audioPaused', function (id) {
 			elem.classList.remove('playing');
 			elem.classList.add('paused');
-
-			var pauseIcon = utils.updateSVGFragment(iconState, 'icon-audio-paused');
-			utils.requestAnimFrame.call(window, function ( ) {
-				pauseIcon.setAttribute('class', 'state-paused');
-			});
 
 			// Update document title to remove ▶ character
 			var documentTitle = document.title.replace('▶ ', '');
@@ -679,11 +667,6 @@ module.exports = {
 		pubsub.subscribe('audioResumed', function (id) {
 			elem.classList.remove('paused');
 			elem.classList.add('playing');
-
-			var pauseIcon = utils.updateSVGFragment(iconState, 'icon-audio-playing');
-			utils.requestAnimFrame.call(window, function ( ) {
-				pauseIcon.setAttribute('class', 'state-playing');
-			});
 
 			// Update document title with ▶ character
 			var documentTitle = '▶ ' + document.title;
@@ -704,8 +687,7 @@ module.exports = {
 			elem.classList.remove('loading');
 
 			// Remove DOM elements but first check if they are actually in the DOM, just in case
-			if (utils.isInDOM(iconState)) {
-				iconState.parentNode.removeChild(iconState);
+			if (utils.isInDOM(currentProgress)) {
 				currentProgress.parentNode.removeChild(currentProgress);
 				progressBar.parentNode.removeChild(progressBar);
 			}
