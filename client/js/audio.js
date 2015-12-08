@@ -149,8 +149,7 @@ var play = function (id, time) {
 					break;
 				case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
 					console.log('The audio could not be loaded, either because the server or network failed or because the format is not supported.', url);
-					audioElement.load();
-					//fail();
+					fail();
 					break;
 				default:
 					console.log('An unknown error occurred.', url);
