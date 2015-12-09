@@ -325,7 +325,7 @@ module.exports = {
 	},
 
 	toggleStickyHeader: function ( ) {
-		var scrollPosition = lastScrollY;
+		var scrollPosition = lastScrollY || window.pageYOffset;
 		if (scrollPosition > c.collectionTop) {
 			c.elems.HTML.classList.add('sticky-header');
 		} else {
