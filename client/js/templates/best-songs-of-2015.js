@@ -6,6 +6,7 @@ var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
 var collection = require('../data/collection.js');
 var config = require('../config.js');
+var utils = require('../utils.js');
 var placeholders = require('../placeholders.js');
 
 // Extend config
@@ -85,13 +86,31 @@ function updateHero (lastScrollY) {
 
 function loading (id) {
 	// Add assigned color based on first associated cover
+	var cover = collection.getItem(id).covers[0];
 	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
-	var rgb = collection.getItem(id).covers[0].colors.primary;
+	var rgb = cover.colors.primary;
 	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
 
 	// Change background color
-	var contrastOpacity = collection.getItem(id).covers[0].colors.contrast === 'dark' ? 0.53 : 0.85;
-	main.cache.elems.body.style.background = 'rgba(' + rgb + ', ' + contrastOpacity + ')';
+	var lighterColor = utils.shadeRGBColor(rgb.toString(), cover.colors.contrast === 'dark' ? 0.37 : 0.1);
+	main.cache.elems.body.style.backgroundColor = 'rgb(' + lighterColor + ')';
+
+	var gradient = document.createElement('DIV');
+	gradient.className = 'gradient';
+	gradient.style.backgroundImage = 'linear-gradient(to bottom, rgba(' + lighterColor + ', 0.97) 0%, rgba(' + lighterColor + ', 0.85) 65%, rgba(' + lighterColor + ', 0.02) 100%)';
+	main.cache.elems.headerShadow.appendChild(gradient);
+	setTimeout(function ( ) {
+		main.cache.elems.headerShadow.classList.add('transition');
+	});
+
+	main.cache.elems.headerShadow.addEventListener('transitionend', function onTransitionEnd ( ) {
+		main.cache.elems.headerShadow.removeEventListener('transitionend', onTransitionEnd);
+		main.cache.elems.headerShadow.removeChild(main.cache.elems.headerShadow.querySelector('.gradient:first-child'));
+		main.cache.elems.headerShadow.classList.remove('transition');
+	});
+
+	var contrast = utils.getContrastYIQ(lighterColor.split(','));
+	main.cache.elems.body.setAttribute('data-color-contrast', contrast);
 }
 
 function paused (id) {

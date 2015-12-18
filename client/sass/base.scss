@@ -22,46 +22,30 @@
 
 /* LAYOUT: Header */
 .main-header {
-	position: relative;
+	display: flex;
+	position: fixed;
+	top: 25px;
 	z-index: 6;
+	width: 100%;
+	justify-content: space-between;
 }
 
 .main-header .logo {
-	position: fixed;
-	top: 25px;
-	left: 24px;
-	z-index: 6;
 	width: 92px;
 	height: auto;
 	fill: #fff;
-	will-change: transform;
 }
 
 @media (max-width: 685px) {
-	.sticky-header .main-header::after {
-		content: "";
+	.sticky-header .header-shadow {
 		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 11%;
-		pointer-events: none;
-		z-index: 1;
-		will-change: transform, opacity;
-		background: -webkit-linear-gradient(to bottom, rgba(25, 24, 24, 0.97) 0%, rgba(25, 24, 24, 0.85) 65%, rgba(0, 0, 0, 0) 100%);
-		background: linear-gradient(to bottom, rgba(25, 24, 24, 0.97) 0%, rgba(25, 24, 24, 0.85) 65%, rgba(0, 0, 0, 0) 100%);
+		height: 80px;
+		visibility: visible;
+		opacity: 1;
 	}
 }
 
 /* Header controls */
-.controls {
-	position: fixed;
-	top: 19px;
-	right: 24px;
-	z-index: 6;
-	will-change: transform;
-}
-
 .fullscreen {
 	display: none;
 	width: 25px;
@@ -83,13 +67,11 @@
 .fullscreen:hover,
 .fullscreen:focus {
 	opacity: 0.9;
-	-webkit-transform: scale(1.05);
 	transform: scale(1.05);
 	outline: 0;
 }
 
 .fullscreen:active {
-	-webkit-transform: scale(0.97);
 	transform: scale(0.97);
 }
 
@@ -236,8 +218,9 @@
 	}
 
 	// Header shadow overlay
-	.no-touch.sticky-header .collection-header::after {
+	.no-touch.sticky-header .header-shadow {
 		opacity: 1;
+		visibility: visible;
 	}
 }
 
@@ -307,15 +290,15 @@
 
 /* Collection header */
 .collection-header {
-	position: relative;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
 	z-index: 5;
-	margin-bottom: -120px;
 	pointer-events: none;
-	will-change: transform;
 }
 
-.no-touch .collection-header::after {
-	content: "";
+.header-shadow {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -324,9 +307,9 @@
 	pointer-events: none;
 	z-index: -1;
 	opacity: 0;
-	will-change: transform, opacity;
-	background: -webkit-linear-gradient(to bottom, rgba(25, 24, 24, 0.97) 0%, rgba(25, 24, 24, 0.85) 65%, rgba(0, 0, 0, 0) 100%);
-	background: linear-gradient(to bottom, rgba(25, 24, 24, 0.97) 0%, rgba(25, 24, 24, 0.85) 65%, rgba(0, 0, 0, 0) 100%);
+	visibility: hidden;
+	will-change: transform, opacity, background;
+	background-image: linear-gradient(to bottom, rgba(25, 24, 24, 0.97) 0%, rgba(25, 24, 24, 0.85) 65%, rgba(0, 0, 0, 0) 100%);
 }
 
 .collection-sub-title {
@@ -338,9 +321,7 @@
 	font-size: 0.65em;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	-webkit-transform: translate3d(0, -100%, 0);
 	transform: translate3d(0, -100%, 0);
-	-webkit-transition: -webkit-transform 0.25s, opacity 0.4s;
 	transition: transform 0.25s, opacity 0.4s;
 	will-change: opacity, transform;
 	cursor: pointer;
@@ -350,7 +331,6 @@
 	position: relative;
 	visibility: visible;
 	opacity: 1;
-	-webkit-transform: translate3d(0, 0, 0);
 	transform: translate3d(0, 0, 0);
 	pointer-events: visible;
 }
@@ -378,13 +358,15 @@
 	list-style: none;
 }
 
-@media (max-width: 685px) {
-	.collection-header {
-		margin-bottom: -104px;
-	}
-
+@media (max-width: 800px) {
 	.collection ol {
 		padding-top: 104px;
+	}
+}
+
+@media (max-width: 400px) {
+	.collection ol {
+		padding-top: 86px;
 	}
 }
 
@@ -442,8 +424,8 @@
 	transition: background 0.2s;
 }
 
-.collection svg.state-playing,
-.collection svg.state-paused {
+.collection .state-playing,
+.collection .state-paused {
 	display: none;
 	position: absolute;
 	height: 100%;
@@ -452,17 +434,17 @@
 	fill: #000;
 }
 
-.collection .playing svg.state-playing {
+.collection .playing .state-playing {
 	display: inline-block;
 }
 
-.collection .paused svg.state-paused {
+.collection .paused .state-paused {
 	display: inline-block;
 }
 
 @media (max-width: 685px) {
-	.collection svg.state-playing,
-	.collection svg.state-paused {
+	.collection .state-playing,
+	.collection .state-paused {
 		margin-left: -8px;
 	}
 }
@@ -693,9 +675,19 @@ html.overlay {
 	font-size: 17px;
 	line-height: 28px;
 }
+
+.dialog footer {
+	text-align: center;
+}
+
 .dialog small {
-	font-size: 70%;
+	font-size: 68%;
 	color: #696969;
+}
+
+.dialog small span {
+	font-size: 105%;
+	margin-right: 9px;
 }
 
 .keyboard-mapping {
@@ -708,7 +700,7 @@ html.overlay {
 	margin-bottom: 32px;
 }
 
-.dialog .player-settings,
+.dialog .share-options,
 .dialog .export-options {
 	width: 50%;
 }
@@ -725,12 +717,13 @@ html.overlay {
 	}
 }
 
+.share-options li,
 .export-options li {
 	list-style: none;
 	margin-bottom: 7px;
 
 	.icon {
-		display: inline;
+		display: inline-block;
 		width: 18px;
 		height: auto;
 		vertical-align: middle;
@@ -758,7 +751,7 @@ html.overlay {
 
 .keyboard-mapping dl dt {
 	float: left;
-	width: 84px;
+	width: 90px;
 	margin: 0 10px 0 0;
 }
 
@@ -771,14 +764,14 @@ html.overlay {
 
 .keyboard-mapping dl dt kbd {
 	float: left;
-	min-width: 31px;
-	height: 31px;
+	min-width: 33px;
+	height: 35px;
 	margin: 0 0 0 3px;
-	border: 1px solid #868686;
+	border: 2px solid #e4e4e4;
 	border-radius: 6px;
 	color: #363535;
 	font-size: 12px;
-	line-height: 30px;
+	line-height: 32px;
 	text-align: center;
 	font-family: -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif;
 	text-transform: capitalize;
@@ -786,8 +779,9 @@ html.overlay {
 
 .keyboard-mapping dl dt span {
 	float: left;
-	margin-left: 5px;
-	margin-right: 2px;
+	margin-left: 4px;
+	margin-right: 0;
+	line-height: 33px;
 }
 
 .keyboard-mapping dl.big dt kbd {

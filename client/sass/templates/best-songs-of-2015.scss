@@ -10,19 +10,64 @@
 @import "../base";
 
 body {
-	background: #f2f2f2;
-	transition: background 0.6s ease;
+	background-color: #f2f2f2;
+	transition: background-color 0.5s ease;
+}
+
+.shadow-header {
+	transition: background 0.5s ease;
 }
 
 .main-header .logo {
 	fill: #212121;
-	width: 92px;
+	width: 86px;
+	transition: fill 0.5s ease;
+}
+
+body[data-color-contrast="bright"] .main-header .logo {
+	fill: rgba(255, 255, 255, 0.85);
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+	.main-header .logo {
+		width: 90px;
+	}
 }
 
 .play-state svg,
 .info-toggle svg,
 .fullscreen svg {
 	fill: #212121;
+	transition: fill 0.5s ease;
+}
+
+.fullscreen:hover,
+.fullscreen:focus,
+.info-toggle:hover,
+.info-toggle:focus,
+.play-state:hover,
+.play-state:focus {
+	transform: none;
+}
+
+.volume-slider::-moz-range-thumb:hover,
+.volume-slider::-moz-range-thumb:focus {
+	transform: none;
+}
+
+.volume-slider::-webkit-slider-thumb:hover,
+.volume-slider::-webkit-slider-thumb:focus {
+	transform: none;
+}
+
+.play-state svg {
+	height: 20px;
+}
+
+body[data-color-contrast="bright"] .play-state svg,
+body[data-color-contrast="bright"] .info-toggle svg,
+body[data-color-contrast="bright"] .fullscreen svg {
+	fill: rgba(255, 255, 255, 0.85);
 }
 
 .volume-slider {
@@ -31,13 +76,21 @@ body {
 	background: rgba(0, 0, 0, 0.15);
 }
 
+body[data-color-contrast="bright"] .volume-slider {
+	background: rgba(255, 255, 255, 0.1);
+}
+
 .volume-slider::-moz-range-thumb {
 	width: 14px;
 	height: 14px;
 	border-radius: 50%;
 	box-shadow: none;
-	background: #f0f0f2;
+	background: #212121;
 	cursor: pointer;
+}
+
+body[data-color-contrast="bright"] .volume-slider::-moz-range-thumb {
+	background: rgba(255, 255, 255, 0.85);
 }
 
 .volume-slider::-moz-range-thumb:hover,
@@ -53,6 +106,10 @@ body {
 	background: #212121;
 	-webkit-appearance: none;
 	cursor: pointer;
+}
+
+body[data-color-contrast="bright"] .volume-slider::-webkit-slider-thumb {
+	background: rgba(255, 255, 255, 0.85);
 }
 
 .volume-slider::-webkit-slider-thumb:hover,
@@ -130,21 +187,47 @@ body {
 	}
 }
 
-.no-touch .collection-header::after {
+.header-shadow {
+	background: none;
+}
+
+.header-shadow .gradient {
+	position: absolute;
+	width: 100%;
+	height: 100%;
 	background: linear-gradient(to bottom, rgba(241, 241, 241, 0.97) 0%, rgba(241, 241, 241, 0.85) 65%, rgba(241, 241, 241, 0.02) 100%);
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+.header-shadow .gradient:first-child {
+	opacity: 1;
+}
+
+.transition .gradient:first-child {
+	opacity: 0;
+}
+
+.transition .gradient:last-child {
+	opacity: 1;
 }
 
 .collection-sub-title {
 	color: #000;
+	transition: color 0.5s ease, transform 0.25s, opacity 0.4s;
+}
+
+body[data-color-contrast="bright"] .collection-sub-title {
+	color: rgba(255, 255, 255, 0.85);
 }
 
 .collection {
 	font-size: 1.11em;
-	margin-bottom: 5.5em;
+	margin-bottom: 3.5em;
 }
 
 .collection .col {
-	padding: 1.1em 0;
+	padding: 1.11em 0;
 }
 
 .collection .scroll-overflow span {
@@ -327,26 +410,72 @@ a:visited {
 	color: #000;
 }
 
-.collection .loading a[data-contrast="bright"],
-.collection .playing a[data-contrast="bright"],
-.collection .paused a[data-contrast="bright"] {
+.sort {
+	transition: color 0.5s ease;
+	color: rgba(0,0,0,0.5);
+}
+
+body[data-color-contrast="bright"] .sort {
+	color: rgba(255, 255, 255, 0.3);
+}
+
+.sort strong svg {
+	transition: fill 0.5s ease;
+}
+
+.collection .state-loading {
+	display: none;
+	position: absolute;
+	height: 100%;
+	width: 16px;
+	z-index: 2;
+	fill: #000;
+}
+
+.collection .loading .state-loading {
+	display: inline-block;
+	visibility: hidden;
+	opacity: 0;
+	animation: loader-pulsate 1.5s ease-out infinite;
+	animation-delay: 0.5s;
+}
+
+@keyframes loader-pulsate {
+    0% { visibility: visible; opacity: 1.0; }
+    50% { visibility: hidden; opacity: 0; }
+    100% { visibility: visible; opacity: 1.0; }
+}
+
+body[data-color-contrast="bright"] .sort strong svg {
+	fill: rgba(255, 255, 255, 0.3);
+}
+
+.collection .loading a[data-color-contrast="bright"],
+.collection .playing a[data-color-contrast="bright"],
+.collection .paused a[data-color-contrast="bright"] {
 	color: rgba(255, 255, 255, 0.82);
 }
 
-.collection a[data-contrast="bright"] svg.state-playing,
-.collection a[data-contrast="bright"] svg.state-paused {
-	fill: rgba(255, 255, 255, 0.82);
-}
-
-.collection .loading a[data-contrast="dark"],
-.collection .playing a[data-contrast="dark"],
-.collection .paused a[data-contrast="dark"] {
+.collection .loading a[data-color-contrast="dark"],
+.collection .playing a[data-color-contrast="dark"],
+.collection .paused a[data-color-contrast="dark"] {
 	color: rgba(0, 0, 0, 0.9);
 }
 
-.collection a[data-contrast="dark"] svg.state-playing,
-.collection a[data-contrast="dark"] svg.state-paused {
+.collection a[data-color-contrast="bright"] .state-loading,
+.collection a[data-color-contrast="bright"] .state-playing,
+.collection a[data-color-contrast="bright"] .state-paused {
+	fill: rgba(255, 255, 255, 0.82);
+}
+
+.collection a[data-color-contrast="dark"] .state-loading,
+.collection a[data-color-contrast="dark"] .state-playing,
+.collection a[data-color-contrast="dark"] .state-paused {
 	fill: rgba(0, 0, 0, 0.9);
+}
+
+.collection a[data-color-contrast="bright"] .progress {
+	background: rgba(0, 0, 0, 0.35);
 }
 
 .collection a:hover,
@@ -354,8 +483,17 @@ a:visited {
 	background: rgba(0, 0, 0, 0.1);
 }
 
+.collection .unavailable a {
+	color: rgba(0, 0, 0, 0.2);
+}
+
 .col.index {
 	width: 9%;
+	max-width: 90px;
+}
+
+.go-to-top {
+	margin-bottom: 5em;
 }
 
 .go-to-top a {

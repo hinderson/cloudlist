@@ -10,7 +10,6 @@ var pngcrush = require('imagemin-pngcrush');
 var cache = require('gulp-cache');
 var newer = require('gulp-newer');
 var merge = require('merge-stream');
-var inject = require('gulp-inject');
 var del = require('del');
 
 var RevAll = require('gulp-rev-all');
@@ -111,24 +110,18 @@ watcher.on('change', function (event) {
 
 // SVG Store
 gulp.task('svgstore', function ( ) {
-	function fileContents (filePath, file) {
-		return file.contents.toString('utf8');
-	}
-
-	var svgs = gulp.src('./client/img/sprite/*.svg')
-		.pipe(svgmin())
-		.pipe(svgstore({
-			fileName: 'asset-sprite.svg',
+	return gulp
+        .src('./client/img/sprite/*.svg')
+        .pipe(svgmin())
+        .pipe(svgstore({
 			inlineSvg: true,
+			fileName: 'icon-sprite.svg',
 			transformSvg: function (svg, cb) {
 				svg.attr({ style: 'display:none' });
 				cb(null);
 			}
-		}));
-
-	return gulp.src('./views/layout.jade')
-		.pipe(inject(svgs, { transform: fileContents } ))
-		.pipe(gulp.dest('./views/'));
+		}))
+        .pipe(gulp.dest('./client/img/'));
 });
 
 // Compress images assets

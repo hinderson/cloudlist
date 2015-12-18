@@ -100,6 +100,7 @@ module.exports = {
 			HTML: document.documentElement || document.body,
 			body: document.getElementsByTagName('body')[0],
 			heroContent: document.getElementsByClassName('hero-inner')[0],
+			headerShadow: document.getElementsByClassName('header-shadow')[0],
 			collectionHeader: document.getElementsByClassName('collection-header')[0],
 			collectionTitle: document.getElementsByClassName('collection-title')[0],
 			collectionSubTitle: document.getElementsByClassName('collection-sub-title')[0],

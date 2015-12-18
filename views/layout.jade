@@ -10,135 +10,18 @@
 
 doctype html
 html(lang="en-US", class="no-js #{collection.template}")
-	head
-		meta(charset="utf-8")
-		title= (single ? combinedArtist + ', "' + single.title + '"' : collection.title) + ' – ' + config.document.title
-		<script>document.documentElement.className = document.documentElement.className.replace(/(^|\\\b)no-js(\b|$)/, 'js');if (!("ontouchstart" in document.documentElement)) {document.documentElement.className += " no-touch";}</script>
-
-		link(rel="icon", type="image/png", href="#{config.host.protocol}://#{config.host.name}/favicon-32x32.png", sizes="32x32")
-		link(rel="icon", type="image/png", href="#{config.host.protocol}://#{config.host.name}/favicon-16x16.png", sizes="16x16")
-
-		meta(name="viewport", content="width=device-width,initial-scale=1.0")
-		meta(name="keywords", content="music, best of the year, playlist, best tracks of 2014, songs, tracks, electronica, hiphop, hip-hop, pop, rock, indie, 2014, soundcloud, stream, mp3")
-		meta(name="description", content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud.")
-
-		meta(property="og:site_name", content="Cloudlist")
-		meta(property="og:url", content="https://www.cloudlist.io/#{path}/#{single ? single.permalink : ''}")
-
-		if single
-			meta(property="og:title", content="#{single.title} by #{single.artist}")
-			//- Determine if it's a screenshot of a moving mp4, or just a regular image
-			- var cover = single.covers[0].screenshot ? single.covers[0].screenshot : single.covers[0].filename;
-			meta(property="og:image", content="#{config.cdn}/media/img/#{cover}")
-			meta(property="og:description", content="At position no. #{index} in the list #{collection.title}: &quot;#{single.title}&quot; by #{combinedArtist}.")
-		else if collection.thumbnails
-			meta(property="og:image", content="#{config.cdn}/media/img/#{collection.thumbnails.montage.filename}")
-			meta(property="og:description", content="#{collection.description}")
-		else
-			meta(property="og:image", content="#{config.cdn}/media/img/cloudlist-splash.jpg")
-			meta(property="og:description", content="#{collection.description}")
-					
-		if prod
-			link(href="#{config.cdn}/css/#{assets.styles['templates/' + collection.template + '.css']}", rel="stylesheet")
-		else
-			link(href="#{config.host.protocol}://#{config.host.name}/css/templates/#{collection.template}.css", rel="stylesheet")
+	include ./includes/head.jade
 	body
-		//- inject:svg
-		<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="icon-audio-paused" viewBox="0 0 73.784 58.753"><path d="M0 41.23h15.62l16.973 15.708V1.815l-16.655 15.71H0z"/></symbol><symbol id="icon-audio-playing" viewBox="0 0 73.784 58.753"><path d="M44.848 16.743l-4.213 4.212c2.17 2.148 3.514 5.127 3.514 8.42s-1.345 6.274-3.515 8.422l4.213 4.213c3.23-3.235 5.23-7.7 5.23-12.634 0-4.932-2-9.397-5.23-12.633zM61.93 29.377c0-8.204-3.334-15.63-8.72-20.995l-4.17 4.17C53.34 16.86 56 22.807 56 29.376S53.342 41.893 49.04 46.2l4.17 4.17c5.386-5.364 8.72-12.79 8.72-20.993zm11.854 0C73.784 17.9 69.122 7.51 61.592 0L57.4 4.19c6.46 6.44 10.456 15.346 10.456 25.187 0 9.84-3.996 18.747-10.456 25.186l4.19 4.19c7.532-7.51 12.194-17.9 12.194-29.376zM0 41.23h15.62l16.973 15.708V1.815l-16.655 15.71H0z"/></symbol><symbol id="icon-caret-asc" viewBox="0 0 612 306"><path d="M306 306L612 0H0l306 306z"/></symbol><symbol id="icon-caret-desc" viewBox="0 0 586.666 293.333"><path d="M293.333 0L0 293.333h586.666L293.333 0z"/></symbol><symbol id="icon-outline-audio-paused" viewBox="0 0 528.162 486.314"><path d="M0 160.99v164.114h115.127l108.81 87.785V76.365l-108.81 84.624H0zm193.906-24.836V352.73l-67.147-57.655H29.655V190.558h97.102l67.148-54.404z"/></symbol><symbol id="icon-outline-audio-playing" viewBox="0 0 528.162 486.314"><path d="M0 160.99v164.114h115.127l108.81 87.785V76.365l-108.81 84.624H0zm193.906-24.836V352.73l-67.147-57.655H29.655V190.558h97.102l67.148-54.404zM450.084 0l-25.447 19.013c45.176 60.743 71.957 143.14 71.957 224.6s-26.787 162.963-71.957 223.693l25.447 19.008c49.04-65.987 78.078-154.06 78.078-242.708S499.122 65.986 450.084 0zM376.74 429.28c37.312-50.176 59.707-118.39 59.707-185.674s-22.394-136.384-59.707-186.56l-25.275 18.888c33.383 44.89 53.42 107.478 53.42 167.678s-20.02 121.884-53.42 166.786l25.275 18.882zm-72.898-56.658c25.537-34.342 40.86-82.965 40.86-129.016s-15.323-95.578-40.86-129.902l-25.275 18.888c21.61 29.05 34.568 72.053 34.568 111.014 0 38.968-12.96 81.077-34.568 110.127l25.275 18.89z"/></symbol></svg>
-		//- endinject
+		include ../client/img/icon-sprite.svg
+		
 		header(class="main-header inner", role="banner")
-			a(href="/", title="Go to main page")
-				span.structural Cloudlist
-				div.logo
-					include ../client/img/cloudlist-logo.svg
-			div.controls
-				button.fullscreen
-					span.structural Toggle fullscreen mode
-					include ../client/img/icon-fullscreen.svg
-				button.info-toggle
-					span.structural Toggle info screen
-					include ../client/img/icon-info.svg
-				button.play-state
-					span.structural Toggle play/pause
-					div.play
-						include ../client/img/icon-state-play.svg
-					div.pause
-						include ../client/img/icon-state-pause.svg
-				input.volume-slider(type="range", step="1", value="90", min="0", max="100")
-
+			block header
+			
 		main(role="main")
 			block content
 
 		footer(role="contentinfo")
-			small.structural Copyright 2014
-		div.dialog-overlay
-		div.dialog(aria-hidden="true")
-			button.close-dialog
-				span.structural Close
-				include ../client/img/icon-close.svg
-			section.keyboard-mapping.group
-				header
-					h4 Keyboard commands
-				dl.big
-					dt
-						kbd space
-					dd Play/pause track
-				dl.medium
-					dt
-						kbd Esc
-					dd Close all open dialogs
-				dl.arrow
-					dt
-						kbd →
-						kbd ↓
-					dd Play next track
-				dl
-					dt
-						kbd ⇧
-						span +
-						kbd F
-					dd Switch to fullscreen
-				dl.arrow
-					dt
-						kbd ←
-						kbd ↑
-					dd Play previous track
-			section.settings.group
-				div.player-settings
-					header
-						h4 Player settings
-					div.input-group
-						input(checked, type="checkbox", id="setting-repeat", name="repeat")
-						label(for="setting-repeat") Repeat playlist
-					div.input-group
-						input(type="checkbox", id="setting-shuffle", name="shuffle")
-						label(for="setting-shuffle") Shuffle playlist
-				div.export-options
-					header
-						h4 Export options
-					ul
-						li
-							a.export-to-spotify(href="https://accounts.spotify.com/authorize?client_id=89b926650c4f4576b4799ae98421a20d&response_type=code&redirect_uri=#{config.host.protocol}://#{config.host.name}/spotify/callback&scope=playlist-modify-private%20playlist-modify-public&state=#{obfuscatedCollectionId}", target="_blank") <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 542.305 542.305"><path d="M397.902 382.014c0-7.532-3.531-13.534-10.592-18.006-45.428-27.068-98.034-40.602-157.819-40.602-31.305 0-65.081 4.001-101.329 12.004-9.886 2.119-14.829 8.238-14.829 18.359 0 4.708 1.589 8.768 4.767 12.181s7.355 5.12 12.534 5.12c1.177 0 5.531-.942 13.063-2.825 31.069-6.355 59.667-9.533 85.794-9.533 53.195 0 99.917 12.122 140.166 36.366 4.473 2.589 8.356 3.883 11.651 3.883 4.472 0 8.356-1.588 11.651-4.766s4.943-7.238 4.943-12.181zm33.894-75.909c0-9.415-4.119-16.594-12.357-21.537-55.784-33.188-120.277-49.782-193.479-49.782-36.013 0-71.672 4.943-106.978 14.829-11.298 3.06-16.947 10.592-16.947 22.596 0 5.885 2.06 10.886 6.179 15.005s9.121 6.179 15.005 6.179c1.648 0 6.002-.942 13.063-2.825 28.716-7.767 58.255-11.651 88.619-11.651 65.67 0 123.102 14.593 172.295 43.78 5.649 3.06 10.121 4.59 13.417 4.59 5.884 0 10.886-2.06 15.005-6.179s6.178-9.12 6.178-15.005zm38.131-87.559c0-11.062-4.708-19.301-14.123-24.714-29.657-17.183-64.14-30.187-103.447-39.013-39.308-8.827-79.675-13.24-121.101-13.24-48.017 0-90.855 5.532-128.515 16.594-5.414 1.647-9.945 4.649-13.593 9.003-3.648 4.354-5.473 10.062-5.473 17.124 0 7.297 2.413 13.417 7.238 18.359 4.826 4.943 10.886 7.414 18.183 7.414 2.589 0 7.296-.941 14.122-2.824 31.305-8.709 67.435-13.063 108.391-13.063 37.425 0 73.849 4.001 109.273 12.004 35.424 8.002 65.258 19.183 89.501 33.541 4.943 2.824 9.65 4.237 14.123 4.237 6.826 0 12.769-2.413 17.83-7.238 5.06-4.827 7.591-10.887 7.591-18.184zm72.378 52.606c0 49.193-12.122 94.562-36.365 136.106-24.244 41.543-57.138 74.437-98.681 98.681-41.544 24.244-86.913 36.365-136.106 36.365s-94.562-12.122-136.106-36.365c-41.543-24.244-74.438-57.138-98.681-98.681-24.244-41.544-36.366-86.912-36.366-136.106s12.122-94.562 36.365-136.105c24.244-41.544 57.138-74.438 98.681-98.682 41.544-24.243 86.913-36.365 136.106-36.365s94.562 12.122 136.106 36.365c41.543 24.244 74.437 57.138 98.681 98.682 24.244 41.543 36.366 86.912 36.366 136.105z"/></svg>Export playlist to Spotify
-						li
-							a.download-csv(href="#{config.host.protocol}://#{config.host.name}/download-as-csv?id=#{obfuscatedCollectionId}", target="_blank") <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 485.569 548.291"><path d="M454.84 196.121h-13.164v-63.531c0-.399-.064-.795-.115-1.2-.021-2.52-.824-5-2.551-6.96l-105.713-120.753-.086-.075c-.629-.707-1.363-1.292-2.141-1.796-.23-.157-.463-.286-.705-.419-.672-.365-1.385-.672-2.119-.893l-.576-.188c-.8-.188-1.628-.306-2.466-.306h-259.807c-11.864 0-21.501 9.649-21.501 21.502v174.613h-13.163c-16.972 0-30.733 13.756-30.733 30.73v159.811c0 16.966 13.761 30.735 30.733 30.735h13.163v109.399c0 11.854 9.637 21.501 21.501 21.501h354.777c11.854 0 21.502-9.647 21.502-21.501v-109.398h13.164c16.967 0 30.729-13.764 30.729-30.73v-159.81c.002-16.98-13.762-30.731-30.729-30.731zm-389.443-174.619h249.053v110.006c0 5.94 4.818 10.751 10.752 10.751h94.973v53.861h-354.778v-174.618zm161.861 291.679c-26.68-9.291-44.063-24.054-44.063-47.39 0-27.404 22.861-48.368 60.732-48.368 18.107 0 31.448 3.811 40.969 8.107l-8.09 29.3c-6.431-3.107-17.863-7.632-33.591-7.632-15.717 0-23.339 7.149-23.339 15.485 0 10.247 9.047 14.769 29.78 22.632 28.341 10.479 41.681 25.238 41.681 47.873 0 26.91-20.721 49.787-64.792 49.787-18.338 0-36.449-4.776-45.497-9.771l7.38-30.017c9.772 5.015 24.775 10.006 40.264 10.006 16.671 0 25.488-6.907 25.488-17.396-.004-10.008-7.631-15.719-26.922-22.616zm-189.144-10.489c0-54.781 39.074-85.27 87.654-85.27 18.822 0 33.113 3.811 39.549 7.149l-7.392 28.816c-7.38-3.084-17.632-5.939-30.491-5.939-28.822 0-51.206 17.375-51.206 53.099 0 32.158 19.051 52.4 51.456 52.4 10.947 0 23.097-2.379 30.241-5.238l5.483 28.346c-6.672 3.34-21.674 6.92-41.208 6.92-55.5.001-84.086-34.551-84.086-80.283zm382.06 218.27h-354.777v-103.57h354.777v103.57zm-24.015-140.379h-42.399l-51.451-160.536h39.787l19.527 67.894c5.479 19.047 10.479 37.387 14.299 57.397h.709c4.047-19.298 9.045-38.353 14.525-56.692l20.486-68.599h38.6l-54.083 160.536z"/></svg>Download playlist in CSV format
-		noscript
-			div#noscript-warning
-				a.close-dialog(href="#noscript-warning")
-					span.structural Close
-					| <svg viewBox="0 0 23.746 23.746"><use xlink:href="#icon-close"></use></svg>
-				h4 :(
-				p It seems you have disabled JavaScript in your browser.
-				p I know this sucks. I really do. But this whole thing kinda depends on JavaScript being activated.
-				p However, if you want to just view the content without interacting with it, click the X in the upper corner of this box to close the message, and then scroll away to your heart's content.
-		script (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-58137452-1', 'auto');ga('send', 'pageview');
-		- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
-		if single
-			- var obfuscatedId = hashids.encodeHex(single._id);
-			script.
-				var autostart = '#{obfuscatedId}';
-		if prod
-			script(src="#{config.cdn}/js/#{assets.scripts['common.js']}")
-			script(src="#{config.cdn}/js/#{assets.scripts[collection.template + '.js']}")
-		else
-			script(src="#{config.host.protocol}://#{config.host.name}/js/build/common.js")
-			script(src="#{config.host.protocol}://#{config.host.name}/js/build/#{collection.template}.js")
+			include ./includes/footer.jade
+			
+		include ./includes/dialog-options.jade
+		include ./includes/scripts.jade

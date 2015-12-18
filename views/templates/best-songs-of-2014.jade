@@ -1,5 +1,25 @@
 extends ../layout
 
+block header
+	a(href="/", title="Go to main page")
+		span.structural Cloudlist
+		div.logo
+			include ../../client/img/cloudlist-logo.svg
+	div.controls
+		button.fullscreen
+			span.structural Toggle fullscreen mode
+			include ../../client/img/icon-fullscreen.svg
+		button.info-toggle
+			span.structural Toggle info screen
+			include ../../client/img/icon-info.svg
+		button.play-state
+			span.structural Toggle play/pause
+			div.play
+				include ../../client/img/icon-state-play.svg
+			div.pause
+				include ../../client/img/icon-state-pause.svg
+		input.volume-slider(type="range", step="1", value="90", min="0", max="100")
+
 block content
 	section.hero.group
 		div.hero-inner

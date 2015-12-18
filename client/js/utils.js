@@ -29,7 +29,7 @@ utils = {
 	getJSON: function (url) {
 		return utils.get(url).then(JSON.parse);
 	},
-	
+
 	forEach: function (array, callback, scope) {
 		for (var i = 0, len = array.length; i < len; i++) {
 			callback.call(scope, i, array[i]);
@@ -347,6 +347,25 @@ utils = {
 			hidden: hidden,
 			visibilityChange: visibilityChange
 		};
+	},
+
+	shadeRGBColor: function (color, percent) {
+	    var f = color.split(','),
+			t = percent < 0 ? 0 : 255,
+			p = percent < 0 ? percent *-1 : percent,
+			R = parseInt(f[0]),
+			G = parseInt(f[1]),
+			B = parseInt(f[2]);
+
+	    return (Math.round((t-R)*p)+R)+','+(Math.round((t-G)*p)+G)+','+(Math.round((t-B)*p)+B);
+	},
+
+	getContrastYIQ: function (rgb) {
+		var r = rgb[0];
+		var g = rgb[1];
+		var b = rgb[2];
+		var yiq = ((r*299)+(g*587)+(b*114))/1000;
+		return (yiq >= 128) ? 'dark' : 'bright';
 	},
 
 };

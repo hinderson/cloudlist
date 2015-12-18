@@ -5,6 +5,7 @@ var async = require('async');
 var utils = require('../../utils/utils');
 var url = require('url');
 var json2csv = require('json2csv');
+var crypto = require('crypto');
 
 // Hashid
 var Hashids = require('hashids');
@@ -218,7 +219,7 @@ module.exports = function (router) {
 			json2csv({ data: data.songs, fields: fields, fieldNames: fieldNames }, function (err, csv) {
 				if (err) throw err;
 
-				res.setHeader('Content-disposition', 'attachment; filename=' + data.collection.title + '.csv');
+				res.setHeader('Content-disposition', 'attachment; filename=' + crypto.randomBytes(16).toString('hex') + '.csv');
 				res.setHeader('Content-type', 'text/plain');
 				res.charset = 'UTF-8';
 				res.write(csv);

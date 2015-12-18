@@ -1,0 +1,68 @@
+div.dialog-overlay
+div.dialog(aria-hidden="true")
+    button.close-dialog
+        span.structural Close
+        include ../../client/img/icon-close.svg
+    section.keyboard-mapping.group
+        header
+            h4 Keyboard commands
+        dl.big
+            dt
+                kbd space
+            dd Play/pause track
+        dl.medium
+            dt
+                kbd Esc
+            dd Close all open dialogs
+        dl.arrow
+            dt
+                kbd →
+                kbd ↓
+            dd Play next track
+        dl
+            dt
+                kbd ⇧
+                span +
+                kbd F
+            dd Switch to fullscreen
+        dl.arrow
+            dt
+                kbd ←
+                kbd ↑
+            dd Play previous track
+    section.settings.group
+        div.share-options
+            header
+                h4 Share options
+            ul
+                li.twitter
+                    a(href="https://twitter.com/share?url=https%3A%2F%2Fcloudlist.io", target="_blank" class="twitter", rel="nofollow")
+                        span.icon
+                            include ../../client/img/icon-twitter.svg
+                        | Share to Twitter
+                li.facebook
+                    a(href="http://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcloudlist.io", target="_blank", rel="nofollow")
+                        span.icon
+                            include ../../client/img/icon-facebook.svg
+                        | Share to Facebook
+                li.problem
+                    a(href="mailto:problem@cloudlist.io")
+                        span.icon
+                            include ../../client/img/icon-problem.svg
+                        | Problem?
+        div.export-options
+            header
+                h4 Export options
+            ul
+                li
+                    a.export-to-spotify(href="https://accounts.spotify.com/authorize?client_id=89b926650c4f4576b4799ae98421a20d&response_type=code&redirect_uri=#{config.host.protocol}://#{config.host.name}/spotify/callback&scope=playlist-modify-private%20playlist-modify-public&state=#{obfuscatedCollectionId}", target="_blank")
+                        span.icon
+                            include ../../client/img/icon-spotify.svg
+                        | Export playlist to Spotify
+                    a.download-csv(href="#{config.host.protocol}://#{config.host.name}/download-as-csv?id=#{obfuscatedCollectionId}", target="_blank")
+                        span.icon
+                            include ../../client/img/icon-file-csv.svg
+                        | Download playlist in CSV format
+                        
+    footer
+        small <span>By <a href="http://hinderson.com/">Hinderson</a></span> All tracks are © of their respective owners.
