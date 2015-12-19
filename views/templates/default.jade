@@ -66,7 +66,8 @@ block content
 							span #{song.title}
 						div.col.artist
 							span #{song.combinedartist}
-						div.col.time #{song.duration}
+						div.col.time
+							span.duration #{song.duration}
 					- var placeholder = song.covers[0].placeholder;
 					if (placeholder)
 						div.cover.placeholder(style="background: #{song.covers[0].placeholder.gradient}; width: #{song.covers[0].width}px; height: #{song.covers[0].height}px;")

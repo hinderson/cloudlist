@@ -368,6 +368,12 @@ utils = {
 		return (yiq >= 128) ? 'dark' : 'bright';
 	},
 
+	forceRedraw: function (el) {
+		var t = el.ownerDocument.createTextNode(' ');
+		el.appendChild(t);
+		setTimeout(function() { el.removeChild(t); }, 0);
+	},
+
 };
 
 module.exports = utils;

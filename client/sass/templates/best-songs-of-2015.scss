@@ -235,19 +235,27 @@ body[data-color-contrast="bright"] .collection-sub-title {
 	line-height: 3.4em;
 }
 
+.col.index {
+	width: 9%;
+	max-width: 90px;
+}
+
 .col.title {
 	width: 30%;
 	max-width: 300px;
+
+	@media (max-width: 685px) {
+		width: 32%;
+	}
 }
 
 .col.artist {
 	width: 32%;
 	max-width: 320px;
-}
 
-.col.time {
-	width: 9%;
-	max-width: 110px;
+	@media (max-width: 685px) {
+		width: 34%;
+	}
 }
 
 
@@ -424,16 +432,14 @@ body[data-color-contrast="bright"] .sort {
 }
 
 .collection .state-loading {
-	display: none;
-	position: absolute;
-	height: 100%;
-	width: 16px;
-	z-index: 2;
-	fill: #000;
+	width: 12px;
+
+	@media (max-width: 685px) {
+		width: 10px;
+	}
 }
 
 .collection .loading .state-loading {
-	display: inline-block;
 	visibility: hidden;
 	opacity: 0;
 	animation: loader-pulsate 1.5s ease-out infinite;
@@ -485,11 +491,6 @@ body[data-color-contrast="bright"] .sort strong svg {
 
 .collection .unavailable a {
 	color: rgba(0, 0, 0, 0.2);
-}
-
-.col.index {
-	width: 9%;
-	max-width: 90px;
 }
 
 .go-to-top {

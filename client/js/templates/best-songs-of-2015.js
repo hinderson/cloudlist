@@ -13,8 +13,6 @@ var placeholders = require('../placeholders.js');
 config.api.version = 'v1';
 
 // Template specific stuff
-var stackBlur = require('../vendor/stackblur.js');
-
 function cacheElems ( ) {
 	// Extends to main cache object
 	main.cache.elems.playBtn = document.querySelector('.hero button');
@@ -44,35 +42,10 @@ function updateParallax (lastScrollY) {
 	translateY3d(main.cache.elems.heroContent, translateValue);
 }
 
-function initCanvas ( ) {
-	var collectionHero = document.querySelector('.collection-hero');
-	var canvas = collectionHero.querySelector('canvas');
-	var hero = collectionHero.querySelector('img');
-
-	var cctx = canvas.getContext('2d');
-	cctx.drawImage(hero, 0, 0);
-
-	collectionHero.style.animation = 'none';
-	collectionHero.style.opacity = 1;
-	hero.style.opacity = 0;
-	hero.style.visibility = 'hidden';
-
-	return { collectionHero: collectionHero, canvas: canvas, hero: hero, cctx: cctx };
-}
-
-var canvas;
 var windowLoaded = false;
 window.addEventListener('load', function ( ) {
 	windowLoaded = true;
-	canvas = initCanvas();
 });
-
-function blurHero (lastScrollY) {
-	if (!windowLoaded) { return; }
-	// canvas.collectionHero.style.opacity = (100 - (lastScrollY / 5)) / 100;
-	canvas.cctx.drawImage(canvas.hero, 0, 0);
-	stackBlur.canvasRGB(canvas.canvas, 0, 0, canvas.canvas.width, canvas.canvas.height, lastScrollY / 9);
-}
 
 function updateHero (lastScrollY) {
 	// Bail if we've reached the collection
@@ -81,7 +54,6 @@ function updateHero (lastScrollY) {
 	}
 
 	updateParallax(lastScrollY);
-	blurHero(lastScrollY);
 }
 
 function loading (id) {

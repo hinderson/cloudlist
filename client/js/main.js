@@ -108,6 +108,7 @@ module.exports = {
 			collectionItems: document.querySelectorAll('.collection ol li'),
 			scrollableOverflowElems: document.querySelectorAll('.collection ol .artist, .collection ol .title'),
 			sort: document.getElementsByClassName('sort')[0],
+			dialog: document.getElementsByClassName('dialog')[0],
 			closeDialog: document.getElementsByClassName('close-dialog')[0],
 			dialogOverlay: document.getElementsByClassName('dialog-overlay')[0],
 			infoBtn: document.getElementsByClassName('info-toggle')[0],
@@ -177,8 +178,8 @@ module.exports = {
 		c.elems.infoBtn.addEventListener('click', this.toggleDialog);
 
 		c.elems.dialogOverlay.addEventListener('click', function ( ) {
-			c.elems.HTML.classList.remove('overlay');
-		});
+			this.toggleDialog();
+		}.bind(this));
 
 		c.elems.closeDialog.addEventListener('click', function ( ) {
 			c.elems.HTML.classList.remove('overlay');
@@ -370,7 +371,13 @@ module.exports = {
 	},
 
 	toggleDialog: function ( ) {
-		c.elems.HTML.classList.toggle('overlay');
+		if (c.elems.HTML.classList.contains('overlay')) {
+			c.elems.dialog.setAttribute('aria-hidden', true);
+			c.elems.HTML.classList.remove('overlay');
+		} else {
+			c.elems.dialog.setAttribute('aria-hidden', false);
+			c.elems.HTML.classList.add('overlay');
+		}
 	},
 
 	registerKeyboardEvents: function ( ) {
@@ -389,6 +396,7 @@ module.exports = {
 				// Esc
 				case 27:
 					e.preventDefault();
+					c.elems.dialog.setAttribute('aria-hidden', true);
 					c.elems.HTML.classList.remove('overlay');
 					break;
 
@@ -444,9 +452,9 @@ module.exports = {
 
 			// Remove cloned span
 			var clonedSpan = item.children[1];
-			utils.requestAnimFrame.call(window, function ( ) {
-				clonedSpan && clonedSpan.remove();
-			});
+			if (clonedSpan) {
+				clonedSpan.remove();
+			}
 		};
 
 		var triggerScrolling = function (item) {
@@ -635,7 +643,7 @@ module.exports = {
 			var firstChild = time.firstChild;
 			currentProgress = document.createElement('span');
 			utils.requestAnimFrame.call(window, function ( ) {
-				currentProgress.innerHTML = '0:00 / ';
+				currentProgress.innerHTML = '0:00';
 				time.insertBefore(currentProgress, firstChild);
 			});
 
@@ -706,7 +714,7 @@ module.exports = {
 			percent = args[1];
 
 			utils.requestAnimFrame.call(window, function ( ) {
-				currentProgress.innerHTML = utils.convertToReadableTime(position) + ' / ';
+				currentProgress.textContent = utils.convertToReadableTime(position);
 			});
 		});
 

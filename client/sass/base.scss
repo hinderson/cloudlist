@@ -27,7 +27,13 @@
 	top: 25px;
 	z-index: 6;
 	width: 100%;
+	align-items: center;
 	justify-content: space-between;
+	pointer-events: none;
+
+	> * {
+		pointer-events: visible;
+	}
 }
 
 .main-header .logo {
@@ -236,9 +242,6 @@
 .sort span,
 .sort strong {
 	cursor: pointer;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 	font-weight: normal;
 	pointer-events: visible;
@@ -270,6 +273,14 @@
 	width: 8%;
 	max-width: 80px;
 	text-align: right;
+
+	@media (max-width: 685px) {
+		.loading &,
+		.playing &,
+		.paused & {
+			display: none;
+		}
+	}
 }
 
 .col.title {
@@ -287,6 +298,19 @@
 	max-width: 100px;
 	margin: 0;
 }
+
+.collection .playing .time .duration,
+.collection .paused .time .duration {
+
+	@media (max-width: 685px) {
+		display: none;
+	}
+
+	&::before {
+		content: " / ";
+	}
+}
+
 
 /* Collection header */
 .collection-header {
@@ -424,29 +448,47 @@
 	transition: background 0.2s;
 }
 
-.collection .state-playing,
-.collection .state-paused {
-	display: none;
+.collection .state-icon {
 	position: absolute;
 	height: 100%;
-	width: 16px;
 	z-index: 2;
 	fill: #000;
 }
 
-.collection .playing .state-playing {
-	display: inline-block;
-}
-
-.collection .paused .state-paused {
-	display: inline-block;
-}
-
 @media (max-width: 685px) {
-	.collection .state-playing,
-	.collection .state-paused {
-		margin-left: -8px;
+	.collection .loading .state-icon,
+	.collection .playing .state-icon,
+	.collection .paused .state-icon {
+		display: inline-block;
+		position: relative;
+		z-index: 2;
+		overflow: hidden;
+		margin-right: 3.5%;
+		text-overflow: ellipsis;
+		vertical-align: middle;
+		white-space: nowrap;
+		width: 9%;
+		max-width: 90px;
 	}
+}
+
+.collection .state-loading,
+.collection .state-playing,
+.collection .state-paused {
+	display: none;
+	width: 16px;
+	height: 100%;
+	margin-left: auto;
+
+	@media (max-width: 685px) {
+		width: 14px;
+	}
+}
+
+.collection .loading .state-loading,
+.collection .playing .state-playing,
+.collection .paused .state-paused {
+	display: block;
 }
 
 /* Cover */
@@ -530,6 +572,13 @@
 		animation-duration: 15s;
 		animation-iteration-count: infinite;
 		animation-timing-function: linear;
+		-webkit-transform: translateZ(0);
+		will-change: transform;
+		-webkit-backface-visibility: hidden;
+
+		@media (max-width: 685px) {
+			padding-right: 20px;
+		}
 	}
 
 	// Control scoll speed based on character count
@@ -698,6 +747,10 @@ html.overlay {
 .dialog .settings {
 	display: flex;
 	margin-bottom: 32px;
+
+	@media (max-width: 685px) {
+		margin-bottom: 22px;
+	}
 }
 
 .dialog .share-options,
@@ -827,13 +880,17 @@ html.overlay {
 		display: block;
 	}
 
-	.dialog .player-settings,
+	.dialog .share-options,
 	.dialog .export-options {
 		width: 100%;
+
+		h4 {
+			margin-bottom: 10px;
+		}
 	}
 
-	.dialog .player-settings {
-		margin-bottom: 40px;
+	.dialog .share-options {
+		margin-bottom: 30px;
 	}
 }
 

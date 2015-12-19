@@ -59,10 +59,10 @@ div.dialog(aria-hidden="true")
                         span.icon
                             include ../../client/img/icon-spotify.svg
                         | Export playlist to Spotify
+                li
                     a.download-csv(href="#{config.host.protocol}://#{config.host.name}/download-as-csv?id=#{obfuscatedCollectionId}", target="_blank")
                         span.icon
                             include ../../client/img/icon-file-csv.svg
                         | Download playlist in CSV format
-                        
     footer
         small <span>By <a href="http://hinderson.com/">Hinderson</a></span> All tracks are © of their respective owners.
