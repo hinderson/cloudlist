@@ -61,7 +61,17 @@ body[data-color-contrast="bright"] .main-header .logo {
 }
 
 .play-state svg {
-	height: 20px;
+	height: 18px;
+	margin-top: 1px;
+}
+
+.info-toggle {
+	width: 11px;
+	margin-left: 13px;
+}
+
+.fullscreen {
+	width: 24px;
 }
 
 body[data-color-contrast="bright"] .play-state svg,
@@ -213,12 +223,20 @@ body[data-color-contrast="bright"] .volume-slider::-webkit-slider-thumb {
 }
 
 .collection-sub-title {
-	color: #000;
-	transition: color 0.5s ease, transform 0.25s, opacity 0.4s;
+	text-align: center;
+	fill: #000;
+	transition: fill 0.5s ease, transform 0.25s, opacity 0.4s;
+	padding-bottom: 5px;
+
+	svg {
+		display: inline-block;
+		width: 89px;
+		height: 22px;
+	}
 }
 
 body[data-color-contrast="bright"] .collection-sub-title {
-	color: rgba(255, 255, 255, 0.85);
+	fill: rgba(255, 255, 255, 0.85);
 }
 
 .collection {
@@ -241,8 +259,8 @@ body[data-color-contrast="bright"] .collection-sub-title {
 }
 
 .col.title {
-	width: 30%;
-	max-width: 300px;
+	width: 30.5%;
+	max-width: 305px;
 
 	@media (max-width: 685px) {
 		width: 32%;
@@ -250,12 +268,17 @@ body[data-color-contrast="bright"] .collection-sub-title {
 }
 
 .col.artist {
-	width: 32%;
-	max-width: 320px;
+	width: 31%;
+	max-width: 310px;
 
 	@media (max-width: 685px) {
 		width: 34%;
 	}
+}
+
+.col.time {
+	width: 11%;
+	max-width: 110px;
 }
 
 
@@ -428,6 +451,7 @@ body[data-color-contrast="bright"] .sort {
 }
 
 .sort strong svg {
+	fill: rgba(0, 0, 0, 0.5);
 	transition: fill 0.5s ease;
 }
 
@@ -481,7 +505,7 @@ body[data-color-contrast="bright"] .sort strong svg {
 }
 
 .collection a[data-color-contrast="bright"] .progress {
-	background: rgba(0, 0, 0, 0.35);
+	background: rgba(0, 0, 0, 0.4);
 }
 
 .collection a:hover,

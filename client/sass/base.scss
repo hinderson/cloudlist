@@ -237,6 +237,10 @@
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	color: #666;
+
+	.sticky-header & {
+		margin-bottom: 0;
+	}
 }
 
 .sort span,
@@ -319,7 +323,6 @@
 	left: 0;
 	width: 100%;
 	z-index: 5;
-	pointer-events: none;
 }
 
 .header-shadow {
@@ -334,6 +337,10 @@
 	visibility: hidden;
 	will-change: transform, opacity, background;
 	background-image: linear-gradient(to bottom, rgba(25, 24, 24, 0.97) 0%, rgba(25, 24, 24, 0.85) 65%, rgba(0, 0, 0, 0) 100%);
+
+	@media (max-width: 685px) {
+		pointer-events: visible;
+	}
 }
 
 .collection-sub-title {
@@ -736,7 +743,6 @@ html.overlay {
 
 .dialog small span {
 	font-size: 105%;
-	margin-right: 9px;
 }
 
 .keyboard-mapping {
@@ -746,10 +752,10 @@ html.overlay {
 
 .dialog .settings {
 	display: flex;
-	margin-bottom: 32px;
+	margin-bottom: 22px;
 
 	@media (max-width: 685px) {
-		margin-bottom: 22px;
+		margin-bottom: 12px;
 	}
 }
 
