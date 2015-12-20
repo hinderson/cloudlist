@@ -50,6 +50,10 @@ module.exports = function (router) {
 		});
 	});
 
+	router.get('/2014', function (req, res) {
+		res.redirect('/best-songs-of-2014/');
+	});
+
 	// Best songs of 2014 (without user name)
 	router.get('/best-songs-of-2014', function (req, res, next) {
 		collections.getOne({ 'permalink': 'best-songs-of-2014' }, function (result) {
