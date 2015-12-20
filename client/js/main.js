@@ -665,6 +665,9 @@ module.exports = {
 			elem.classList.remove('playing');
 			elem.classList.add('paused');
 
+			// Force progress bar to stop with a repaint (required on Mobile Safari)
+			pubsub.publish('forceCollectionRepaint');
+
 			// Update document title to remove ▶ character
 			var documentTitle = document.title.replace('▶ ', '');
 			history.updateDocumentTitle(documentTitle);

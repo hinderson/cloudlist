@@ -22,7 +22,8 @@ var currentId;
 var currentPausedTime;
 
 // WebAudio basics
-var audioElement;
+var audioElement = new Audio();
+audioElement.autoplay = true;
 
 var getState = function ( ) {
 	return currentState;
@@ -71,13 +72,12 @@ var play = function (id, time) {
 	setState('loading');
 	pubsub.publish('audioLoading', id);
 
-	audioElement = new Audio();
-
 	// Set initial volume
 	audioElement.volume = settings.volume;
 
 	// Load URL
 	audioElement.src = url;
+	audioElement.load();
 
 	function removeEventListeners ( ) {
 		audioElement.removeEventListener('loadedmetadata', events.onLoad);
@@ -118,6 +118,7 @@ var play = function (id, time) {
 		onStop: function ( ) {
 			removeEventListeners();
 			audioElement.src = '';
+			audioElement.load();
 		},
 		onError: function (e) {
 			function fail ( ) {
