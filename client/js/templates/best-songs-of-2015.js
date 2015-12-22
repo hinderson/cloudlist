@@ -28,7 +28,7 @@ function updateParallax (lastScrollY) {
 		elem.style.transform = translate;
 	};
 
-	var speedDivider = 6.7;
+	var speedDivider = 3.6;
 	var translateValue = lastScrollY / speedDivider;
 
 	if (translateValue < 0) {
@@ -52,15 +52,9 @@ function updateHero (lastScrollY) {
 	updateParallax(lastScrollY);
 }
 
-function loading (id) {
-	// Add assigned color based on first associated cover
-	var cover = collection.getItem(id).covers[0];
-	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
-	var rgb = cover.colors.primary;
-	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
-
+function updateDocumentColors (rgb, contrast) {
 	// Change background color
-	var lighterColor = utils.shadeRGBColor(rgb.toString(), cover.colors.contrast === 'dark' ? 0.37 : 0.1);
+	var lighterColor = utils.shadeRGBColor(rgb.toString(), contrast === 'dark' ? 0.37 : 0.1);
 	main.cache.elems.body.style.backgroundColor = 'rgb(' + lighterColor + ')';
 
 	var gradient = document.createElement('DIV');
@@ -77,8 +71,24 @@ function loading (id) {
 		main.cache.elems.headerShadow.classList.remove('transition');
 	});
 
-	var contrast = utils.getContrastYIQ(lighterColor.split(','));
-	main.cache.elems.body.setAttribute('data-color-contrast', contrast);
+	var bgContrast = utils.getContrastYIQ(lighterColor.split(','));
+	main.cache.elems.body.setAttribute('data-color-contrast', bgContrast);
+}
+
+function resetDocumentColors ( ) {
+	main.cache.elems.body.removeAttribute('style');
+	main.cache.elems.body.removeAttribute('data-color-contrast');
+	main.cache.elems.headerShadow.querySelector('.gradient').removeAttribute('style');
+}
+
+function loading (id) {
+	// Add assigned color based on first associated cover
+	var cover = collection.getItem(id).covers[0];
+	var elemLink = main.cache.elems.collection.querySelector('[data-id="' + id + '"] a');
+	var rgb = cover.colors.primary;
+	elemLink.style.background = 'rgba(' + rgb + ', 0.85)';
+
+	updateDocumentColors(rgb, cover.colors.contrast);
 }
 
 function paused (id) {
@@ -110,3 +120,6 @@ pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioPaused', paused);
 pubsub.subscribe('audioStopped', stopped);
 pubsub.subscribe('audioResumed', resume);
+pubsub.subscribe('historyChanged', function (event) {
+	if (!event) { resetDocumentColors(); }
+});

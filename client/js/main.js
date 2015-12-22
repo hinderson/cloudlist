@@ -199,7 +199,7 @@ module.exports = {
 			this.scrollToPosition(0, 400);
 		}.bind(this));
 
-		document.addEventListener('mousemove', this.storeMousePosition.bind(this));
+		document.addEventListener('mousemove', this.mouseEvent.bind(this));
 		window.addEventListener('scroll', this.scrollEvent.bind(this));
 		window.addEventListener('resize', this.resizeEvent.bind(this));
 
@@ -231,12 +231,13 @@ module.exports = {
 		});
 	},
 
-	storeMousePosition: utils.debounce(function (e) {
+	mouseEvent: utils.debounce(function (e) {
+		// Store mouse position
 		c.mousePosition = {
 			x: e.x,
 			y: e.y
 		};
-	}, 150),
+	}, 100),
 
 	scrollEvent: function ( ) {
 		lastScrollY = window.pageYOffset;
