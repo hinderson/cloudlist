@@ -88,6 +88,7 @@ var createPlaceholder = function (element) {
     image.width = placeholder.width;
     image.height = placeholder.height;
     image.className = 'placeholder';
+	image.crossOrigin = '';
 
     // Create blurry placeholder
     var canvas = document.createElement('canvas');
