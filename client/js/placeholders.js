@@ -84,7 +84,7 @@ var createPlaceholder = function (element) {
     // Create placeholder
     var image = new Image();
 	image.crossOrigin = '';
-    image.src = 'https://static.cloudlist.io' + '/img/' + placeholder.filename;
+    image.src = config.settings.cdn + '/img/' + placeholder.filename;
     image.alt = '';
     image.width = placeholder.width;
     image.height = placeholder.height;
