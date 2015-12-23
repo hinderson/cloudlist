@@ -20,10 +20,10 @@ head
 		meta(property="og:image", content="#{config.cdn}/img/#{cover}")
 		meta(property="og:description", content="At position no. #{index} in the list #{collection.title}: &quot;#{single.title}&quot; by #{combinedArtist}.")
 	else if collection.thumbnails
-		meta(property="og:image", content="#{config.cdn}/media/img/#{collection.thumbnails.montage.filename}")
+		meta(property="og:image", content="#{config.cdn}/img/#{collection.thumbnails.montage.filename}")
 		meta(property="og:description", content="#{collection.description}")
 	else
-		meta(property="og:image", content="#{config.cdn}/media/img/cloudlist-splash.jpg")
+		meta(property="og:image", content="#{config.cdn}/img/cloudlist-splash.jpg")
 		meta(property="og:description", content="#{collection.description}")
 				
 	if prod
