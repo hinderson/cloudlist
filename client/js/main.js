@@ -186,8 +186,7 @@ module.exports = {
 		});
 
 		c.elems.volume.addEventListener('input', function (e) {
-  			var fraction = parseInt(e.target.value) / parseInt(e.target.max);
-			audio.setVolume(fraction * fraction);
+			audio.setVolume(e.target.value / 100);
 		}.bind(this));
 
 		c.elems.goToTop.addEventListener('click', function (e) {
