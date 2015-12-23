@@ -13,15 +13,15 @@ html(lang="en-US", class="no-js #{collection.template}")
 	include ./includes/head.jade
 	body
 		include ../client/img/icon-sprite.svg
-		
+
 		header(class="main-header inner", role="banner")
 			block header
-			
+
 		main(role="main")
 			block content
 
 		footer(role="contentinfo")
 			include ./includes/footer.jade
-			
+
 		include ./includes/dialog-options.jade
 		include ./includes/scripts.jade

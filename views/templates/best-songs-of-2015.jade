@@ -24,9 +24,11 @@ block content
 	- var cdn = prod ? config.cdn : config.host.protocol + '://' + config.host.name;
 	section.hero.group
 		div.hero-inner
-			h1.collection-title
-				span.structural #{collection.title}
-				include ../../client/img/templates/best-songs-of-2015/banner.svg
+			div.collection-title
+				p Presenting the year’s 100 best songs, selected by <strong>@hinderson</strong>.
+				h1
+					span.structural #{collection.title}
+					include ../../client/img/templates/best-songs-of-2015/banner.svg
 
 	- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
 	section.collection.group(data-id="#{obfuscatedCollectionId}")
@@ -69,3 +71,7 @@ block content
 	footer.go-to-top
 		a(href="#top")
 			include ../../client/img/icon-arrow-up.svg
+
+block dialog
+	p Cloudlist is by <a href="http://hinderson.com/">Hinderson</a>. Previous years: <strike>2011</strike>, <a href="http://xn--retsbsta-4zae.se/2012/" target="_blank">2012</a>, <a href="http://xn--retsbsta-4zae.se/" target="_blank">2013</a>, <a href="https://www.cloudlist.io/best-songs-of-2014/" target="_blank">2014</a>.
+	small All tracks and images are © of their respective owners.
