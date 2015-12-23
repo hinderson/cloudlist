@@ -11,16 +11,6 @@ var placeholders = require('../placeholders.js');
 // Extend config
 config.api.version = 'v1';
 
-// Template specific stuff
-function cacheElems ( ) {
-	// Extends to main cache object
-	main.cache.elems.playBtn = document.querySelector('.hero button');
-}
-
-function registerEvents ( ) {
-
-}
-
 function updateParallax (lastScrollY) {
 	var translateY3d = function (elem, value) {
 		var translate = 'translate3d(0px,' + value + 'px, 0px)';
@@ -111,8 +101,6 @@ function stopped (id) {
 }
 
 main.init();
-cacheElems();
-registerEvents();
 placeholders.lazyLoad();
 
 pubsub.subscribe('scrolling', updateHero);
