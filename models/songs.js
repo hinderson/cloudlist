@@ -163,7 +163,7 @@ songs = {
 					var height = orientation === 'horizontal' ? 282 : 407;
 
 					if (path.extname(targetCoverPath) === '.gif') {
-						execFile(gifsicle, ['--resize-' + (width > height ? 'height' : 'width'), (width > height ? height : width), '-o', tempCoverPath, tempCoverPath], function (err) {
+						execFile(gifsicle, ['--resize-' + (width > height ? 'width' : 'height'), (width > height ? width : height), '-o', tempCoverPath, tempCoverPath], function (err) {
 							if (err) throw err;
 
 							execFile(gifsicle, ['--crop', width + 'x' + height, '-o', tempCoverPath, tempCoverPath], function (err) {

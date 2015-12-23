@@ -11,6 +11,10 @@ var placeholders = require('../placeholders.js');
 // Extend config
 config.api.version = 'v1';
 
+function cacheElems ( ) {
+	main.cache.elems.collectionH1 = main.cache.elems.collectionTitle.querySelector('h1');
+}
+
 function updateParallax (lastScrollY) {
 	var translateY3d = function (elem, value) {
 		var translate = 'translate3d(0px,' + value + 'px, 0px)';
@@ -18,14 +22,14 @@ function updateParallax (lastScrollY) {
 		elem.style.transform = translate;
 	};
 
-	var speedDivider = 3.6;
+	var speedDivider = 4.8;
 	var translateValue = lastScrollY / speedDivider;
 
 	if (translateValue < 0) {
 		translateValue = 0;
 	}
 
-	translateY3d(main.cache.elems.heroContent, translateValue);
+	translateY3d(main.cache.elems.collectionTitle, translateValue);
 }
 
 var windowLoaded = false;
@@ -63,6 +67,9 @@ function updateDocumentColors (rgb, contrast) {
 
 	var bgContrast = utils.getContrastYIQ(lighterColor.split(','));
 	main.cache.elems.body.setAttribute('data-color-contrast', bgContrast);
+
+	// Update hero header
+	//main.cache.elems.collectionH1.style.fill = 'rgb(' + rgb + ')';
 }
 
 function resetDocumentColors ( ) {
@@ -101,6 +108,7 @@ function stopped (id) {
 }
 
 main.init();
+cacheElems();
 placeholders.lazyLoad();
 
 pubsub.subscribe('scrolling', updateHero);
