@@ -10,9 +10,7 @@ var collection = require('./data/collection.js');
 var settings = {
 	key: config.settings.soundCloudKey,
 	path: config.settings.cdn + '/audio/',
-	volume: (utils.isLocalStorageAllowed() ? window.localStorage.volume : 0.9) || 0.9,
-	repeat: (utils.isLocalStorageAllowed() ? window.localStorage.volume : true) || true,
-	shuffle: (utils.isLocalStorageAllowed() ? window.localStorage.volume : false) || false,
+	volume: (utils.isLocalStorageAllowed() ? (window.localStorage.volume > 1 ? (window.localStorage.volume / 100) : window.localStorage.volume ) : 0.9) || 0.9, // TODO: This is terrible
 	direction: 'forwards'
 };
 
