@@ -3,8 +3,8 @@ head
 	title= (single ? combinedArtist + ', "' + single.title + '"' : collection.title) + ' – ' + config.document.title
 	<script>document.documentElement.className = document.documentElement.className.replace(/(^|\\\b)no-js(\b|$)/, 'js');if (!("ontouchstart" in document.documentElement)) {document.documentElement.className += " no-touch";}</script>
 
-	link(rel="icon", type="image/png", href="#{config.host.protocol}://#{config.host.name}/favicon-32x32.png", sizes="32x32")
-	link(rel="icon", type="image/png", href="#{config.host.protocol}://#{config.host.name}/favicon-16x16.png", sizes="16x16")
+	link(rel="icon", type="image/png", href="#{config.cdn}/favicon-32x32.png", sizes="32x32")
+	link(rel="icon", type="image/png", href="#{config.cdn}/favicon-16x16.png", sizes="16x16")
 
 	meta(name="viewport", content="width=device-width,initial-scale=1.0")
 	meta(name="keywords", content="music, best of the year, playlist, best tracks of 2014, songs, tracks, electronica, hiphop, hip-hop, pop, rock, indie, 2014, soundcloud, stream, mp3")
