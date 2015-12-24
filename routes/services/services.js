@@ -1,6 +1,7 @@
 'use strict';
 
 // General
+var request = require('request');
 var async = require('async');
 var utils = require('../../utils/utils');
 var url = require('url');
@@ -146,6 +147,7 @@ module.exports = function (router) {
 
 		var id = hashids.decodeHex(req.query.state) || null;
 		var code = req.query.code || null;
+		var accessToken;
 
 		collections.getOne({ 'id': id }, function (result) {
 			users.getOne({ 'id': result.collection.owner }, function (user) {
@@ -159,6 +161,8 @@ module.exports = function (router) {
 						console.log('The token expires in ' + data.body.expires_in);
 						console.log('The access token is ' + data.body.access_token);
 						console.log('The refresh token is ' + data.body.refresh_token);
+
+						accessToken = data.body.access_token;
 
 						// Set the access token on the API object to use it in later calls
 						spotifyApi.setAccessToken(data.body.access_token);
@@ -187,13 +191,31 @@ module.exports = function (router) {
 
 								spotifyApi.createPlaylist(spotifyAccount, playlistTitle, { 'public' : true })
 									.then(function (data) {
-										spotifyApi.addTracksToPlaylist(spotifyAccount, data.body.id, spotifySongs);
+										function makeRequest (songs, callback) {
+											request.post({
+												headers: {
+													'Authorization': 'Bearer ' + accessToken,
+													'Content-Type': 'application/json'
+												},
+												url: 'https://api.spotify.com/v1/users/koeeoaddi/playlists/' + data.body.id + '/tracks?uris=' + encodeURIComponent(songs.join(',')),
+											}, function (error, response) {
+												if (callback && typeof(callback) === 'function') {
+													callback();
+												}
+												console.log(response.statusMessage);
+											});
+										}
 
-										var publicPlaylistUrl = data.body.external_urls.spotify;
-										res.redirect(publicPlaylistUrl);
+										// Split request into two to avoid "URI Too Long" error
+										makeRequest(spotifySongs.slice(0, spotifySongs.length / 2), function ( ) {
+											makeRequest(spotifySongs.slice(spotifySongs.length / 2, spotifySongs.length), function ( ) {
+												// Redirect to playlist
+												res.redirect(data.body.external_urls.spotify);
+											});
+										});
 									})
 									.catch(function (err) {
-										console.error(err);
+										console.error('Couldn\'t create playlist ', err);
 									});
 							});
 						});
