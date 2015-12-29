@@ -197,7 +197,7 @@ module.exports = function (router) {
 													'Authorization': 'Bearer ' + accessToken,
 													'Content-Type': 'application/json'
 												},
-												url: 'https://api.spotify.com/v1/users/koeeoaddi/playlists/' + data.body.id + '/tracks?uris=' + encodeURIComponent(songs.join(',')),
+												url: 'https://api.spotify.com/v1/users/' + spotifyAccount + '/playlists/' + data.body.id + '/tracks?uris=' + encodeURIComponent(songs.join(',')),
 											}, function (error, response) {
 												if (callback && typeof(callback) === 'function') {
 													callback();
