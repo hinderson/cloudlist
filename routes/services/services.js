@@ -4,9 +4,10 @@
 var request = require('request');
 var async = require('async');
 var utils = require('../../utils/utils');
-var url = require('url');
+var url = require('fast-url-parser');
 var json2csv = require('json2csv');
 var crypto = require('crypto');
+var config = require('config');
 
 // Hashid
 var Hashids = require('hashids');
@@ -38,6 +39,11 @@ module.exports = function (router) {
 
 	// Return all songs in JSON format
 	router.get('/api/v1/collection', function (req, res, next) {
+		// Bail if request isn't coming from same domain
+		if (typeof req.headers.referer === 'undefined' || url.parse(req.headers.referer).host !== config.host.name) {
+			return next();
+		}
+
 		function returnJSON (result) {
 			if ('production' === process.env.NODE_ENV) {
 				res.header('Cache-Control', 'max-age=' + 31556952000); // One year
