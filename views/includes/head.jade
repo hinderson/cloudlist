@@ -29,4 +29,4 @@ head
 	if prod
 		link(href="#{config.cdn}/css/#{assets.styles['templates/' + collection.template + '.css']}", rel="stylesheet")
 	else
-		link(href="#{config.host.protocol}://#{config.host.name}/css/templates/#{collection.template}.css", rel="stylesheet")
+		link(href="#{config.host.protocol}://#{config.host.name}/css/build/templates/#{collection.template}.css", rel="stylesheet")

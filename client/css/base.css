@@ -1,21 +1,16 @@
-@charset 'UTF-8';
+@charset "UTF-8";
 
-// 1. Base
-@import "_base/_config";
-@import "_base/_normalize";
-@import "_base/_fonts";
-@import "_base/_typography";
-@import "_base/_base";
-
-// 2. Animation
-@import "_animation/_animation";
+@import "normalize.css";
+@import "partials/base/fonts.css";
+@import "partials/base/typography.css";
+@import "partials/base/base.css";
+@import "partials/animation/animation.css";
 
 .loading-song,
 .loading-song .loading a {
 	cursor: wait;
 }
 
-// LAYOUT: General
 .inner {
 	padding: 0 1.5em;
 }
@@ -223,7 +218,7 @@
 		width: 100%;
 	}
 
-	// Header shadow overlay
+	/* Header shadow overlay */
 	.no-touch.sticky-header .header-shadow {
 		opacity: 1;
 		visibility: visible;
@@ -598,7 +593,7 @@
 		}
 	}
 
-	// Control scoll speed based on character count
+	/* Control scoll speed based on character count */
 	&[data-char-count^="2"] span { animation-duration: 13.5s; }
 	&[data-char-count^="3"] span { animation-duration: 14s; }
 	&[data-char-count^="4"] span { animation-duration: 15.5s; }

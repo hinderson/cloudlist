@@ -3,14 +3,24 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var path = require('path');
-var sass = require('gulp-ruby-sass');
-var prefix = require('gulp-autoprefixer');
 var imagemin = require('gulp-imagemin');
 var pngcrush = require('imagemin-pngcrush');
 var cache = require('gulp-cache');
 var newer = require('gulp-newer');
 var merge = require('merge-stream');
 var del = require('del');
+
+var postcss = require('gulp-postcss');
+var sourcemaps = require('gulp-sourcemaps');
+var processors = [
+	require('postcss-import'),
+	require('postcss-custom-media'),
+	require('postcss-simple-vars'),
+	require('postcss-nested'),
+	require('postcss-inline-comment'),
+	require('autoprefixer')({ browsers: ['last 2 versions', '> 1%'] }),
+	require('csswring')
+];
 
 var RevAll = require('gulp-rev-all');
 
@@ -71,18 +81,17 @@ gulp.task('webpack:prod', function (callback) {
 	});
 });
 
-// Sass for development
-gulp.task('sass:dev', function ( ) {
-	return sass('./client/sass', { sourcemap: true })
-		.on('error', function (err) {
-			console.error('Error!', err.message);
-		})
-		.pipe(prefix('last 2 versions', '> 1%'))
-		.pipe(gulp.dest('./client/css/'));
+// PostCSS for development
+gulp.task('css:dev', function ( ) {
+    return gulp.src(['./client/css/**/*.css', '!./client/css/partials/**/*', '!./client/css/build/**/*'])
+        .pipe(sourcemaps.init())
+        .pipe(postcss(processors))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('./client/css/build'));
 });
 
-// Sass for production
-gulp.task('sass:prod', function ( ) {
+// PostCSS for production
+gulp.task('css:prod', function ( ) {
 	var revAll = new RevAll({
 		transformFilename: function (file, hash) {
 			var ext = path.extname(file.path);
@@ -91,19 +100,16 @@ gulp.task('sass:prod', function ( ) {
 		fileNameManifest: 'rev-manifest-css.json'
 	});
 
-	return sass('./client/sass', { sourcemap: false, style: 'compressed' })
-		.on('error', function (err) {
-			console.error('Error!', err.message);
-		})
-		.pipe(prefix('last 2 versions', '> 1%'))
+    return gulp.src(['./client/css/**/*.css', '!./client/css/partials/**/*', '!./client/css/build/**/*'])
+        .pipe(postcss(processors))
 		.pipe(revAll.revision())
 		.pipe(gulp.dest('./dist/css/'))
 		.pipe(revAll.manifestFile())
 		.pipe(gulp.dest('./client/'));
 });
 
-// Watcher for Sass
-var watcher = gulp.watch('./client/sass/**/*.scss', ['sass:dev']);
+// Watcher for PostCSS
+var watcher = gulp.watch('./client/css/**/*.css', ['css:dev']);
 watcher.on('change', function (event) {
 	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 });
@@ -170,7 +176,7 @@ gulp.task('clean-tmp', function (callback) {
 });
 
 gulp.task('default', function ( ) {
-	gulp.start('sass:dev');
+	gulp.start('css:dev');
 });
 
 // Run deploy task for uploads folder

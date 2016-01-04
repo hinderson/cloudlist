@@ -33,7 +33,7 @@ npm-debug.log
 gulp-cache
 .sass-cache
 dump
-client/css
+client/css/build
 client/js/build
 client/media
 dist
