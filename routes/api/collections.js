@@ -1,10 +1,5 @@
 'use strict';
 
-var slugify = require('../../utils/slugify.js');
-var shortId = require('shortid');
-var async = require('async');
-var ObjectId = require('mongoskin').ObjectID;
-
 module.exports = function (router) {
 
 	/*
@@ -14,26 +9,21 @@ module.exports = function (router) {
 		return false;
 	});
 
-	// GET one collection
-	router.get('/api/v1/collections/:id', function (req, res) {
-		return false;
-	});
-
 	// CREATE new collection
 	router.post('/api/v1/collections/', function (req, res) {
 		return false;
 	});
 
-	// UPDATE single collection
-	router.put('/api/v1/collections/:id', function (req, res) {
-		return false;
-	});
-
-	// DELETE collection
-	router.delete('/api/v1/collections/:id', function (req, res) {
-		return false;
-	});
-
+	router.route('/api/v1/collections/:id')
+		.get(function (req, res) {
+			return false;
+		})
+		.put(function (req, res) {
+			return false;
+		})
+		.delete(function (req, res) {
+			return false;
+		});
 	*/
 
 };

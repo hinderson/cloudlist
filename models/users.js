@@ -1,12 +1,32 @@
 'use strict';
 
-var db = require('../server').db;
-var ObjectId = require('mongoskin').ObjectID;
+// General
+var mongoose = require('../server').mongoose;
+
+// Mongoose
+var Schema = mongoose.Schema;
+var userSchema = new Schema({
+	created: { type: Date, default: Date.now },
+	avatar: {
+		small: String,
+		medium: String,
+		large: String
+	},
+	collections: [],
+	username: String,
+	name: {
+		first: String,
+		last: String
+	}
+}, { collection: 'users' });
+
+// Model
+var User = mongoose.model('User', userSchema);
 
 module.exports = {
 
 	getAll: function (callback) {
-		db.collection('users').find( ).toArray(function (err, users) {
+		User.find({}, function (err, users) {
 			if (err) throw err;
 
 			if (typeof(callback) === 'function') {
@@ -18,11 +38,11 @@ module.exports = {
 	// Find user based on id or username
 	getOne: function (query, callback) {
 		if (query.hasOwnProperty('id')) {
-			query._id = new ObjectId(query.id);
+			query._id = query.id;
 			delete query.id;
 		}
 
-		db.collection('users').findOne(query, function (err, user) {
+		User.where(query).findOne(function (err, user) {
 			if (err) throw err;
 
 			if (typeof(callback) === 'function') {
@@ -38,7 +58,7 @@ module.exports = {
 	update: function (id, query, callback) {
 		if (!id) { return false; }
 
-		db.collection('users').update( { _id: new ObjectId(id) }, { '$set': query }, function (err) {
+		User.update({_id: id}, { '$set': query }, function (err) {
 			if (err) throw err;
 
 			if (typeof(callback) === 'function') {

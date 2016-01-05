@@ -108,12 +108,6 @@ gulp.task('css:prod', function ( ) {
 		.pipe(gulp.dest('./client/'));
 });
 
-// Watcher for PostCSS
-var watcher = gulp.watch('./client/css/**/*.css', ['css:dev']);
-watcher.on('change', function (event) {
-	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-});
-
 // SVG Store
 gulp.task('svgstore', function ( ) {
 	return gulp
@@ -176,7 +170,7 @@ gulp.task('clean-tmp', function (callback) {
 });
 
 gulp.task('default', function ( ) {
-	gulp.start('css:dev');
+	gulp.watch('./client/css/**/*.css', ['css:dev']);
 });
 
 // Run deploy task for uploads folder

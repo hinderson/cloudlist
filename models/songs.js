@@ -1,13 +1,12 @@
 'use strict';
 
-var db = require('../server').db;
+var mongoose = require('../server').mongoose;
 var fs = require('fs');
 var request = require('request');
 var crypto = require('crypto');
 var path = require('path');
 var slugify = require('../utils/slugify.js');
 var async = require('async');
-var ObjectId = require('mongoskin').ObjectID;
 var jsonpClient = require('jsonp-client');
 var config = require('config');
 var execFile = require('child_process').execFile;
@@ -23,23 +22,48 @@ var probe = require('node-ffprobe');
 // Methods
 var collections = require('./collections.js');
 
+// Mongoose
+var Schema = mongoose.Schema;
+var songSchema = new Schema({
+	added: { type: Date, default: Date.now },
+	album: String,
+	artist: String,
+	audio: {
+		source: String,
+		url: String,
+		stream: String,
+		starttime: { type: Number, default: 0 },
+		endtime: Number,
+		duration: Number
+	},
+	available: { type: Boolean, default: true },
+	featuredartist: String,
+	covers: [],
+	slugs: {
+		album: String,
+		artist: String,
+		title: String
+	},
+	permalink: String,
+	tags: [],
+	title: String
+}, { collection: 'songs' });
+
+// Model
+var Song = mongoose.model('Song', songSchema);
+
 // Constructor
 var songs = {};
 
 songs = {
 
-	getAll: function (id, result) {
+	getAll: function (collectionId, result) {
 
 	},
 
 	getOne: function (id, callback) {
 		if (id === null) { return false; }
-
-		db.collection('songs').find( { _id: new ObjectId(id) } ).toArray(function (err, song) {
-			if (err || song === undefined || song.length === 0) return callback(false);
-
-			return callback(song[0]);
-		});
+		Song.find( { _id: id }, callback);
 	},
 
 	create: function (collectionId, args, files, result) {
@@ -64,6 +88,40 @@ songs = {
 		songFeatured && songFeatured.trim();
 		songTitle && songTitle.trim();
 		songAlbum && songAlbum.trim();
+
+		// Check for multiple artists
+		if (songArtist && songArtist.indexOf(',') > -1) {
+			songArtist = songArtist.split(/\s*,\s*/);
+		}
+
+		// Check for multiple featured artists
+		if (songFeatured && songFeatured.indexOf(',') > -1) {
+			songFeatured = songFeatured.split(/\s*,\s*/);
+		}
+
+		var slugs = {
+			album: songAlbum && slugify(songAlbum),
+			artist: songArtist && slugify((Array.isArray(songArtist) ? songArtist.join('-') : songArtist) + (songFeatured && songFeatured.length > 0 ? (' feat. ' + (Array.isArray(songFeatured) ? songFeatured.join('-') : songFeatured )) : '')),
+			title: songTitle && slugify(songTitle)
+		};
+
+		// Create model
+		var newSong = new Song({
+			album: songAlbum,
+			artist : songArtist,
+			audio: {
+				source: streamUrl ? 'soundcloud' : 'file',
+				url: streamUrl ? streamUrl : audioUrl,
+				stream: resolvedUrl,
+				starttime: startTime,
+				endtime: endTime || songDuration,
+				duration: songDuration
+			},
+			featuredartist: songFeatured,
+			title: songTitle,
+			slugs: slugs,
+			permalink: slugs.artist + '-' + slugs.title
+		});
 
 		function determineAudioSource (callback) {
 			// First resolve the URL if it's Soundcloud
@@ -265,7 +323,7 @@ songs = {
 			], function (err, identify) {
 				if (err) throw err;
 
-				var songCover = {
+				newSong.covers.push({
 					format: identify.format,
 					filename: filename,
 					width: identify.size.width,
@@ -278,9 +336,9 @@ songs = {
 						contrast: identify.colorContrast,
 						gradient: gradientPlaceholder
 					}
-				};
+				});
 
-				return callback(null, songCover);
+				return callback(null);
 			});
 		}
 
@@ -342,64 +400,25 @@ songs = {
 				});
 		}
 
-		function formatInputFields (callback) {
-			// Check for multiple artists
-			if (songArtist && songArtist.indexOf(',') > -1) {
-				songArtist = songArtist.split(/\s*,\s*/);
-			}
-
-			// Check for multiple featured artists
-			if (songFeatured && songFeatured.indexOf(',') > -1) {
-				songFeatured = songFeatured.split(/\s*,\s*/);
-			}
-
-			return callback(null);
-		}
-
-		function postToDb (err, songCover) {
+		// Main async chain
+		async.series([
+			determineAudioSource,
+			processImageSearchResults,
+			identifyCoverType,
+			processCover,
+			processCoverVideo
+		], function postToDb (err, songCover) {
 			if (err) throw err;
 
-			var slugs = {
-				album: songAlbum && slugify(songAlbum),
-				artist: songArtist && slugify((Array.isArray(songArtist) ? songArtist.join('-') : songArtist) + (songFeatured && songFeatured.length > 0 ? (' feat. ' + (Array.isArray(songFeatured) ? songFeatured.join('-') : songFeatured )) : '')),
-				title: songTitle && slugify(songTitle)
-			};
-
-			var song = {
-				'added': new Date(),
-				'album': songAlbum,
-				'artist' : songArtist,
-				'audio': {
-					'source': streamUrl ? 'soundcloud' : 'file',
-					'url': streamUrl ? streamUrl : audioUrl,
-					'stream': resolvedUrl,
-					'starttime': startTime,
-					'endtime': endTime || songDuration,
-					'duration': songDuration
-				},
-				'available': true,
-				'featuredartist': songFeatured,
-				'covers': [songCover[2]],
-				'slugs': {
-					'album': slugs.album,
-					'artist': slugs.artist,
-					'title': slugs.title
-				},
-				'permalink': slugs.artist + '-' + slugs.title,
-				'tags': null,
-				'title': songTitle
-			};
-
 			if (songCover[4]) {
-				song.covers[0].video = songCover[4];
+				newSong.covers[0].video = songCover[4];
 			}
 
-			// Submit to the DB
-			db.collection('songs').insert(song, function (err, doc) {
+			newSong.save(function (err, doc) {
 				if (err) throw err;
 
 				// Fetch newly created song id
-				var songId = doc[0]._id + '';
+				var songId = doc._id + '';
 
 				collections.getOne({ 'id': collectionId }, function (data) {
 					var items = data.collection.items;
@@ -411,7 +430,7 @@ songs = {
 						console.log('Added ' + songId +' to collection ' + collectionId);
 
 						if (typeof(result) === 'function') {
-							return result(song);
+							return result(doc);
 						}
 					});
 
@@ -421,17 +440,7 @@ songs = {
 					}
 				});
 			});
-		}
-
-		// Main async chain
-		async.series([
-			determineAudioSource,
-			processImageSearchResults,
-			identifyCoverType,
-			processCover,
-			processCoverVideo,
-			formatInputFields
-		], postToDb);
+		});
 	},
 
 	update: function (id, args, result) {
@@ -450,13 +459,7 @@ songs = {
 			query[field] = content;
 		}
 
-		db.collection('songs').update({ _id: new ObjectId(id) }, { '$set': query }, function (err) {
-			if (err) throw err;
-
-			if (typeof(result) === 'function') {
-				return result();
-			}
-		});
+		Song.update({ _id: id }, { '$set': query }, result);
 	},
 
 	delete: function (id, result) {
@@ -465,9 +468,11 @@ songs = {
 		async.waterfall([
 			function (callback) {
 				// Remove song from database
-				db.collection('songs').findAndRemove( { _id: new ObjectId(id) }, [], callback);
+				Song.findByIdAndRemove(id, function (err, song) {
+					callback(null, song);
+				});
 			},
-			function (song, sort, callback) {
+			function (song, callback) {
 				// Remove all associated files (audio files, images, etc.)
 				if (song.covers) {
 					var source = song.covers[0].filename;
@@ -488,15 +493,23 @@ songs = {
 					fs.unlink('./client/media/audio/' + song.audio.url);
 				}
 
-				callback();
-			},
-			function (callback) {
 				// Return an array of collections that associates with the song
-				db.collection('collections').find({ items: id }).toArray(function (err, collections) {
-					// Delete every reference to the song from item array
-					collections.forEach(function (collection) {
-						var collectionId = collection._id;
-						db.collection('collections').update( { _id: new ObjectId(collectionId) }, { $pull: { items: id } }, callback);
+				mongoose.connection.db.collection('collections', function (err, data) {
+					if (err) throw err;
+
+					data.find({ items: id }).toArray(function (err, cols) {
+						if (err) throw err;
+
+						// Delete every reference to the song from item array
+						cols.forEach(function (collection) {
+							var items = collection.items.filter(function (item) {
+								return item !== id;
+							});
+
+							collections.update(collection._id, { items: items }, function ( ) {
+								callback(null, song);
+							});
+						});
 					});
 				});
 			}

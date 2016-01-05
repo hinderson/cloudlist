@@ -1,18 +1,37 @@
 'use strict';
 
 var fs = require('fs');
-var db = require('../server').db;
+var mongoose = require('../server').mongoose;
 var slugify = require('../utils/slugify.js');
 var async = require('async');
-var ObjectId = require('mongoskin').ObjectID;
 var utils = require('../utils/utils');
 var crypto = require('crypto');
+
+// Mongoose
+var Schema = mongoose.Schema;
+var collectionSchema = new Schema({
+	created: { type: Date, default: Date.now },
+	covers: [],
+	description: String,
+	items: [],
+	owner: String,
+	permalink: String,
+	published: { type: Boolean, default: false },
+	slugs: {
+		title: String
+	},
+	template: { type: String, default: 'default' },
+	title: String
+}, { collection: 'collections' });
 
 // Imagemagick
 var im = require('simple-imagemagick');
 
 // Database methods
 var users = require('../models/users.js');
+
+// Model
+var Collection = mongoose.model('Collection', collectionSchema);
 
 // Constructor
 var collections = {};
@@ -21,7 +40,7 @@ collections = {
 
 	getAll: function (user, result) {
 		users.getOne({ 'id': user }, function (user) {
-			db.collection('collections').find( ).toArray(function (err, collections) {
+			Collection.find({}, function (err, collections) {
 				if (err) throw err;
 
 				if (typeof(result) === 'function') {
@@ -37,62 +56,56 @@ collections = {
 	// Find collection based on id or permalink
 	getOne: function (query, result) {
 		if (query.hasOwnProperty('id')) {
-			query._id = new ObjectId(query.id);
+			query._id = query.id;
 			delete query.id;
 		}
 
-		db.collection('collections').find(query).toArray(function (err, collection) {
-			if (err || collection === undefined || collection.length === 0) return result(false);
+		Collection.findOne(query, function (err, collection) {
+			if (err || !collection) return result(false);
 
 			// Turn items into ObjectId's
-			collection = collection[0];
+			var ObjectId = require('mongoskin').ObjectID;
 			var items = collection.items.map(function (item) {
 				return new ObjectId(item);
 			});
 
-			// Match songs that are contained within the collection's items array
-			db.collection('songs').find( { _id: { $in: items } } ).toArray(function (err, items) {
-				if (err) throw err;
+			mongoose.connection.db.collection('songs', function (err, data) {
+				data.find({ _id: { $in: items } }).toArray(function (err, items) {
+					if (err) throw err;
 
-				var hashmap = utils.makeHashmap(items);
-				var sortedSongs = utils.sortHashmap(hashmap, collection.items);
+					var hashmap = utils.makeHashmap(items);
+					var sortedSongs = utils.sortHashmap(hashmap, collection.items);
 
-				if (typeof(result) === 'function') {
-					return result({
-						collection: collection,
-						songs: sortedSongs
-					});
-				}
+					if (typeof(result) === 'function') {
+						return result({
+							collection: collection,
+							songs: sortedSongs
+						});
+					}
+				});
 			});
+
 		});
 	},
 
 	create: function (title, user, result) {
-		title = title || 'New playlist';
-
-		var collection = {
-			'created': new Date(),
-			'covers': [],
-			'description': '',
-			'items': [],
-			'owner': user,
-			'permalink': slugify(title),
-			'published': false,
-			'slugs': {
-				'title': slugify(title)
+		var newCollection = new Collection({
+			owner: user,
+			permalink: slugify(title),
+			slugs: {
+				title: slugify(title)
 			},
-			'template': 'default',
-			'title': title
-		};
+			title: title || 'New playlist'
+		});
 
 		async.waterfall([
 			function (callback) {
 				// Add new collection document to database
-				db.collection('collections').insert(collection, callback);
+				newCollection.save(callback);
 			},
-			function (doc, callback) {
+			function (doc, status, callback) {
 				// Add new collection reference to user document
-				var newCollectionId = doc[0]._id + '';
+				var newCollectionId = doc._id + '';
 				users.getOne({ 'id': user }, function (user) {
 					user.collections.push(newCollectionId);
 					users.update(user._id, { 'collections': user.collections }, callback);
@@ -102,7 +115,7 @@ collections = {
 			if (err) throw err;
 
 			if (typeof(result) === 'function') {
-				return result(collection);
+				return result(newCollection);
 			}
 		});
 	},
@@ -110,20 +123,17 @@ collections = {
 	update: function (id, query, result) {
 		if (!id) { return false; }
 
-		// Generate covers montage if the order changes for the first 4 songs
-		if (query.hasOwnProperty('items')) {
-			collections.getOne({ 'id': id }, function (data) {
-				// Look through the first 4 items in the old and new array to detect changes
-				var items = data.collection.items.splice(0, 4);
+		Collection.findOneAndUpdate({ _id: id }, { '$set': query }, function (err, collection) {
+			if (err) throw err;
+
+			// Generate covers montage if the order changes for the first 4 songs
+			if (collection.items.length > 4) {
+				var items = collection.items.splice(0, 4);
 				var isSame = items.every(function (element, index) {
 					return element === query.items[index];
 				});
 				isSame || collections.createCoversMontage(id);
-			});
-		}
-
-		db.collection('collections').update( { _id: new ObjectId(id) }, { '$set': query }, function (err) {
-			if (err) throw err;
+			}
 
 			if (typeof(result) === 'function') {
 				return result(true);
@@ -137,7 +147,7 @@ collections = {
 		async.waterfall([
 			function (callback) {
 				// Remove collection document from database
-				db.collection('collections').findAndRemove( { _id: new ObjectId(id) }, [], callback);
+				Collection.findOneAndRemove({ _id: id }, [], callback);
 			},
 			function (doc, sort, callback) {
 				// Remove collection reference from user document

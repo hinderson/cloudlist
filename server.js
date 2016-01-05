@@ -12,11 +12,11 @@ var utils = require('./utils/utils');
 // Config
 var config = require('config');
 
-// MongoDB
-var mongo = require('mongoskin');
+// Mongoose
+var mongoose = require('mongoose');
 var dbConfig = config.get('db');
-var db = mongo.db(dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.name, { native_parser:true });
-exports.db = db;
+mongoose.connect(dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.name, { native_parser: true });
+exports.mongoose = mongoose;
 
 var app = express();
 var env = process.env.NODE_ENV;
@@ -87,12 +87,6 @@ if (env === 'production') {
 } else {
 	app.use(express.static(path.join(__dirname, 'client')));
 }
-
-// Make our db accessible to our router
-app.use(function (req, res, next) {
-	req.db = db;
-	next();
-});
 
 // Require all routes at the same time
 require('./routes')(app);
