@@ -2,7 +2,7 @@ var webpack = require('webpack');
 
 module.exports = {
 	entry: {
-		'admin': './client/js/admin/admin.js',
+		'dashboard': './client/js/dashboard/dashboard.js',
 		'default': './client/js/templates/default.js',
 		'best-songs-of-2014': './client/js/templates/best-songs-of-2014.js',
 		'best-songs-of-2015': './client/js/templates/best-songs-of-2015.js'
@@ -17,9 +17,9 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.optimize.CommonsChunkPlugin({
-			name: 'admin-common',
-			filename: 'admin-common.js',
-			chunks: ['admin'],
+			name: 'dashboard-common',
+			filename: 'dashboard-common.js',
+			chunks: ['dashboard'],
 		}),
 		new webpack.optimize.CommonsChunkPlugin({
 			name: 'common',
