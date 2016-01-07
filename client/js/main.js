@@ -4,6 +4,7 @@
 var history = require('./history.js'); // jshint ignore:line
 var utils = require('./utils.js');
 var config = require('./config.js');
+var cache = require('./cache.js');
 var pubsub = require('./pubsub.js');
 var audio = require('./audio.js');
 var collection = require('./data/collection.js');
@@ -13,7 +14,6 @@ var s, c;
 
 // Private variables
 var ticking = false;
-var lastScrollY = null;
 
 // Private functions
 var itemClickHandler = function (e) {
@@ -30,11 +30,6 @@ var itemHoverHandler = function (e) {
 			if (target !== this.currentHover) {
 				this.currentHover = target;
 				this.scrollOverflowingText(target);
-				if (!(target.parentNode.classList.contains('playing') ||
-					target.parentNode.classList.contains('paused') ||
-					target.parentNode.classList.contains('loading'))) {
-						this.showItemCover(target);
-					}
 				pubsub.publish('itemMouseover', target);
 			}
 			break;
@@ -119,10 +114,6 @@ module.exports = {
 			goToTop: document.getElementsByClassName('go-to-top')[0].firstChild,
 			currentItem: null
 		},
-		mousePosition: {
-			x: 0,
-			y: 0
-		},
 		collectionTop: utils.getElemDistanceFromDoc(document.getElementsByClassName('collection')[0]).top
 	},
 
@@ -135,8 +126,8 @@ module.exports = {
 		this.registerKeyboardEvents();
 		this.toggleStickyHeader();
 		this.findOverflowingElements();
-		this.viewportWidth = window.innerWidth;
-		this.viewportHeight = window.innerHeight;
+		cache.set('viewportWidth', window.innerWidth);
+		cache.set('viewportHeight', window.innerHeight);
 
 		// Get collection
 		collection.getCollection.then(function (res) {
@@ -154,7 +145,7 @@ module.exports = {
 
 		// Trigger resize event when window has been focused again
 		pubsub.subscribe('windowFocused', function ( ) {
-			if (window.innerWidth !== this.viewportWidth || window.innerHeight !== this.viewportHeight) {
+			if (window.innerWidth !== cache.get('viewportWidth') || window.innerHeight !== cache.get('viewportHeight')) {
 				this.resizeEvent();
 			}
 		}.bind(this));
@@ -232,14 +223,14 @@ module.exports = {
 
 	mouseEvent: utils.debounce(function (e) {
 		// Store mouse position
-		c.mousePosition = {
+		cache.set('mousePosition', {
 			x: e.x,
 			y: e.y
-		};
+		});
 	}, 100),
 
 	scrollEvent: function ( ) {
-		lastScrollY = window.pageYOffset;
+		cache.set('lastScrollY', window.pageYOffset);
 
 		var requestTick = function ( ) {
 			this.throttleHoverStates();
@@ -256,7 +247,7 @@ module.exports = {
 				}
 			}.bind(this), 6000);
 
-			pubsub.publish('scrolling', lastScrollY);
+			pubsub.publish('scrolling', cache.get('lastScrollY'));
 
 			// Stop ticking
 			ticking = false;
@@ -277,17 +268,17 @@ module.exports = {
 	},
 
 	resizeEvent: utils.debounce(function ( ) {
-		var prevWidth = this.viewportWidth;
-		var prevHeight = this.viewportHeight;
+		var prevWidth = cache.get('viewportWidth');
+		var prevHeight = cache.get('viewportHeight');
 
 		// Set new viewport dimensions
-		this.viewportWidth = window.innerWidth;
-		this.viewportHeight = window.innerHeight;
+		cache.set('viewportWidth', window.innerWidth);
+		cache.set('viewportHeight', window.innerHeight);
 
 		// Remove or add overflowing text and reposition cover on currently playing item
 		if (c.elems.currentItem !== null) {
-			var widthDiff = Math.abs(prevWidth - this.viewportWidth);
-			var heightDiff = Math.abs(prevHeight - this.viewportHeight);
+			var widthDiff = Math.abs(prevWidth - cache.get('viewportWidth'));
+			var heightDiff = Math.abs(prevHeight - cache.get('viewportHeight'));
 
 			// Only reflow/reposition element if the diff between
 			// previous size and new is more than 40px
@@ -308,7 +299,12 @@ module.exports = {
 		// Update position of collection top
 		c.collectionTop = utils.getElemDistanceFromDoc(c.elems.collection).top;
 
-		pubsub.publish('resize');
+		pubsub.publish('resize', {
+			width: cache.get('viewportWidth'),
+			height: cache.get('viewportHeight'),
+			prevWidth: prevWidth,
+			prevHeight: prevHeight
+		});
 	}, 250),
 
 	findOverflowingElements: function ( ) {
@@ -327,7 +323,7 @@ module.exports = {
 	},
 
 	toggleStickyHeader: function ( ) {
-		var scrollPosition = lastScrollY || window.pageYOffset;
+		var scrollPosition = cache.get('lastScrollY') || window.pageYOffset;
 		if (scrollPosition > c.collectionTop) {
 			c.elems.HTML.classList.add('sticky-header');
 		} else {
@@ -480,7 +476,7 @@ module.exports = {
 	},
 
 	scrollToPosition: function (destination, duration, callback) {
-		var start = lastScrollY;
+		var start = cache.get('lastScrollY');
 		var startTime = 0;
 		var delta = destination - start;
 
@@ -516,66 +512,10 @@ module.exports = {
 
 	scrollToElement: function (element) {
 		var rect = element.getBoundingClientRect();
-		var offsetTop = rect.top + lastScrollY;
-		var offset = (this.viewportHeight / 2) - (rect.height / 2);
+		var offsetTop = rect.top + cache.get('lastScrollY');
+		var offset = (cache.get('viewportHeight') / 2) - (rect.height / 2);
 
 		this.scrollToPosition(offsetTop - offset, 500);
-	},
-
-	showItemCover: function (target) {
-		if (this.viewportWidth < 685 || !collection.getAllItems()) { return; }
-
-		var parentNode = target.parentNode;
-		var id = parentNode.getAttribute('data-id');
-
-		var loadItemCover = function (item) {
-			var format = item.format === 'MP4' || item.format === 'GIF' ? 'video' : 'img';
-			var cdn = s.cdn + '/' + format + '/';
-			var coverContainer = parentNode.querySelector('.cover');
-			var cover = format === 'video' ? document.createElement(format) : new Image();
-
-			function appendCover ( ) {
-				cover.removeEventListener('canplay', appendCover);
-				utils.requestAnimFrame.call(window, function ( ) {
-					coverContainer.appendChild(cover);
-					setTimeout(function ( ) {
-						coverContainer.classList.add('cover-loaded');
-					}, 10);
-				});
-			}
-
-			cover.setAttribute('width', item.width);
-			cover.setAttribute('height', item.height);
-			cover.setAttribute('src', cdn + (item.format === 'GIF' ? item.video.filename : item.filename));
-
-			if (format === 'video' || item.format === 'GIF') {
-				cover.load();
-				cover.play();
-				cover.setAttribute('muted', '');
-				cover.setAttribute('loop', true);
-				cover.addEventListener('canplay', appendCover);
-			} else {
-				cover.setAttribute('alt', '');
-				cover.onload = appendCover;
-			}
-
-			target.coverLoaded = true;
-		};
-
-		var randomCoverPosition = function (item) {
-			var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
-			var margin = (4 / 100) * this.viewportWidth; // The number 4 here is the percentage
-			var leftMin = margin;
-			var leftMax = (this.viewportWidth - item.width) - margin;
-			var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
-
-			var coverContainer = target.parentNode.querySelector('[data-id="' + id + '"] .cover');
-			coverContainer.style.cssText = coverContainer.style.cssText + 'top: ' + topPos +'px; left: ' + leftPos +'px';
-		}.bind(this);
-
-		var item = collection.getItem(id).covers[0];
-		randomCoverPosition(item);
-		target.coverLoaded || loadItemCover(item);
 	},
 
 	setupAudio: function ( ) {

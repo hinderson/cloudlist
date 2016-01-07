@@ -6,7 +6,8 @@ var pubsub = require('../pubsub.js');
 var collection = require('../data/collection.js');
 var config = require('../config.js');
 var utils = require('../utils.js');
-var placeholders = require('../placeholders.js');
+var placeholders = require('../components/placeholders.js');
+var itemCover = require('../components/covers.js');
 
 // Extend config
 config.api.version = 'v1';
@@ -107,6 +108,19 @@ function stopped (id) {
 	elemLink.removeAttribute('style');
 }
 
+function resizeEvent (width, height, prevWidth, prevHeight) {
+	if (main.cache.elems.currentItem !== null) {
+		var widthDiff = Math.abs(prevWidth - width);
+		var heightDiff = Math.abs(prevHeight - height);
+
+		// Only reflow/reposition element if the diff between
+		// previous size and new is more than 40px
+		if (widthDiff >= 40 || heightDiff >= 40) {
+			itemCover.show(main.cache.elems.currentItem.firstChild);
+		}
+	}
+}
+
 main.init();
 cacheElems();
 placeholders.lazyLoad();
@@ -116,6 +130,8 @@ pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioPaused', paused);
 pubsub.subscribe('audioStopped', stopped);
 pubsub.subscribe('audioResumed', resume);
+pubsub.subscribe('itemMouseover', itemCover.show);
+pubsub.subscribe('resize', resizeEvent);
 pubsub.subscribe('historyChanged', function (event) {
 	if (!event) { resetDocumentColors(); }
 });

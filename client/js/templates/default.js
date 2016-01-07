@@ -4,6 +4,7 @@
 var main = require('../main.js');
 var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
+var itemCover = require('../components/covers.js');
 
 function cacheElems ( ) {
 	// Extends to main cache object
@@ -57,6 +58,19 @@ function failedLoading (id) {
 	elem.classList.remove(currentColor);
 }
 
+function resizeEvent (width, height, prevWidth, prevHeight) {
+	if (main.cache.elems.currentItem !== null) {
+		var widthDiff = Math.abs(prevWidth - width);
+		var heightDiff = Math.abs(prevHeight - height);
+
+		// Only reflow/reposition element if the diff between
+		// previous size and new is more than 40px
+		if (widthDiff >= 40 || heightDiff >= 40) {
+			itemCover.show(main.cache.elems.currentItem.firstChild);
+		}
+	}
+}
+
 cacheElems();
 registerEvents();
 main.init();
@@ -65,3 +79,5 @@ pubsub.subscribe('scrolling', updateParallax);
 pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioFailedLoading', failedLoading);
 pubsub.subscribe('audioStopped', stopped);
+pubsub.subscribe('itemMouseover', itemCover.show);
+pubsub.subscribe('resize', resizeEvent);
