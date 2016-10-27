@@ -1,18 +1,4 @@
 /* GENERAL */
-* {
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-}
-
-html,
-body {
-	width: 100%;
-	min-height: 100%;
-}
-
 html.scrolling {
 	pointer-events: none;
 }
@@ -24,12 +10,6 @@ body {
 	color: #fff;
 }
 
-svg {
-	display: block;
-	max-height: 100%;
-}
-
-a,
 a:visited {
 	color: #fff;
 	text-decoration: none;

@@ -1,4 +1,4 @@
-@charset 'UTF-8';
+@import "main.css";
 
 @font-face {
 	font-family: "Helvetica Neue";
@@ -6,8 +6,6 @@
 	font-style: normal;
 	src: local("Helvetica Neue"), url("/fonts/bcf54343-d033-41ee-bbd7-2b77df3fe7ba-03.woff") format("woff");
 }
-
-@import "../base";
 
 body {
 	background-color: #f2f2f2;
