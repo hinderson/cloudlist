@@ -1,60 +1,74 @@
+/* Extend global styles
+-------------------------------------------------- */
 @import "main.css";
 
-@font-face {
-	font-family: "Helvetica Neue";
-	font-weight: normal;
-	font-style: normal;
-	src: local("Helvetica Neue"), url("/fonts/bcf54343-d033-41ee-bbd7-2b77df3fe7ba-03.woff") format("woff");
-}
 
+/* Component imports
+-------------------------------------------------- */
+@import "components/_collection.css";
+@import "components/_controls.css";
+@import "components/_dialog.css";
+@import "components/_footer.css";
+@import "components/_header.css";
+@import "components/_player-ui.css";
+@import "components/_sort-collection.css";
+
+
+/* Template specific imports
+-------------------------------------------------- */
+@import "_fonts.css";
+
+
+/* Template styling
+-------------------------------------------------- */
 .hero {
 	min-height: 500px;
 	height: 100vh;
-}
 
-.hero-inner {
-	position: absolute;
-	z-index: 1;
-	width: 100%;
-	text-align: center;
-	will-change: transform;
-}
+	&-inner {
+		position: absolute;
+		z-index: 1;
+		width: 100%;
+		text-align: center;
+		will-change: transform;
 
-.hero-inner h1 {
-	margin: 9rem auto 0;
-	width: 85%;
-	max-width: 800px;
-	max-height: 340px;
+		h1 {
+			margin: 9rem auto 0;
+			width: 85%;
+			max-width: 800px;
+			max-height: 340px;
 
-	svg {
-		fill: #fff;
-	}
-}
-
-.hero-inner button {
-	display: inline-block;
-	margin-top: 3em;
-	padding: 0;
-	background: none;
-	border: 0;
-	width: 77px;
-	height: 77px;
-	cursor: pointer;
-
-	svg {
-		fill: #fff;
-	}
-
-	.pause {
-		display: none;
-	}
-
-	&.playing {
-		.play {
-			display: none;
+			svg {
+				fill: #fff;
+			}
 		}
-		.pause {
-			display: block;
+
+		button {
+			display: inline-block;
+			margin-top: 3em;
+			padding: 0;
+			background: none;
+			border: 0;
+			width: 77px;
+			height: 77px;
+			cursor: pointer;
+
+			svg {
+				fill: #fff;
+			}
+
+			.pause {
+				display: none;
+			}
+
+			&.playing {
+				.play {
+					display: none;
+				}
+				.pause {
+					display: block;
+				}
+			}
 		}
 	}
 }

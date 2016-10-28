@@ -1,0 +1,30 @@
+.header-main {
+    position: fixed;
+    top: 25px;
+    z-index: 20;
+    width: 100%;
+    pointer-events: none;
+
+    > * {
+        pointer-events: visible;
+    }
+
+    .group {
+        width: 100%;
+
+        &-inner {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    .logo {
+        width: 92px;
+        height: auto;
+        fill: #fff;
+
+        .svg-container {
+            padding-bottom: 14.706%;
+        }
+    }
+}

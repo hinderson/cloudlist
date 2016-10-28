@@ -1,0 +1,30 @@
+.sort-collection {
+	margin: 0 auto 1rem;
+	padding: 0;
+	text-align: center;
+	font-size: 0.6em;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #666;
+
+	.sticky-header & {
+		margin-bottom: 0;
+	}
+
+    span,
+    strong {
+    	cursor: pointer;
+    	user-select: none;
+    	font-weight: normal;
+    	pointer-events: visible;
+    }
+
+    strong svg {
+    	display: inline-block;
+    	vertical-align: middle;
+    	fill: #666;
+    	width: 7px;
+    	margin-left: 3px;
+    	margin-top: -2px;
+    }
+}

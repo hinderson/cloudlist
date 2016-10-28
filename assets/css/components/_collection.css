@@ -1,0 +1,305 @@
+.collection {
+	position: relative;
+	margin-bottom: 6em;
+	font-size: 2rem;
+
+    ol {
+    	margin: 0;
+        padding: 120px 0 0 0;
+    	list-style: none;
+
+        @media (max-width: 800px) {
+        	padding-top: 104px;
+        }
+
+        @media (max-width: 400px) {
+        	padding-top: 86px;
+        }
+
+        .index,
+        .time {
+        	font-size: 0.9em;
+        }
+    }
+
+    li {
+    	position: relative;
+		font-size: 1em;
+    }
+
+    a {
+    	display: block;
+    	position: relative;
+        text-decoration: none;
+    	z-index: 2;
+    	margin: 0 auto;
+    	text-align: center;
+    	will-change: opacity, background;
+
+        & > * {
+        	pointer-events: none;
+        }
+
+        &:hover,
+        &:focus {
+        	background: rgba(0, 0, 0, 0.15);
+        }
+    }
+
+    .unavailable {
+    	pointer-events: none;
+
+        a {
+        	color: #474646;
+        	pointer-events: none;
+        }
+    }
+
+    /* Columns */
+    .col {
+        display: inline-block;
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        margin-right: 3.5%;
+        padding: 19px 0;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-align: left;
+
+        &-index {
+            width: 8%;
+            max-width: 80px;
+            text-align: right;
+
+            @media (max-width: 685px) {
+                .loading &,
+                .playing &,
+                .paused & {
+                    display: none;
+                }
+            }
+        }
+
+        &-title {
+            width: 30%;
+            max-width: 300px;
+        }
+
+        &-artist {
+            width: 32%;
+            max-width: 320px;
+        }
+
+        &-time {
+            width: 10%;
+            max-width: 100px;
+            margin: 0;
+
+            .playing & .duration,
+            .paused & .duration {
+                @media (max-width: 685px) {
+                    display: none;
+                }
+
+                &::before {
+                    content: " / ";
+                }
+            }
+        }
+    }
+
+    &-sub-title {
+    	visibility: hidden;
+    	opacity: 0;
+    	margin: 0;
+    	padding: 25px 0 10px;
+    	text-align: center;
+    	font-size: 0.65em;
+    	letter-spacing: 0.2em;
+    	text-transform: uppercase;
+    	transform: translate3d(0, -100%, 0);
+    	transition: transform 0.25s, opacity 0.4s;
+    	will-change: opacity, transform;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+        	opacity: 0.7;
+        }
+
+        @media (min-width: 686px) {
+        	.no-touch.sticky-header & {
+        		position: relative;
+        		visibility: visible;
+        		opacity: 1;
+        		transform: translate3d(0, 0, 0);
+        		pointer-events: visible;
+        	}
+        }
+    }
+
+    /* States */
+    .loading a,
+    .playing a {
+    	color: #000;
+    	transition: background 0.45s;
+    }
+
+    .paused a {
+    	color: #000;
+    	-webkit-transition: background 0.2s;
+    	transition: background 0.2s;
+    }
+
+    .state-icon {
+    	position: absolute;
+    	height: 100%;
+    	z-index: 2;
+    	fill: #000;
+    }
+
+    @media (max-width: 685px) {
+    	.loading .state-icon,
+    	.playing .state-icon,
+    	.paused .state-icon {
+    		display: inline-block;
+    		position: relative;
+    		z-index: 2;
+    		overflow: hidden;
+    		margin-right: 3.5%;
+    		text-overflow: ellipsis;
+    		vertical-align: middle;
+    		white-space: nowrap;
+    		width: 9%;
+    		max-width: 90px;
+    	}
+    }
+
+    @media (max-width: 400px) {
+    	.loading .state-icon,
+    	.playing .state-icon,
+    	.paused .state-icon {
+    		width: 7%;
+    	}
+    }
+
+    .state-loading,
+    .state-playing,
+    .state-paused {
+    	display: none;
+    	width: 16px;
+    	height: 100%;
+    	margin-left: auto;
+
+    	@media (max-width: 685px) {
+    		width: 14px;
+    	}
+    }
+
+    .loading .state-loading,
+    .playing .state-playing,
+    .paused .state-paused {
+    	display: block;
+    }
+
+	/* Overflowing spans */
+	.scroll-overflow {
+		font-size: 0; /* Reset weird line-height bug for inline-block elements */
+
+		& span {
+			display: inline-block;
+			padding-right: 50px;
+			font-size: 1em;
+			animation-name: scroll-overflow;
+			animation-duration: 15s;
+			animation-iteration-count: infinite;
+			animation-timing-function: linear;
+			transform: translateZ(0);
+			will-change: transform;
+			backface-visibility: hidden;
+
+			@media (max-width: 685px) {
+				padding-right: 20px;
+			}
+		}
+
+		/* Control scoll speed based on character count */
+		&[data-char-count^="2"] span { animation-duration: 13.5s; }
+		&[data-char-count^="3"] span { animation-duration: 14s; }
+		&[data-char-count^="4"] span { animation-duration: 15.5s; }
+		&[data-char-count^="5"] span { animation-duration: 16s; }
+		&[data-char-count^="6"] span { animation-duration: 16.5s; }
+		&[data-char-count^="6"] span { animation-duration: 17s; }
+	}
+
+	/* Cover */
+	.cover {
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 0;
+		box-shadow: 0 1px 7px rgba(0, 0, 0, 0.45);
+		will-change: transform, opacity;
+
+		@media (max-width: 685px) {
+			display: none !important;
+		}
+
+		.placeholder {
+			display: none;
+		}
+
+		img,
+		video {
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			visibility: hidden;
+			opacity: 0;
+			transition: visibility 0s linear 0s, opacity 0.15s linear 0s;
+		}
+	}
+}
+
+.collection ol:hover .cover-loaded img,
+.collection ol:focus .cover-loaded img,
+.collection ol:hover .cover-loaded video,
+.collection ol:focus .cover-loaded video {
+	opacity: 0.4;
+}
+
+.collection .playing .cover,
+.collection .paused .cover,
+.collection .loading .cover,
+.collection li:hover .cover,
+.collection li:focus .cover {
+	display: block;
+}
+
+.collection .playing .cover-loaded img,
+.collection .paused .cover-loaded img,
+.collection .loading .cover-loaded img,
+.collection li:hover .cover-loaded img,
+.collection li:focus .cover-loaded img,
+.collection .playing .cover-loaded video,
+.collection .paused .cover-loaded video,
+.collection .loading .cover-loaded video,
+.collection li:hover .cover-loaded video,
+.collection li:focus .cover-loaded video {
+	opacity: 1;
+}
+
+.collection li:hover .cover,
+.collection li:focus .cover {
+	z-index: 1;
+}
+
+.collection .cover-loaded img,
+.collection .cover-loaded video {
+	visibility: visible;
+	opacity: 1;
+}

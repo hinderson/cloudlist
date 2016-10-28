@@ -20,10 +20,7 @@ var postCssProcessors = [
 
 // Post CSS task for use in development
 gulp.task('css:dev', function ( ) {
-	return gulp.src([
-			'./assets/css/main.css',
-			'./assets/css/templates/**/*.css'
-		])
+	return gulp.src('./assets/css/templates/**/*.css')
 		.pipe(sourcemaps.init())
 		.pipe(postcss(postCssProcessors))
 		.pipe(sourcemaps.write('.'))
@@ -32,10 +29,7 @@ gulp.task('css:dev', function ( ) {
 
 // Default watch task for use in development
 gulp.task('watch', function ( ) {
-	gulp.watch([
-		'./assets/css/main.css',
-		'./assets/css/templates/**/*.css'
-	], ['css:dev']);
+	gulp.watch('./assets/css/**/*.css', ['css:dev']);
 });
 
 // Default dev task

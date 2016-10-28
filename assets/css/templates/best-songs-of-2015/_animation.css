@@ -1,0 +1,16 @@
+@keyframes fadeInHero {
+	0% { opacity: 0; }
+	85% { opacity: 1; }
+	100% { opacity: 1; }
+}
+
+@keyframes loader-pulsate {
+    0% { visibility: visible; opacity: 1.0; }
+    50% { visibility: hidden; opacity: 0; }
+    100% { visibility: visible; opacity: 1.0; }
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
