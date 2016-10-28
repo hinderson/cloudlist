@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "gulp & gulp watch & node ./bin/www"
+    "dev": "gulp & gulp watch & mongod & node ./bin/www"
   },
   "dependencies": {
     "async": "~0.9.0",
@@ -34,6 +34,7 @@
     "node-ffprobe": "~1.2.2",
     "node-fs": "~0.1.7",
     "normalize.css": "~3.0.2",
+    "pug": "^2.0.0-beta6",
     "request": "~2.55.0",
     "serve-favicon": "~2.2.0",
     "shortid": "~2.2.2",

@@ -1,7 +1,7 @@
 noscript
     div#noscript-warning
         a.close-dialog(href="#noscript-warning")
-            span.structural Close
+            span.visuallyhidden Close
             | <svg viewBox="0 0 23.746 23.746"><use xlink:href="#icon-close"></use></svg>
         h4 :(
         p It seems you have disabled JavaScript in your browser.
@@ -15,8 +15,8 @@ if single
     script.
         var autostart = '#{obfuscatedId}';
 if prod
-    script(src="#{config.cdn}/js/#{assets.scripts['common.js']}")
-    script(src="#{config.cdn}/js/#{assets.scripts[collection.template + '.js']}")
+    script(src=config.cdn + "/js/" + assets.scripts['common.js'])
+    script(src=config.cdn + "/js/" + assets.scripts[collection.template + '.js'])
 else
-    script(src="#{config.host.protocol}://#{config.host.name}/js/build/common.js")
-    script(src="#{config.host.protocol}://#{config.host.name}/js/build/#{collection.template}.js")
+    script(src=config.host.protocol + "://" + config.host.name + "/js/build/common.js")
+    script(src=config.host.protocol + "://" + config.host.name + "/js/build/" + collection.template + ".js")

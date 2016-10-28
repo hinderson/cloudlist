@@ -9,19 +9,19 @@
 -	}
 
 doctype html
-html(lang="en-US", class="no-js #{collection.template}")
-	include ./includes/head.jade
+html(lang="en", class="no-js " + collection.template)
+	include ./includes/head
 	body
 		include ../client/img/icon-sprite.svg
 
-		header(class="main-header inner", role="banner")
+		header(class="main-header", role="banner")
 			block header
 
 		main(role="main")
 			block content
 
 		footer(role="contentinfo")
-			include ./includes/footer.jade
+			small.visuallyhidden= "Copyright " + new Date().getFullYear()
 
-		include ./includes/dialog-options.jade
-		include ./includes/scripts.jade
+		include ./includes/dialog-options
+		include ./includes/scripts

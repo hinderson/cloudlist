@@ -26,7 +26,7 @@ app.use(favicon(__dirname + '/client/favicon.ico'));
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 // Send globals
 app.locals.config = config;
@@ -100,7 +100,7 @@ require('./routes')(app);
 // Handle 404
 app.use(function (req, res) {
 	res.status(400);
-	res.render('404.jade', { title: '404: Page Not Found' });
+	res.render('404.pug', { title: '404: Page Not Found' });
 });
 
 // Handle 500

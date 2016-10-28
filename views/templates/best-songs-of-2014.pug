@@ -2,18 +2,18 @@ extends ../layout
 
 block header
 	a(href="/", title="Go to main page")
-		span.structural Cloudlist
+		span.visuallyhidden Cloudlist
 		div.logo
 			include ../../client/img/cloudlist-logo.svg
 	div.controls
 		button.fullscreen
-			span.structural Toggle fullscreen mode
+			span.visuallyhidden Toggle fullscreen mode
 			include ../../client/img/icon-fullscreen.svg
 		button.info-toggle
-			span.structural Toggle info screen
+			span.visuallyhidden Toggle info screen
 			include ../../client/img/icon-info.svg
 		button.play-state
-			span.structural Toggle play/pause
+			span.visuallyhidden Toggle play/pause
 			div.play
 				include ../../client/img/icon-state-play.svg
 			div.pause
@@ -21,7 +21,7 @@ block header
 		input.volume-slider(type="range", step="1", value="90", min="0", max="100")
 
 block content
-	section.hero.group
+	section.hero
 		div.hero-inner
 			h1.collection-title
 				div(data-string="Best")
@@ -45,11 +45,11 @@ block content
 					span 4
 
 	- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
-	section.collection.group(data-id="#{obfuscatedCollectionId}")
+	section.collection(data-id="#{obfuscatedCollectionId}")
 		header.collection-header
 			div.header-shadow
 			h3.collection-sub-title #{collection.title}
-			h4.structural Sort tracks:
+			h4.visuallyhidden Sort tracks:
 			ul(class="sort group")
 				li.col.index(data-sort-type="index")
 					strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
@@ -59,7 +59,7 @@ block content
 					span Artist
 				li.col.time(data-sort-type="time")
 					span Time
-		h3.structural.
+		h3.visuallyhidden.
 			Song list
 		ol
 			each song, index in songs
