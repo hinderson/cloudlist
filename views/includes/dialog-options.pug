@@ -51,12 +51,12 @@ div.dialog(aria-hidden="true")
                 h4 Export options
             ul
                 li
-                    a.export-to-spotify(href="https://accounts.spotify.com/authorize?client_id=89b926650c4f4576b4799ae98421a20d&response_type=code&redirect_uri=#{config.host.protocol}://#{config.host.name}/spotify/callback&scope=playlist-modify-private%20playlist-modify-public&state=#{obfuscatedCollectionId}", target="_blank")
+                    a.export-to-spotify(href="https://accounts.spotify.com/authorize?client_id=89b926650c4f4576b4799ae98421a20d&response_type=code&redirect_uri=" + config.host.protocol + "://" + config.host.name + "/spotify/callback&scope=playlist-modify-private%20playlist-modify-public&state=" + obfuscatedCollectionId, target="_blank")
                         span.icon
                             include ../../client/img/icon-spotify.svg
                         | Export playlist to Spotify
                 li
-                    a.download-csv(href="#{config.host.protocol}://#{config.host.name}/download-as-csv?id=#{obfuscatedCollectionId}", target="_blank")
+                    a.download-csv(href=config.host.protocol + "://" + config.host.name + "/download-as-csv?id=" + obfuscatedCollectionId, target="_blank")
                         span.icon
                             include ../../client/img/icon-file-csv.svg
                         | Download playlist in CSV format

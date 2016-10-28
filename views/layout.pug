@@ -11,16 +11,82 @@
 doctype html
 html(lang="en", class="no-js " + collection.template)
 	include ./includes/head
+
 	body
-		include ../client/img/icon-sprite.svg
-
-		header(class="main-header", role="banner")
+		header(class="header-main", role="banner")
 			block header
+				div.group
+					div.group-inner
+						a(href="/", title="Go to main page")
+							span.visuallyhidden Cloudlist
+							div.logo
+								span.svg-container
+									include ../client/img/cloudlist-logo.svg
+						div.controls
+							input.volume-slider(type="range", step="1", value="90", min="0", max="100")
+							button.play-state
+								span.visuallyhidden Toggle play/pause
+								div.play
+									span.svg-container
+										include ../client/img/icon-state-play.svg
+								div.pause
+									span.svg-container
+										include ../client/img/templates/best-songs-of-2015/icon-state-pause.svg
+							button.info-toggle
+								span.visuallyhidden Toggle info screen
+								span.svg-container
+									include ../client/img/templates/best-songs-of-2015/icon-info.svg
+							button.fullscreen
+								span.visuallyhidden Toggle fullscreen mode
+								span.svg-container
+									include ../client/img/templates/best-songs-of-2015/icon-fullscreen.svg
 
-		main(role="main")
+		main(class="content-main", role="main")
 			block content
+				block hero
 
-		footer(role="contentinfo")
+				block collection
+					- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
+					section.collection(data-id=obfuscatedCollectionId)
+						block collectionHeader
+							header.collection-header
+								div.header-shadow
+									div.gradient
+
+								block collectionSubtitle
+
+								block collectionSort
+									strong.visuallyhidden Sort tracks:
+									ul(class="sort-collection")
+										li(class="col col-index", data-sort-type="index")
+											strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
+										li(class="col col-title", data-sort-type="title")
+											span Title
+										li(class="col col-artist", data-sort-type="artist")
+											span Artist
+										li(class="col col-time", data-sort-type="time")
+											span Time
+
+						block collectionList
+							h3.visuallyhidden Song list
+							ol
+								each song, index in songs
+									- var obfuscatedId = hashids.encodeHex(song._id);
+									- song = structureSong(song);
+
+									li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
+										a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/")
+											div.col.col-index= index+1
+											div.col.col-title
+												span= song.title
+											div.col.col-artist
+												span= song.combinedartist
+											div.col.col-time
+												span.duration= song.duration
+										div.cover
+
+
+		footer(class="footer-main", role="contentinfo")
 			small.visuallyhidden= "Copyright " + new Date().getFullYear()
 
 		include ./includes/dialog-options

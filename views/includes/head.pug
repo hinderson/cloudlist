@@ -7,7 +7,6 @@ head
 	link(rel="icon", type="image/png", href=config.cdn + "/favicon-16x16.png", sizes="16x16")
 
 	meta(name="viewport", content="width=device-width,initial-scale=1.0")
-	meta(name="keywords", content="music, best of the year, playlist, best tracks of 2014, songs, tracks, electronica, hiphop, hip-hop, pop, rock, indie, 2014, soundcloud, stream, mp3")
 	meta(name="description", content="Cloudlist is a WYSIWYG playlist creation and publishing tool based on SoundCloud.")
 
 	meta(property="og:site_name", content="Cloudlist")
@@ -29,4 +28,4 @@ head
 	if prod
 		link(href=config.cdn + "/css/" + assets.styles['templates/' + collection.template + '.css'], rel="stylesheet")
 	else
-		link(href=config.host.protocol + "://" + config.host.name + "/assets/css/" + collection.template + ".css", rel="stylesheet")
+		link(href=config.host.protocol + "://" + config.host.name + "/assets/css/" + collection.template + "/main.css", rel="stylesheet")

@@ -1,29 +1,6 @@
 extends ../layout
 
-block header
-	div.group
-		div.group-inner
-			a(href="/", title="Go to main page")
-				span.visuallyhidden Cloudlist
-				div.logo
-					include ../../client/img/cloudlist-logo.svg
-			div.controls
-				button.fullscreen
-					span.visuallyhidden Toggle fullscreen mode
-					include ../../client/img/templates/best-songs-of-2015/icon-fullscreen.svg
-				button.info-toggle
-					span.visuallyhidden Toggle info screen
-					include ../../client/img/templates/best-songs-of-2015/icon-info.svg
-				button.play-state
-					span.visuallyhidden Toggle play/pause
-					div.play
-						include ../../client/img/icon-state-play.svg
-					div.pause
-						include ../../client/img/templates/best-songs-of-2015/icon-state-pause.svg
-				input.volume-slider(type="range", step="1", value="90", min="0", max="100")
-
-block content
-	- var cdn = prod ? config.cdn : config.host.protocol + '://' + config.host.name;
+block hero
 	section.hero
 		div.hero-inner
 			div.collection-title
@@ -32,40 +9,29 @@ block content
 					span.visuallyhidden collection.title
 					include ../../client/img/templates/best-songs-of-2015/banner.svg
 
-	- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
-	section.collection(data-id=obfuscatedCollectionId)
-		header.collection-header
-			div.header-shadow
-				div.gradient
-			div.collection-sub-title
-				include ../../client/img/templates/best-songs-of-2015/banner-small.svg
-			h4.visuallyhidden Sort tracks:
-			ul(class="sort group")
-				li.col.index(data-sort-type="index")
-					strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
-				li.col.title(data-sort-type="title")
-					span Title
-				li.col.artist(data-sort-type="artist")
-					span Artist
-				li.col.time(data-sort-type="time")
-					span Time
-		h3.visuallyhidden.
-			Song list
-		ol
-			each song, index in songs
-				- var obfuscatedId = hashids.encodeHex(song._id);
-				- song = structureSong(song);
+block collectionSubtitle
+	div.collection-sub-title
+		include ../../client/img/templates/best-songs-of-2015/banner-small.svg
 
-				li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId, data-index=index+1, data-artist=song.combinedartist, data-title=song.title)
-					a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/", data-color-contrast=song.covers[0].colors.contrast)
-						div.col.index= index+1
-						div.col.title
-							span= song.title
-						div.col.artist
-							span= song.combinedartist
-						div.col.time
-							span.duration= song.duration
-					div.cover(style="background: rgb(" + song.covers[0].colors.primary + ");")
+block collectionList
+	h3.visuallyhidden Song list
+	ol
+		each song, index in songs
+			- var obfuscatedId = hashids.encodeHex(song._id);
+			- song = structureSong(song);
+
+			li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
+				a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/", data-color-contrast=song.covers[0].colors.contrast)
+					div.col.col-index= index+1
+					div.col.col-title
+						span= song.title
+					div.col.col-artist
+						span= song.combinedartist
+					div.col.col-time
+						span.duration= song.duration
+				div.cover(style="background: rgb(" + song.covers[0].colors.primary + ");")
+
+append collection
 	footer.go-to-top
 		a(href="#top")
 			include ../../client/img/icon-arrow-up.svg

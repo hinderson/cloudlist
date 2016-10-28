@@ -1,26 +1,7 @@
 extends ../layout
 
-block header
-	a(href="/", title="Go to main page")
-		span.visuallyhidden Cloudlist
-		div.logo
-			include ../../client/img/cloudlist-logo.svg
-	div.controls
-		button.fullscreen
-			span.visuallyhidden Toggle fullscreen mode
-			include ../../client/img/icon-fullscreen.svg
-		button.info-toggle
-			span.visuallyhidden Toggle info screen
-			include ../../client/img/icon-info.svg
-		button.play-state
-			span.visuallyhidden Toggle play/pause
-			div.play
-				include ../../client/img/icon-state-play.svg
-			div.pause
-				include ../../client/img/icon-state-pause.svg
-		input.volume-slider(type="range", step="1", value="90", min="0", max="100")
-
-block content
+block hero
+	- var cdn = prod ? config.cdn : config.host.protocol + '://' + config.host.name;
 	section.hero
 		div.hero-inner
 			h1.collection-title
@@ -31,51 +12,13 @@ block content
 				| <svg viewBox="0 0 612 612" class="play"><use xlink:href="#icon-play-main"></use></svg>
 				| <svg viewBox="0 0 612 612" class="pause"><use xlink:href="#icon-pause-main"></use></svg>
 		if prod
-			img.collection-hero(src="#{config.cdn}/media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
+			img.collection-hero(src=config.cdn + "media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
 		else
-			img.collection-hero(src="#{config.host.protocol}://#{config.host.name}/media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
+			img.collection-hero(src=config.host.protocol + "://" + config.host.name + "/media/img/oblique-strategies-hero.jpg", width="338", height="454", alt="")
 
-	- var obfuscatedCollectionId = hashids.encodeHex(collection._id);
-	section.collection(data-id="#{obfuscatedCollectionId}")
-		header.collection-header
-			div.header-shadow
-			h3.collection-sub-title #{collection.title}
-			h4.visuallyhidden Sort tracks:
-			ul(class="sort group")
-				li.col.index(data-sort-type="index")
-					strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
-				li.col.title(data-sort-type="title")
-					span Title
-				li.col.artist(data-sort-type="artist")
-					span Artist
-				li.col.time(data-sort-type="time")
-					span Time
-		h3.visuallyhidden.
-			Song list
-		ol
-			each song, index in songs
-				- var obfuscatedId = hashids.encodeHex(song._id);
-				- song = structureSong(song);
-
-				li(class=song.available === true ? undefined : "unavailable", data-id="#{obfuscatedId}", data-index="#{index+1}", data-artist="#{song.combinedartist}", data-title="#{song.title}")
-					a(href="#{config.host.protocol}://#{config.host.name}/#{path}/#{song.permalink}/")
-						span.state-icon
-							| <svg viewBox="0 0 73.784 58.753" class="state-playing"><use xlink:href="#icon-audio-playing"></use></svg>
-							| <svg viewBox="0 0 73.784 58.753" class="state-paused"><use xlink:href="#icon-audio-paused"></use></svg>
-						div.col.index #{index+1}
-						div.col.title
-							span #{song.title}
-						div.col.artist
-							span #{song.combinedartist}
-						div.col.time
-							span.duration #{song.duration}
-					- var placeholder = song.covers[0].placeholder;
-					if (placeholder)
-						div.cover.placeholder(style="background: #{song.covers[0].placeholder.gradient}; width: #{song.covers[0].width}px; height: #{song.covers[0].height}px;")
-					else
-						div.cover.placeholder(style="width: #{song.covers[0].width}px; height: #{song.covers[0].height}px;")
+append collection
 	footer.go-to-top
-		a(href="#top") Top ↑
+			a(href="#top") Top ↑
 
 block dialog
 	small All tracks and images are © of their respective owners.
