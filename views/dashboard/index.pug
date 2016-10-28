@@ -3,7 +3,7 @@ html(lang="en-US")
 	head
 		meta(charset="utf-8")
 		title= config.document.title
-		link(rel="stylesheet", href="/css/dashboard.css")
+		link(rel="stylesheet", href="/assets/css/dashboard/dashboard.css")
 	body
 		header(role="banner")
 			h1
@@ -25,12 +25,12 @@ html(lang="en-US")
 								input(type="checkbox", checked)
 							div.image
 								if collection.covers && collection.covers[0]
-									div.img(style="background-image:url(../media/img/#{collection.covers[0].src});", title="#{collection.covers[0].src}")
+									div.img(style="background-image:url(../media/img/" + collection.covers[0].src + ");", title=collection.covers[0].src)
 							div.title
-								a(href="/hinderson/#{obfuscatedId}/edit/") #{collection.title}
+								a(href="/hinderson/" + obfuscatedId + "/edit/")= collection.title
 							div.stats Songs: #{collection.items.length}
 							div.actions
-								form(name="delete-collection", method="post", action="/delete-collection/#{obfuscatedId}", enctype="multipart/form-data")
+								form(name="delete-collection", method="post", action="/delete-collection/" + obfuscatedId, enctype="multipart/form-data")
 									button(type="submit").delete ✕ Delete
 
 						-	}
@@ -41,7 +41,7 @@ html(lang="en-US")
 			section.create-playlist
 				h2 Create new playlist
 				- var obfuscatedUserId = hashids.encodeHex(user._id);
-				form(name="create-collection", method="post", action="/create-collection/#{obfuscatedUserId}", enctype="multipart/form-data")
+				form(name="create-collection", method="post", action="/create-collection/" + obfuscatedUserId, enctype="multipart/form-data")
 					fieldset.metadata
 						h3 Title
 						label Title
