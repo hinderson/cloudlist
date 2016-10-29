@@ -91,7 +91,6 @@ var play = function (id, time) {
 			audioElement.currentTime = time || Math.max((song.audio.starttime / 1000), 0);
 		},
 		onPlay: function ( ) {
-			console.log('PLAYING EVENT', currentState);
 			if (currentState === 'playing') { return; } // Sometimes a canPlay event is sent twice
 			setState('playing');
 			pubsub.publish('audioPlaying', id);

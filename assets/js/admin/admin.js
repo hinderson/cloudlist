@@ -1,3 +1,8 @@
+// Requires
+var $ = require('webpack-zepto');
+var id3 = require('./libs/id3.js');
+var Slip = require('./libs/slip.js');
+
 var gradify = function (image) {
 	// Colors which do not catch the eye
 	var ignoredColors = [[0,0,0,], [255,255,255]];

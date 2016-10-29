@@ -11,10 +11,6 @@ var placeholders = require('../placeholders.js');
 // Extend config
 config.api.version = 'v1';
 
-function cacheElems ( ) {
-	main.cache.elems.collectionH1 = main.cache.elems.collectionTitle.querySelector('h1');
-}
-
 function updateParallax (lastScrollY) {
 	var translateY3d = function (elem, value) {
 		var translate = 'translate3d(0px,' + value + 'px, 0px)';
@@ -31,11 +27,6 @@ function updateParallax (lastScrollY) {
 
 	translateY3d(main.cache.elems.collectionTitle, translateValue);
 }
-
-var windowLoaded = false;
-window.addEventListener('load', function ( ) {
-	windowLoaded = true;
-});
 
 function updateHero (lastScrollY) {
 	// Bail if we've reached the collection
@@ -67,9 +58,6 @@ function updateDocumentColors (rgb, contrast) {
 
 	var bgContrast = utils.getContrastYIQ(lighterColor.split(','));
 	main.cache.elems.body.setAttribute('data-color-contrast', bgContrast);
-
-	// Update hero header
-	//main.cache.elems.collectionH1.style.fill = 'rgb(' + rgb + ')';
 }
 
 function resetDocumentColors ( ) {
@@ -108,9 +96,9 @@ function stopped (id) {
 }
 
 main.init();
-cacheElems();
 placeholders.lazyLoad();
 
+// Event messages
 pubsub.subscribe('scrolling', updateHero);
 pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioPaused', paused);
@@ -119,3 +107,12 @@ pubsub.subscribe('audioResumed', resume);
 pubsub.subscribe('historyChanged', function (event) {
 	if (!event) { resetDocumentColors(); }
 });
+
+// Events
+var elemGoToTop = document.querySelector('.go-to-top');
+if (elemGoToTop) {
+	elemGoToTop.addEventListener('click', function (e) {
+		utils.scrollToPosition(0, 400);
+		e.preventDefault();
+	});
+}

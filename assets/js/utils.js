@@ -81,6 +81,57 @@ utils = {
 		}
 	},
 
+	scrollToPosition: function (destination, duration, callback) {
+    	var start = window.pageYOffset;
+    	var startTime = 0;
+    	var delta = destination - start;
+
+    	// Default easing function
+    	function easing (t, b, c, d) {
+    		t /= d / 2;
+    		if (t < 1) {
+    			return c / 2 * t * t * t + b;
+    		}
+    		t -= 2;
+    		return c / 2 * (t * t * t + 2) + b;
+    	}
+
+    	function loop (time) {
+    		startTime || (startTime = time); // jshint ignore:line
+    		var runTime = time - startTime;
+
+    		if (duration > runTime) {
+    			utils.requestAnimFrame.call(window, loop);
+    			window.scrollTo(0, easing(runTime, start, delta, duration));
+    		} else {
+    			if (destination !== delta + start) {
+    				window.scrollTo(0, delta + start);
+    			}
+    			if (typeof callback === 'function') {
+    				callback(+new Date());
+    			}
+    		}
+    	}
+
+    	utils.requestAnimFrame.call(window, loop);
+    },
+
+    scrollToElement: function (element, duration, offset) {
+        offset = offset || 0;
+    	var rect = element.getBoundingClientRect();
+    	var offsetTop = rect.top + window.pageYOffset - offset;
+
+    	utils.scrollToPosition(offsetTop, duration || 500);
+    },
+
+    scrollToAnchor: function (e, offset) {
+        e.preventDefault();
+        var href = e.target.getAttribute('href');
+        var hash = utils.getUrlParams(href).hash;
+        var section = document.querySelector(hash);
+        utils.scrollToElement(section, 500, offset);
+    },
+
 	vendorPrefix: function ( ) {
 		var styles = window.getComputedStyle(document.documentElement, ''),
 			pre = (Array.prototype.slice

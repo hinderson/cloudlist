@@ -106,8 +106,8 @@ module.exports = {
 			collectionSubTitle: document.getElementsByClassName('collection-sub-title')[0],
 			collection: document.getElementsByClassName('collection')[0],
 			collectionItems: document.querySelectorAll('.collection ol li'),
-			scrollableOverflowElems: document.querySelectorAll('.collection ol .artist, .collection ol .title'),
-			sort: document.getElementsByClassName('sort')[0],
+			scrollableOverflowElems: document.querySelectorAll('.collection ol .col-artist, .collection ol .col-title'),
+			sort: document.getElementsByClassName('sort-collection')[0],
 			dialog: document.getElementsByClassName('dialog')[0],
 			closeDialog: document.getElementsByClassName('close-dialog')[0],
 			dialogOverlay: document.getElementsByClassName('dialog-overlay')[0],
@@ -116,7 +116,6 @@ module.exports = {
 			fullscreen: document.getElementsByClassName('fullscreen')[0],
 			volume: document.getElementsByClassName('volume-slider')[0],
 			options: document.getElementsByClassName('options')[0],
-			goToTop: document.getElementsByClassName('go-to-top')[0].firstChild,
 			currentItem: null
 		},
 		mousePosition: {
@@ -189,14 +188,9 @@ module.exports = {
 			audio.setVolume(e.target.value / 100);
 		}.bind(this));
 
-		c.elems.goToTop.addEventListener('click', function (e) {
-			e.preventDefault();
-			this.scrollToPosition(0, 400);
-		}.bind(this));
-
 		c.elems.collectionSubTitle.addEventListener('click', function (e) {
-			this.scrollToPosition(0, 400);
-		}.bind(this));
+			utils.scrollToPosition(0, 400);
+		});
 
 		document.addEventListener('mousemove', this.mouseEvent.bind(this));
 		window.addEventListener('scroll', this.scrollEvent.bind(this));
@@ -250,7 +244,7 @@ module.exports = {
 			this.focusInterval = window.setTimeout(function ( ) {
 				var elem = c.elems.currentItem;
 				if (elem && !utils.inViewport(elem, 250) && audio.getState() === 'playing') {
-					this.scrollToElement(elem);
+					utils.scrollToElement(elem);
 				} else {
 					window.clearTimeout(this.focusInterval);
 				}
@@ -467,7 +461,7 @@ module.exports = {
 			});
 		};
 
-		var items = target.children;
+		var items = target.querySelector('.cols').children;
 		utils.forEach(items, function (index, item) {
 			if (!item.classList.contains('overflow')) { return; }
 
@@ -477,49 +471,6 @@ module.exports = {
 				triggerScrolling(item);
 			}
 		});
-	},
-
-	scrollToPosition: function (destination, duration, callback) {
-		var start = lastScrollY;
-		var startTime = 0;
-		var delta = destination - start;
-
-		// Default easing function
-		function easing (t, b, c, d) {
-			t /= d / 2;
-			if (t < 1) {
-				return c / 2 * t * t * t + b;
-			}
-			t -= 2;
-			return c / 2 * (t * t * t + 2) + b;
-		}
-
-		function loop (time) {
-			startTime || (startTime = time);
-			var runTime = time - startTime;
-
-			if (duration > runTime) {
-				utils.requestAnimFrame.call(window, loop);
-				window.scrollTo(0, easing(runTime, start, delta, duration));
-			} else {
-				if (destination !== delta + start) {
-					window.scrollTo(0, delta + start);
-				}
-				if (typeof callback === 'function') {
-					callback(+new Date());
-				}
-			}
-		}
-
-		utils.requestAnimFrame.call(window, loop);
-	},
-
-	scrollToElement: function (element) {
-		var rect = element.getBoundingClientRect();
-		var offsetTop = rect.top + lastScrollY;
-		var offset = (this.viewportHeight / 2) - (rect.height / 2);
-
-		this.scrollToPosition(offsetTop - offset, 500);
 	},
 
 	showItemCover: function (target) {
@@ -615,7 +566,7 @@ module.exports = {
 
 			// Scroll to track if out of bounds
 			if (!utils.inViewport(elem, 250)) {
-				this.scrollToElement(elem);
+				utils.scrollToElement(elem);
 			}
 		}.bind(this));
 
@@ -639,7 +590,7 @@ module.exports = {
 			history.updateDocumentTitle(documentTitle);
 
 			// Insert duration element
-			var time = elem.getElementsByClassName('time')[0];
+			var time = elem.getElementsByClassName('col-time')[0];
 			var firstChild = time.firstChild;
 			currentProgress = document.createElement('span');
 			utils.requestAnimFrame.call(window, function ( ) {
@@ -685,7 +636,7 @@ module.exports = {
 			history.updateDocumentTitle(documentTitle);
 
 			// Scroll to track
-			this.scrollToElement(elem);
+			utils.scrollToElement(elem);
 
 			// Set global state
 			c.elems.playStateBtn.classList.add('playing');
@@ -726,7 +677,7 @@ module.exports = {
 				audio.play(id);
 			} else {
 				audio.stop();
-				this.scrollToPosition(0, 400);
+				utils.scrollToPosition(0, 400);
 			}
 		}.bind(this));
 
