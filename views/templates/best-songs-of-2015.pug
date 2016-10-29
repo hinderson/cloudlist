@@ -6,7 +6,7 @@ block hero
 			div.collection-title
 				p This is a list of the year’s 100 best songs, curated by <a href="https://twitter.com/hinderson">@hinderson</a>.
 				h1
-					span.visuallyhidden collection.title
+					span.visuallyhidden= collection.title
 					include ../../client/img/templates/best-songs-of-2015/banner.svg
 
 block collectionSubtitle
@@ -22,19 +22,22 @@ block collectionList
 
 			li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
 				a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/", data-color-contrast=song.covers[0].colors.contrast)
-					div.col.col-index= index+1
-					div.col.col-title
-						span= song.title
-					div.col.col-artist
-						span= song.combinedartist
-					div.col.col-time
-						span.duration= song.duration
+					div.cols
+						div.col.col-index= index+1
+						div.col.col-title
+							span= song.title
+						div.col.col-artist
+							span= song.combinedartist
+						div.col.col-time
+							span.duration= song.duration
 				div.cover(style="background: rgb(" + song.covers[0].colors.primary + ");")
 
 append collection
 	footer.go-to-top
 		a(href="#top")
-			include ../../client/img/icon-arrow-up.svg
+			div.icon(aria-hidden="true")
+				span.svg-container
+					include ../../client/img/icon-arrow-up.svg
 
 block dialog
 	p Cloudlist is by <a href="http://hinderson.com/">Hinderson</a>. Previous years: <strike>2011</strike>, <a href="http://xn--retsbsta-4zae.se/2012/" target="_blank">2012</a>, <a href="http://xn--retsbsta-4zae.se/" target="_blank">2013</a>, <a href="https://www.cloudlist.io/best-songs-of-2014/" target="_blank">2014</a>.
