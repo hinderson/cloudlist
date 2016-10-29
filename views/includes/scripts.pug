@@ -18,5 +18,5 @@ if prod
     script(src=config.cdn + "/js/" + assets.scripts['common.js'])
     script(src=config.cdn + "/js/" + assets.scripts[collection.template + '.js'])
 else
-    script(src=config.host.protocol + "://" + config.host.name + "/js/build/common.js")
-    script(src=config.host.protocol + "://" + config.host.name + "/js/build/" + collection.template + ".js")
+    script(src=config.host.protocol + "://" + config.host.name + "/assets/js/common.js")
+    script(src=config.host.protocol + "://" + config.host.name + "/assets/js/" + collection.template + ".js")
