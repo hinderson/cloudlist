@@ -8,7 +8,6 @@
 @import "components/_collection.css";
 @import "components/_controls.css";
 @import "components/_dialog.css";
-@import "components/_footer.css";
 @import "components/_header.css";
 @import "components/_player-ui.css";
 @import "components/_sort-collection.css";
@@ -21,6 +20,19 @@
 
 /* Template styling
 -------------------------------------------------- */
+body {
+	background: #191818;
+	color: #fff;
+	-webkit-font-smoothing: antialiased;
+}
+
+a,
+a:visited {
+	color: #fff;
+	text-decoration: none;
+	outline: 0;
+}
+
 .hero {
 	min-height: 500px;
 	height: 100vh;

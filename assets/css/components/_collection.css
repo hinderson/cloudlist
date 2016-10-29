@@ -1,7 +1,7 @@
 .collection {
 	position: relative;
 	margin-bottom: 6em;
-	font-size: 2rem;
+	font-size: var(--collection-font-size);
 
     ol {
     	margin: 0;
@@ -16,10 +16,17 @@
         	padding-top: 86px;
         }
 
-        .index,
-        .time {
+        .col-index,
+        .col-time {
         	font-size: 0.9em;
         }
+
+		.col-artist,
+		.col-title {
+			span {
+				font-size: calc(var(--collection-font-size) * 0.99);
+			}
+		}
     }
 
     li {
@@ -55,61 +62,6 @@
         }
     }
 
-    /* Columns */
-    .col {
-        display: inline-block;
-        position: relative;
-        z-index: 2;
-        overflow: hidden;
-        margin-right: 3.5%;
-        padding: 19px 0;
-        text-overflow: ellipsis;
-        vertical-align: middle;
-        white-space: nowrap;
-        text-align: left;
-
-        &-index {
-            width: 8%;
-            max-width: 80px;
-            text-align: right;
-
-            @media (max-width: 685px) {
-                .loading &,
-                .playing &,
-                .paused & {
-                    display: none;
-                }
-            }
-        }
-
-        &-title {
-            width: 30%;
-            max-width: 300px;
-        }
-
-        &-artist {
-            width: 32%;
-            max-width: 320px;
-        }
-
-        &-time {
-            width: 10%;
-            max-width: 100px;
-            margin: 0;
-
-            .playing & .duration,
-            .paused & .duration {
-                @media (max-width: 685px) {
-                    display: none;
-                }
-
-                &::before {
-                    content: " / ";
-                }
-            }
-        }
-    }
-
     &-sub-title {
     	visibility: hidden;
     	opacity: 0;
@@ -138,19 +90,6 @@
         		pointer-events: visible;
         	}
         }
-    }
-
-    /* States */
-    .loading a,
-    .playing a {
-    	color: #000;
-    	transition: background 0.45s;
-    }
-
-    .paused a {
-    	color: #000;
-    	-webkit-transition: background 0.2s;
-    	transition: background 0.2s;
     }
 
     .state-icon {
@@ -208,10 +147,9 @@
 	.scroll-overflow {
 		font-size: 0; /* Reset weird line-height bug for inline-block elements */
 
-		& span {
+		span {
 			display: inline-block;
-			padding-right: 50px;
-			font-size: 1em;
+			padding-right: 5rem;
 			animation-name: scroll-overflow;
 			animation-duration: 15s;
 			animation-iteration-count: infinite;
@@ -221,7 +159,7 @@
 			backface-visibility: hidden;
 
 			@media (max-width: 685px) {
-				padding-right: 20px;
+				padding-right: 2rem;
 			}
 		}
 
@@ -261,6 +199,63 @@
 			visibility: hidden;
 			opacity: 0;
 			transition: visibility 0s linear 0s, opacity 0.15s linear 0s;
+		}
+	}
+}
+
+/* Columns */
+.col {
+	display: inline-block;
+	position: relative;
+	z-index: 2;
+	overflow: hidden;
+	margin-right: 3.5%;
+	padding: 19px 0;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	white-space: nowrap;
+	text-align: left;
+
+	&-index {
+		width: 8%;
+		max-width: 80px;
+		text-align: right;
+
+		@media (max-width: 685px) {
+			.loading &,
+			.playing &,
+			.paused & {
+				display: none;
+			}
+		}
+	}
+
+	&-title {
+		width: 30%;
+		max-width: 300px;
+	}
+
+	&-artist {
+		width: 32%;
+		max-width: 320px;
+	}
+
+	&-time {
+		width: 10%;
+		max-width: 100px;
+		margin: 0;
+
+		.playing &,
+		.paused & {
+			.duration {
+				@media (max-width: 685px) {
+					display: none;
+				}
+
+				&::before {
+					content: " / ";
+				}
+			}
 		}
 	}
 }

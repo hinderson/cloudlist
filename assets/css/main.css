@@ -1,7 +1,7 @@
 /* Media query variables
 -------------------------------------------------- */
-@custom-media --wide (min-width: 1080px);
-@custom-media --large-only (min-width: 768px) and (max-width: 1080px);
+@custom-media --wide (min-width: 1280px);
+@custom-media --large-only (min-width: 768px) and (max-width: 1280px);
 @custom-media --large (min-width: 768px);
 @custom-media --medium-only (min-width: 561px) and (max-width: 768px);
 @custom-media --medium (min-width: 561px);

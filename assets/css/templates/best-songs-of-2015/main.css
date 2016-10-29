@@ -8,7 +8,6 @@
 @import "components/_collection.css";
 @import "components/_controls.css";
 @import "components/_dialog.css";
-@import "components/_footer.css";
 @import "components/_header.css";
 @import "components/_player-ui.css";
 @import "components/_sort-collection.css";
@@ -16,6 +15,7 @@
 
 /* Template specific imports
 -------------------------------------------------- */
+@import "_settings.css";
 @import "_animation.css";
 @import "_fonts.css";
 
@@ -26,6 +26,7 @@ body {
 	background-color: #f2f2f2;
 	transition: background-color 0.5s ease;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
 }
 
 a,
@@ -195,7 +196,7 @@ a:visited {
 }
 
 .collection {
-	font-size: 1.8rem;
+	font-size: var(--collection-font-size);
 	margin-bottom: 3.5em;
 
     a:hover,
@@ -322,6 +323,16 @@ a:visited {
         }
     }
 
+	/* States */
+	.loading a,
+	.playing a {
+		transition: background 0.45s;
+	}
+
+	.paused a {
+		transition: background 0.2s;
+	}
+
     .cover {
     	background: #f3f3f3;
     	box-shadow: none;
@@ -339,11 +350,6 @@ a:visited {
         	will-change: opacity;
         	transition: opacity 0.25s;
         }
-    }
-
-    .scroll-overflow span {
-    	font-size: 1.11rem;
-    	line-height: 3.4em;
     }
 
     .state-loading {
@@ -446,17 +452,27 @@ a:visited {
 
 /* Go to top */
 .go-to-top {
-	margin-bottom: 5em;
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	margin-bottom: 5rem;
 
     a {
+		display: inline-block;
+		width: 2rem;
     	color: #212121;
+		text-decoration: none;
     }
 
-    svg {
-    	display: inline-block;
-    	width: 19px;
-        fill: #fff;
-    }
+	.icon {
+		display: inline-block;
+		width: 100%;
+		fill: #212121;
+
+		.svg-container {
+			padding-bottom: 122.719%;
+		}
+	}
 }
 
 

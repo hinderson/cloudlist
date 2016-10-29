@@ -15,13 +15,14 @@
         &-inner {
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
     }
 
     .logo {
         width: 92px;
         height: auto;
-        fill: #fff;
+        fill: currentColor;
 
         .svg-container {
             padding-bottom: 14.706%;

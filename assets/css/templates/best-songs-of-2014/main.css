@@ -8,7 +8,6 @@
 @import "components/_collection.css";
 @import "components/_controls.css";
 @import "components/_dialog.css";
-@import "components/_footer.css";
 @import "components/_header.css";
 @import "components/_player-ui.css";
 @import "components/_sort-collection.css";
@@ -163,6 +162,21 @@ a:visited {
 			}
 		}
 	}
+}
+
+/* States */
+.loading a,
+.loading a:visited,
+.playing a,
+.playing a:visited {
+	color: #000;
+	transition: background 0.45s;
+}
+
+.paused a,
+.paused a:visited {
+	color: #000;
+	transition: background 0.2s;
 }
 
 

@@ -1,0 +1,92 @@
+/* Extend global styles
+-------------------------------------------------- */
+@import "main.css";
+
+
+/* Component imports
+-------------------------------------------------- */
+@import "components/_collection.css";
+@import "components/_controls.css";
+@import "components/_dialog.css";
+@import "components/_header.css";
+@import "components/_player-ui.css";
+@import "components/_sort-collection.css";
+
+
+/* Template specific imports
+-------------------------------------------------- */
+@import "_settings.css";
+@import "_animation.css";
+@import "_fonts.css";
+
+
+/* Template styling
+-------------------------------------------------- */
+body {
+	background-color: #f2f2f2;
+	transition: background-color 0.5s ease;
+    font-family: var(--font-main);
+	-webkit-font-smoothing: antialiased;
+}
+
+a,
+a:visited {
+	color: #000;
+    text-decoration: none;
+}
+
+
+/* Header */
+.header-main {
+	color: var(--color-black);
+	fill: var(--color-black);
+
+    .group-inner {
+        max-width: none;
+    }
+}
+
+
+.collection {
+	font-size: var(--collection-font-size);
+
+	&-title {
+		text-align: center;
+	}
+
+	/* States */
+	.loading a,
+	.loading a:visited,
+	.playing a,
+	.playing a:visited {
+		transition: background 0.45s;
+	}
+
+	.paused a,
+	.paused a:visited {
+		transition: background 0.2s;
+	}
+}
+
+.cols {
+	max-width: var(--site-width);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.col {
+	&-index,
+	&-title,
+	&-artist,
+	&-time {
+		max-width: none;
+	}
+
+	&-artist {
+		width: 32%;
+	}
+
+	&-title {
+		width: 31%;
+	}
+}

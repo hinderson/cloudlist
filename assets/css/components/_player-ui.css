@@ -29,3 +29,17 @@
 .loading-song .loading a {
 	cursor: wait;
 }
+
+a,
+a:visited {
+	.loading &,
+	.playing & {
+		background: rgba(0, 0, 0, 0.85);
+		color: #fff;
+	}
+
+	.paused {
+		background: rgba(0, 0, 0, 0.55);
+		color: #fff;
+	}
+}

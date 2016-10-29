@@ -12,6 +12,7 @@
 		margin: 0 0 0 15px;
 		line-height: 0;
 		background: none;
+		fill: currentColor;
 
 	    &:hover,
 	    &:focus {
@@ -26,10 +27,6 @@
 
 	    .no-touch & {
 	        display: block;
-	    }
-
-	    svg {
-	        fill: #fff;
 	    }
 	}
 
@@ -95,6 +92,7 @@
 		margin-left: 1rem;
 		border: 0;
 		background: none;
+		fill: currentColor;
 
 	    &:hover,
 	    &:focus {
@@ -108,10 +106,6 @@
 	    	-webkit-transform: scale(0.97);
 	    	transform: scale(0.97);
 	    }
-
-	    svg {
-	        fill: #fff;
-	    }
 	}
 
 	.play-state {
@@ -120,6 +114,7 @@
 		padding: 0;
 		background: none;
 		cursor: pointer;
+		fill: currentColor;
 
 	    &:hover,
 	    &:focus {
@@ -130,10 +125,6 @@
 
 	    &:active {
 	    	transform: scale(0.97);
-	    }
-
-	    svg {
-	        fill: #fff;
 	    }
 
 	    .pause {

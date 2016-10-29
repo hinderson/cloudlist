@@ -1,8 +1,9 @@
 :root {
     /* Layout */
-    --site-width: 108rem;
+    --site-width: 128rem;
     --base-font-size: 1.5rem;
     --base-line-height: calc(1.25 * var(--base-font-size));
+    --collection-font-size: 2rem;
 
     /* Fonts */
     --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
