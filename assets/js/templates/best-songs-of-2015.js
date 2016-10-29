@@ -7,9 +7,15 @@ var collection = require('../data/collection.js');
 var config = require('../config.js');
 var utils = require('../utils.js');
 var placeholders = require('../placeholders.js');
+var covers = require('../components/random-covers.js');
 
 // Extend config
 config.api.version = 'v1';
+
+// Cached elems
+var elems = {
+	headerShadow: document.getElementsByClassName('header-shadow')[0],
+};
 
 function updateParallax (lastScrollY) {
 	var translateY3d = function (elem, value) {
@@ -45,15 +51,15 @@ function updateDocumentColors (rgb, contrast) {
 	var gradient = document.createElement('DIV');
 	gradient.className = 'gradient';
 	gradient.style.backgroundImage = 'linear-gradient(to bottom, rgba(' + lighterColor + ', 0.97) 0%, rgba(' + lighterColor + ', 0.85) 65%, rgba(' + lighterColor + ', 0.02) 100%)';
-	main.cache.elems.headerShadow.appendChild(gradient);
+	elems.headerShadow.appendChild(gradient);
 	setTimeout(function ( ) {
-		main.cache.elems.headerShadow.classList.add('transition');
+		elems.headerShadow.classList.add('transition');
 	});
 
-	main.cache.elems.headerShadow.addEventListener('transitionend', function onTransitionEnd ( ) {
-		main.cache.elems.headerShadow.removeEventListener('transitionend', onTransitionEnd);
-		main.cache.elems.headerShadow.removeChild(main.cache.elems.headerShadow.querySelector('.gradient:first-child'));
-		main.cache.elems.headerShadow.classList.remove('transition');
+	elems.headerShadow.addEventListener('transitionend', function onTransitionEnd ( ) {
+		elems.headerShadow.removeEventListener('transitionend', onTransitionEnd);
+		elems.headerShadow.removeChild(elems.headerShadow.querySelector('.gradient:first-child'));
+		elems.headerShadow.classList.remove('transition');
 	});
 
 	var bgContrast = utils.getContrastYIQ(lighterColor.split(','));
@@ -61,9 +67,9 @@ function updateDocumentColors (rgb, contrast) {
 }
 
 function resetDocumentColors ( ) {
-	main.cache.elems.body.removeAttribute('style');
-	main.cache.elems.body.removeAttribute('data-color-contrast');
-	main.cache.elems.headerShadow.querySelector('.gradient').removeAttribute('style');
+	document.body.removeAttribute('style');
+	document.body.removeAttribute('data-color-contrast');
+	elems.headerShadow.querySelector('.gradient').removeAttribute('style');
 }
 
 function loading (id) {
@@ -95,11 +101,23 @@ function stopped (id) {
 	elemLink.removeAttribute('style');
 }
 
+function showItemCover (target) {
+	if (main.viewportWidth < 685 ||
+		!collection.getAllItems() ||
+		target.parentNode.classList.contains('playing') ||
+		target.parentNode.classList.contains('paused') ||
+		target.parentNode.classList.contains('loading')
+	) { return; }
+
+	covers.show(target);
+}
+
 main.init();
 placeholders.lazyLoad();
 
 // Event messages
 pubsub.subscribe('scrolling', updateHero);
+pubsub.subscribe('itemMouseover', showItemCover);
 pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioPaused', paused);
 pubsub.subscribe('audioStopped', stopped);

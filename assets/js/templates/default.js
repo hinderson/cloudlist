@@ -4,18 +4,13 @@
 var main = require('../main.js');
 var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
+var collection = require('../data/collection.js');
+var covers = require('../components/random-covers.js');
 
-function cacheElems ( ) {
-	// Extends to main cache object
-	main.cache.elems.playBtn = document.querySelector('.hero button');
-}
-
-function registerEvents ( ) {
-	main.cache.elems.playBtn.addEventListener('click', function (e) {
-		// Play first song in collection
-		audio.toggleState();
-	}, false);
-}
+var elems = {
+	heroContent: document.getElementsByClassName('hero-inner')[0],
+	playBtn: document.querySelector('.hero button'),
+};
 
 function updateParallax (lastScrollY) {
 	// Bail if we've reached the collection
@@ -36,7 +31,7 @@ function updateParallax (lastScrollY) {
 		translateValue = 0;
 	}
 
-	translateY3d(main.cache.elems.heroContent, translateValue);
+	translateY3d(elems.heroContent, translateValue);
 }
 
 var currentColor;
@@ -57,11 +52,28 @@ function failedLoading (id) {
 	elem.classList.remove(currentColor);
 }
 
-cacheElems();
-registerEvents();
+function showItemCover (target) {
+	if (main.viewportWidth < 685 ||
+		!collection.getAllItems() ||
+		target.parentNode.classList.contains('playing') ||
+		target.parentNode.classList.contains('paused') ||
+		target.parentNode.classList.contains('loading')
+	) { return; }
+
+	covers.show(target);
+}
+
 main.init();
 
+// Event messages
 pubsub.subscribe('scrolling', updateParallax);
+pubsub.subscribe('itemMouseover', showItemCover);
 pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioFailedLoading', failedLoading);
 pubsub.subscribe('audioStopped', stopped);
+
+// Events
+elems.playBtn.addEventListener('click', function (e) {
+	// Play first song in collection
+	audio.toggleState();
+}, false);

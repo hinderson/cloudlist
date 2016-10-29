@@ -3,6 +3,8 @@
 // Requires
 var main = require('../main.js');
 var pubsub = require('../pubsub.js');
+var collection = require('../data/collection.js');
+var covers = require('../components/random-covers.js');
 
 // TODO: Clean up this intro animation
 setTimeout(function ( ) {
@@ -27,8 +29,20 @@ function failedLoading (id) {
 	elem.classList.remove(currentColor);
 }
 
+function showItemCover (target) {
+	if (main.viewportWidth < 685 ||
+		!collection.getAllItems() ||
+		target.parentNode.classList.contains('playing') ||
+		target.parentNode.classList.contains('paused') ||
+		target.parentNode.classList.contains('loading')
+	) { return; }
+
+	covers.show(target);
+}
+
 main.init();
 
+pubsub.subscribe('itemMouseover', showItemCover);
 pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioFailedLoading', failedLoading);
 pubsub.subscribe('audioStopped', stopped);
