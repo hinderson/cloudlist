@@ -30,11 +30,6 @@ var itemHoverHandler = function (e) {
 			if (target !== this.currentHover) {
 				this.currentHover = target;
 				this.scrollOverflowingText(target);
-				if (!(target.parentNode.classList.contains('playing') ||
-					target.parentNode.classList.contains('paused') ||
-					target.parentNode.classList.contains('loading'))) {
-						this.showItemCover(target);
-					}
 				pubsub.publish('itemMouseover', target);
 			}
 			break;
@@ -97,10 +92,8 @@ module.exports = {
 
 	cache: {
 		elems: {
-			HTML: document.documentElement || document.body,
-			body: document.getElementsByTagName('body')[0],
-			heroContent: document.getElementsByClassName('hero-inner')[0],
-			headerShadow: document.getElementsByClassName('header-shadow')[0],
+			HTML: document.documentElement,
+			body: document.body,
 			collectionHeader: document.getElementsByClassName('collection-header')[0],
 			collectionTitle: document.getElementsByClassName('collection-title')[0],
 			collectionSubTitle: document.getElementsByClassName('collection-sub-title')[0],
@@ -244,7 +237,8 @@ module.exports = {
 			this.focusInterval = window.setTimeout(function ( ) {
 				var elem = c.elems.currentItem;
 				if (elem && !utils.inViewport(elem, 250) && audio.getState() === 'playing') {
-					utils.scrollToElement(elem);
+					var offset = (this.viewportHeight / 2) - (elem.clientHeight / 2);
+					utils.scrollToElement(elem, 500, offset);
 				} else {
 					window.clearTimeout(this.focusInterval);
 				}
@@ -278,17 +272,10 @@ module.exports = {
 		this.viewportWidth = window.innerWidth;
 		this.viewportHeight = window.innerHeight;
 
+		pubsub.publish('resize', { prevWidth: prevWidth, prevHeight: prevHeight });
+
 		// Remove or add overflowing text and reposition cover on currently playing item
 		if (c.elems.currentItem !== null) {
-			var widthDiff = Math.abs(prevWidth - this.viewportWidth);
-			var heightDiff = Math.abs(prevHeight - this.viewportHeight);
-
-			// Only reflow/reposition element if the diff between
-			// previous size and new is more than 40px
-			if (widthDiff >= 40 || heightDiff >= 40) {
-				this.showItemCover(c.elems.currentItem.firstChild);
-			}
-
 			this.scrollOverflowingText(c.elems.currentItem.firstChild, true, true);
 
 			setTimeout(function ( ) {
@@ -301,8 +288,6 @@ module.exports = {
 
 		// Update position of collection top
 		c.collectionTop = utils.getElemDistanceFromDoc(c.elems.collection).top;
-
-		pubsub.publish('resize');
 	}, 250),
 
 	findOverflowingElements: function ( ) {
@@ -473,62 +458,6 @@ module.exports = {
 		});
 	},
 
-	showItemCover: function (target) {
-		if (this.viewportWidth < 685 || !collection.getAllItems()) { return; }
-
-		var parentNode = target.parentNode;
-		var id = parentNode.getAttribute('data-id');
-
-		var loadItemCover = function (item) {
-			var format = item.format === 'MP4' || item.format === 'GIF' ? 'video' : 'img';
-			var cdn = s.cdn + '/' + format + '/';
-			var coverContainer = parentNode.querySelector('.cover');
-			var cover = format === 'video' ? document.createElement(format) : new Image();
-
-			function appendCover ( ) {
-				cover.removeEventListener('canplay', appendCover);
-				utils.requestAnimFrame.call(window, function ( ) {
-					coverContainer.appendChild(cover);
-					setTimeout(function ( ) {
-						coverContainer.classList.add('cover-loaded');
-					}, 10);
-				});
-			}
-
-			cover.setAttribute('width', item.width);
-			cover.setAttribute('height', item.height);
-			cover.setAttribute('src', cdn + (item.format === 'GIF' ? item.video.filename : item.filename));
-
-			if (format === 'video' || item.format === 'GIF') {
-				cover.load();
-				cover.play();
-				cover.setAttribute('muted', '');
-				cover.setAttribute('loop', true);
-				cover.addEventListener('canplay', appendCover);
-			} else {
-				cover.setAttribute('alt', '');
-				cover.onload = appendCover;
-			}
-
-			target.coverLoaded = true;
-		};
-
-		var randomCoverPosition = function (item) {
-			var topPos = Math.floor(Math.random() * (-(item.height - 100) - (-30)) + (- 30));
-			var margin = (4 / 100) * this.viewportWidth; // The number 4 here is the percentage
-			var leftMin = margin;
-			var leftMax = (this.viewportWidth - item.width) - margin;
-			var leftPos = Math.floor(Math.random() * (leftMax - leftMin)) + leftMin;
-
-			var coverContainer = target.parentNode.querySelector('[data-id="' + id + '"] .cover');
-			coverContainer.style.cssText = coverContainer.style.cssText + 'top: ' + topPos +'px; left: ' + leftPos +'px';
-		}.bind(this);
-
-		var item = collection.getItem(id).covers[0];
-		randomCoverPosition(item);
-		target.coverLoaded || loadItemCover(item);
-	},
-
 	setupAudio: function ( ) {
 		// Set initial (visual) volume state
 		c.elems.volume.value = audio.getVolume() * 100;
@@ -566,7 +495,8 @@ module.exports = {
 
 			// Scroll to track if out of bounds
 			if (!utils.inViewport(elem, 250)) {
-				utils.scrollToElement(elem);
+				var offset = (this.viewportHeight / 2) - (elem.clientHeight / 2);
+				utils.scrollToElement(elem, 500, offset);
 			}
 		}.bind(this));
 
@@ -636,7 +566,8 @@ module.exports = {
 			history.updateDocumentTitle(documentTitle);
 
 			// Scroll to track
-			utils.scrollToElement(elem);
+			var offset = (this.viewportHeight / 2) - (elem.clientHeight / 2);
+			utils.scrollToElement(elem, 500, offset);
 
 			// Set global state
 			c.elems.playStateBtn.classList.add('playing');
