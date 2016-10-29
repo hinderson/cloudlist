@@ -2,14 +2,15 @@ var webpack = require('webpack');
 
 module.exports = {
 	entry: {
-		'admin': './client/js/admin/admin.js',
-		'default': './client/js/templates/default.js',
-		'best-songs-of-2014': './client/js/templates/best-songs-of-2014.js',
-		'best-songs-of-2015': './client/js/templates/best-songs-of-2015.js'
+		'admin': './assets/js/admin/admin.js',
+		'default': './assets/js/templates/default.js',
+		'best-songs-of-2014': './assets/js/templates/best-songs-of-2014.js',
+		'best-songs-of-2015': './assets/js/templates/best-songs-of-2015.js',
+		'best-songs-of-2016': './assets/js/templates/best-songs-of-2016.js'
 	},
 	output: {
 		filename: '[name].js',
-		path: './client/js/build',
+		path: './client/assets/js',
 		publicPath: '/js/'
 	},
 	resolve: {
@@ -24,7 +25,12 @@ module.exports = {
 		new webpack.optimize.CommonsChunkPlugin({
 			name: 'common',
 			filename: 'common.js',
-			chunks: ['default', 'best-songs-of-2014', 'best-songs-of-2015'],
+			chunks: [
+				'default',
+				'best-songs-of-2014',
+				'best-songs-of-2015',
+				'best-songs-of-2016'
+			],
 		})
 	]
 };

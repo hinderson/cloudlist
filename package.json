@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "gulp & gulp watch & mongod & node ./bin/www"
+    "dev": "webpack --progress --colors & gulp & gulp watch & mongod & node ./bin/www"
   },
   "dependencies": {
     "async": "~0.9.0",
@@ -79,6 +79,7 @@
     "postcss-import": "^7.1.3",
     "postcss-nested": "^1.0.0",
     "postcss-scss": "^0.3.1",
-    "webpack": "~1.12.2"
+    "webpack": "~1.12.2",
+    "webpack-zepto": "0.0.1"
   }
 }
