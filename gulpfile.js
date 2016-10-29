@@ -1,7 +1,10 @@
 'use strict';
 
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var sourcemaps = require('gulp-sourcemaps');
+var webpack = require('webpack');
+var webpackConfig = require('./webpack.config.js');
 
 var postcss = require('gulp-postcss');
 var postCssProcessors = [
@@ -27,9 +30,29 @@ gulp.task('css:dev', function ( ) {
 		.pipe(gulp.dest('./client/assets/css'));
 });
 
+// Webpack task for use in development
+gulp.task('webpack:dev', function (callback) {
+	// Modify/overwrite some default webpack config options
+	var devConfig = Object.create(webpackConfig);
+
+	devConfig.devtool = 'sourcemap';
+	devConfig.debug = true;
+
+	webpack(devConfig, function (err, stats) {
+		if (err) { throw new gutil.PluginError('webpack:dev', err); }
+
+		gutil.log('[webpack:dev]', stats.toString({
+			colors: true
+		}));
+
+		callback();
+	});
+});
+
 // Default watch task for use in development
 gulp.task('watch', function ( ) {
 	gulp.watch('./assets/css/**/*.css', ['css:dev']);
+	gulp.watch('./assets/js/**/*.js', ['webpack:dev']);
 });
 
 // Default dev task
