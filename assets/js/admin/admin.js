@@ -428,13 +428,17 @@ var gradify = function (image) {
 	}
 
 	var advancedInputs = document.querySelector('form .advanced');
-	advancedInputs.style.display = 'none';
+	if (advancedInputs) {
+		advancedInputs.style.display = 'none';
+	}
 
 	var showHideBtn = document.createElement('a');
 	showHideBtn.innerHTML = '+ More';
 	showHideBtn.className = 'expand-advanced';
 	showHideBtn.href = '/';
-	advancedInputs.parentNode.insertBefore(showHideBtn, advancedInputs.nextSibling);
+	if (advancedInputs) {
+		advancedInputs.parentNode.insertBefore(showHideBtn, advancedInputs.nextSibling);
+	}
 	showHideBtn.addEventListener('click', toggleAdvancedInputs, false);
 
 
@@ -443,26 +447,36 @@ var gradify = function (image) {
 		e.addEventListener('click', deleteSong, false);
 	});
 
-	document.querySelector('input[name="artist"]').onchange = function (e) {
-		fetchArtistImages(this.value);
-	};
+	var inputName = document.querySelector('input[name="artist"]');
+	if (inputName) {
+		inputName.onchange = function (e) {
+			fetchArtistImages(this.value);
+		};
+	}
 
-	document.querySelector('input[name="audio"]').onchange = function (e) {
-		id3(this.files[0], function (err, tags) {
-			showMetaDataInputs();
-			populateInputs(tags);
-		});
-	};
+	var inputAudio = document.querySelector('input[name="audio"]');
+	if (inputAudio) {
+		inputAudio.onchange = function (e) {
+			id3(this.files[0], function (err, tags) {
+				showMetaDataInputs();
+				populateInputs(tags);
+			});
+		};
+	}
 
-	document.querySelector('input[name="soundcloud"]').onblur = function (e) {
-		fetchSoundCloudMetaData(this.value);
-	};
+	var inputSoundcloud = document.querySelector('input[name="soundcloud"]');
+	if (inputSoundcloud) {
+		inputSoundcloud.onblur = function (e) {
+			fetchSoundCloudMetaData(this.value);
+		};
+	}
 
-	document.querySelector('input[name="image"]').onchange = function (e) {
-		readImgURL(this);
-	};
-
-
+	var inputImage = document.querySelector('input[name="image"]');
+	if (inputImage) {
+		inputImage.onchange = function (e) {
+			readImgURL(this);
+		};
+	}
 
 	// LIVE EDIT
 	var editableSongs = document.querySelectorAll('.collection [contenteditable]');
@@ -507,7 +521,10 @@ var gradify = function (image) {
 			}
 		});
 	};
-	editableCollectionTitle.addEventListener('blur', postCollectionEdit, false);
+
+	if (editableCollectionTitle) {
+		editableCollectionTitle.addEventListener('blur', postCollectionEdit, false);
+	}
 
 	var availability = document.querySelectorAll('.availability input');
 	[].forEach.call(availability, function (e) {
@@ -518,37 +535,39 @@ var gradify = function (image) {
 
 	// DRAG AND DROP
 	var collection = document.querySelector('.collection-list');
-	collection.addEventListener('slip:beforereorder', function (e) {
-		if (/demo-no-reorder/.test(e.target.className)) {
-			e.preventDefault();
-		}
-	}, false);
+	if (collection) {
+		collection.addEventListener('slip:beforereorder', function (e) {
+			if (/demo-no-reorder/.test(e.target.className)) {
+				e.preventDefault();
+			}
+		}, false);
 
-	collection.addEventListener('slip:beforewait', function (e) {
-		if (e.target.className.indexOf('handle') > -1) {
-			e.preventDefault();
-		}
-	}, false);
+		collection.addEventListener('slip:beforewait', function (e) {
+			if (e.target.className.indexOf('handle') > -1) {
+				e.preventDefault();
+			}
+		}, false);
 
-	collection.addEventListener('slip:afterswipe', function (e) {
-		e.target.parentNode.appendChild(e.target);
-	}, false);
+		collection.addEventListener('slip:afterswipe', function (e) {
+			e.target.parentNode.appendChild(e.target);
+		}, false);
 
-	var collectionId = document.querySelector('.collection').getAttribute('data-id');
+		var collectionId = document.querySelector('.collection').getAttribute('data-id');
 
-	// Store item order on load
-	var items = document.querySelector('.collection-list').children;
-	var sortOrder = [].map.call(items, function (obj) {
-		return obj.getAttribute('data-id');
-	});
+		// Store item order on load
+		var items = document.querySelector('.collection-list').children;
+		var sortOrder = [].map.call(items, function (obj) {
+			return obj.getAttribute('data-id');
+		});
 
-	collection.addEventListener('slip:reorder', function (e) {
-		e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+		collection.addEventListener('slip:reorder', function (e) {
+			e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
 
-		updateIndexInDatabase(collectionId);
+			updateIndexInDatabase(collectionId);
 
-		return false;
-	}, false);
+			return false;
+		}, false);
 
 		new Slip(collection);
+	}
 })();

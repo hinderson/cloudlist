@@ -12,27 +12,27 @@ html(lang="en-US")
 		main(role="main")
 			section.song
 				- var obfuscatedSongId = hashids.encodeHex(song._id);
-				form(name="edit-song", method="post", action="/edit-song/#{obfuscatedSongId}", enctype="multipart/form-data")
+				form(name="edit-song", method="post", action="/edit-song/" + obfuscatedSongId, enctype="multipart/form-data")
 					fieldset.image
 						h3 Edit image
-						img(src="/media/img/#{song.covers[0].filename}", width="#{song.covers[0].width}", height="#{song.covers[0].height}", alt="")
+						img(src="/media/img/" + song.covers[0].filename, width=song.covers[0].width, height=song.covers[0].height, alt="")
 						label Upload new image
 							div.group
 								input(type="file", name="image", accept="image/*, video/*")
 					fieldset.metadata
 						h3 Edit metadata
 						label Title
-							input(type="text", value="#{song.title}")
+							input(type="text", value=song.title)
 						label Artist(s)
-							input(type="text", value="#{song.artist}")
+							input(type="text", value=song.artist)
 						label Featured artist(s)
-							input(type="text", value="#{song.featuredartist}")
+							input(type="text", value=song.featuredartist)
 						label Album
-							input(type="text", value="#{song.album}")
+							input(type="text", value=song.album)
 						label Permalink
-							input(type="text", value="#{song.permalink}")
+							input(type="text", value=song.permalink)
 						label Tags
-							input(type="text", value="#{song.tags}")
+							input(type="text", value=song.tags)
 					fieldset.audio
 						h3 Audio source
 					button Save
