@@ -14,32 +14,35 @@ html(lang="en", class="no-js " + collection.template)
 
 	body
 		header(class="header-main", role="banner")
-			block header
-				div.group
-					div.group-inner
+			div.group
+				div.group-inner
+
+					block header
 						a(href="/", title="Go to main page")
 							span.visuallyhidden Cloudlist
 							div.logo
 								span.svg-container
 									include ../client/img/cloudlist-logo.svg
+
 						div.controls
-							input.volume-slider(type="range", step="1", value="90", min="0", max="100")
-							button.play-state
-								span.visuallyhidden Toggle play/pause
-								div.play
+							block controls
+								input.volume-slider(type="range", step="1", value="90", min="0", max="100")
+								button.play-state
+									span.visuallyhidden Toggle play/pause
+									div.play
+										span.svg-container
+											include ../client/img/icon-state-play.svg
+									div.pause
+										span.svg-container
+											include ../client/img/templates/best-songs-of-2015/icon-state-pause.svg
+								button.info-toggle
+									span.visuallyhidden Toggle info screen
 									span.svg-container
-										include ../client/img/icon-state-play.svg
-								div.pause
+										include ../client/img/templates/best-songs-of-2015/icon-info.svg
+								button.fullscreen
+									span.visuallyhidden Toggle fullscreen mode
 									span.svg-container
-										include ../client/img/templates/best-songs-of-2015/icon-state-pause.svg
-							button.info-toggle
-								span.visuallyhidden Toggle info screen
-								span.svg-container
-									include ../client/img/templates/best-songs-of-2015/icon-info.svg
-							button.fullscreen
-								span.visuallyhidden Toggle fullscreen mode
-								span.svg-container
-									include ../client/img/templates/best-songs-of-2015/icon-fullscreen.svg
+										include ../client/img/templates/best-songs-of-2015/icon-fullscreen.svg
 
 		main(class="content-main", role="main")
 			block content
@@ -57,7 +60,7 @@ html(lang="en", class="no-js " + collection.template)
 
 								block collectionSort
 									strong.visuallyhidden Sort tracks:
-									ul(class="sort-collection")
+									ul(class="sort-collection cols")
 										li(class="col col-index", data-sort-type="index")
 											strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
 										li(class="col col-title", data-sort-type="title")
@@ -76,13 +79,14 @@ html(lang="en", class="no-js " + collection.template)
 
 									li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
 										a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/")
-											div.col.col-index= index+1
-											div.col.col-title
-												span= song.title
-											div.col.col-artist
-												span= song.combinedartist
-											div.col.col-time
-												span.duration= song.duration
+											div.cols
+												div.col.col-index= index+1
+												div.col.col-title
+													span= song.title
+												div.col.col-artist
+													span= song.combinedartist
+												div.col.col-time
+													span.duration= song.duration
 										div.cover
 
 
