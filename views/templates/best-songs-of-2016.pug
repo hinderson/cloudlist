@@ -1,0 +1,35 @@
+extends ../layout
+
+block hero
+	section.hero
+		div.hero-inner
+			div.collection-title
+				h1
+					span= collection.title
+
+block collectionSubtitle
+	h2.collection-sub-title= collection.title
+
+block collectionList
+	h3.visuallyhidden Song list
+	ol
+		each song, index in songs
+			- var obfuscatedId = hashids.encodeHex(song._id);
+			- song = structureSong(song);
+
+			li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
+				a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/", data-color-contrast=song.covers[0].colors.contrast)
+					div.cols
+						div.col.col-index= index+1
+						div.col.col-title
+							span= song.title
+						div.col.col-artist
+							span= song.combinedartist
+						div.col.col-time
+							span.duration= song.duration
+				div.cover(style="background: rgb(" + song.covers[0].colors.primary + ");")
+					div.aspect-ratio(style="padding-bottom:" + (song.covers[0].height / song.covers[0].width * 100) + "%;")
+
+block dialog
+	p Cloudlist is by <a href="http://hinderson.com/">Hinderson</a>. Previous years: <strike>2011</strike>, <a href="http://xn--retsbsta-4zae.se/2012/" target="_blank">2012</a>, <a href="http://xn--retsbsta-4zae.se/" target="_blank">2013</a>, <a href="https://www.cloudlist.io/best-songs-of-2014/" target="_blank">2014</a>.
+	small All tracks and images are © of their respective owners.
