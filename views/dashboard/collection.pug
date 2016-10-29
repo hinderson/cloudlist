@@ -18,6 +18,7 @@ html(lang="en-US")
 						option(selected=collection.template == "default", value="default") Default
 						option(selected=collection.template == "best-songs-of-2014", value="best-songs-of-2014") Best Songs of 2014
 						option(selected=collection.template == "best-songs-of-2015", value="best-songs-of-2015") Best Songs of 2015
+						option(selected=collection.template == "best-songs-of-2016", value="best-songs-of-2016") Best Songs of 2016
 					input(type="submit", value="OK")
 				div.collection(data-id=obfuscatedCollectionId)
 					div.collection-title
@@ -67,6 +68,7 @@ html(lang="en-US")
 			section.add-song
 				h2 Add new song
 				form(name="create-song", method="post", action="/create-song/" + obfuscatedCollectionId, enctype="multipart/form-data")
+					input(type="hidden", name="template", value=collection.template)
 					fieldset.source
 						h3 Choose your audio source
 						label Enter Soundcloud URL
@@ -99,8 +101,5 @@ html(lang="en-US")
 								input(type="hidden", name="gradientplaceholder", value="")
 					button(type="submit") Add song
 
-		script(src="/js/admin/libs/zepto.min.js")
-		script(src="/js/admin/libs/id3.js")
-		script(src="/js/admin/libs/slip.js")
-		script(src="/js/build/admin-common.js")
-		script(src="/js/build/admin.js")
+		script(src="/assets/js/admin-common.js")
+		script(src="/assets/js/admin.js")
