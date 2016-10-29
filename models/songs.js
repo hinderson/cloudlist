@@ -12,6 +12,7 @@ var jsonpClient = require('jsonp-client');
 var config = require('config');
 var execFile = require('child_process').execFile;
 var gifsicle = require('gifsicle');
+var dominantColor = require('dominant-color');
 
 // Graphicsmagick
 var gm = require('gm').subClass({imageMagick: true});
@@ -54,6 +55,7 @@ songs = {
 		var endTime = args.endtime;
 		var resolvedUrl = null;
 		var gradientPlaceholder = args.gradientplaceholder || null;
+		var templateName = args.template;
 
 		var tempCoverPath = files.image ? files.image.path : null;
 		var tempFilename = files.image ? files.image.name : null;
@@ -159,8 +161,13 @@ songs = {
 				},
 			    function (orientation, next) {
 					// Create large (or maybe medium?) cover
-					var width = orientation === 'horizontal' ? 452 : 306;
-					var height = orientation === 'horizontal' ? 282 : 407;
+					var templateConfig = require('../config/templates/' + templateName + '.json');
+					var width = orientation === 'horizontal' ?
+						templateConfig.covers.dimensions.landscape.width :
+						templateConfig.covers.dimensions.portrait.width;
+					var height = orientation === 'horizontal' ?
+						templateConfig.covers.dimensions.landscape.height :
+						templateConfig.covers.dimensions.portrait.height;
 
 					if (path.extname(targetCoverPath) === '.gif') {
 						execFile(gifsicle, ['--resize-' + (width > height ? 'width' : 'height'), (width > height ? width : height), '-o', tempCoverPath, tempCoverPath], function (err) {
@@ -196,43 +203,29 @@ songs = {
 					});
 			    },
 				function (identify, next) {
+					// Determines if contrast should be dark or bright
+					function getContrastYIQ (rgb) {
+						var r = rgb[0];
+						var g = rgb[1];
+						var b = rgb[2];
+						var yiq = ((r*299)+(g*587)+(b*114))/1000;
+						return (yiq >= 128) ? 'dark' : 'bright';
+					}
+
+					// Darkens or brightens the original color
+					function luminance (c, n, i, d) {
+						for (i=3;i--;c[i]=d<0?0:d>255?255:d|0)d=c[i]+n;
+						return c;
+					}
+
 					// Identifies the dominant color of the image
-					gm(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath).identify('%[pixel:s]', function (err, dominantColor) {
+					dominantColor(ext === '.gif' ? tempCoverPath + '[0]' : tempCoverPath, {format: 'rgb'}, function(err, color) {
 						if (err) throw err;
 
-						// Determines if contrast should be dark or bright
-						function getContrastYIQ (rgb) {
-							var r = rgb[0];
-							var g = rgb[1];
-							var b = rgb[2];
-							var yiq = ((r*299)+(g*587)+(b*114))/1000;
-							return (yiq >= 128) ? 'dark' : 'bright';
-						}
+						var contrast = getContrastYIQ(color.slice(0));
 
-						// Darkens or brightens the original color
-						function luminance (c, n, i, d) {
-							for (i=3;i--;c[i]=d<0?0:d>255?255:d|0)d=c[i]+n;
-							return c;
-						}
-
-						// Output can be either srgb or srgba (or in rare cases just a keyword, e.g. "black")
-						var rgb;
-						if (dominantColor !== 'black') {
-							rgb = dominantColor
-								.split('(')[1]
-								.split(')')[0]
-								.split(',', 3)
-								.map(function (x) {
-									return parseInt(x);
-								});
-						} else {
-							rgb = [10, 10, 10]; // Not pitch-black
-						}
-
-						var contrast = getContrastYIQ(rgb.slice(0));
-
-						identify.primaryColor = rgb;
-						identify.secondaryColor = luminance(rgb.slice(0), contrast === 'dark' ? -160 : 160);
+						identify.primaryColor = color;
+						identify.secondaryColor = luminance(color.slice(0), contrast === 'dark' ? -160 : 160);
 						identify.colorContrast = contrast;
 						return next(null, identify);
 					});
