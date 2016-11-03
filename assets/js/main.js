@@ -101,14 +101,7 @@ module.exports = {
 			collectionItems: document.querySelectorAll('.collection ol li'),
 			scrollableOverflowElems: document.querySelectorAll('.collection ol .col-artist, .collection ol .col-title'),
 			sort: document.getElementsByClassName('sort-collection')[0],
-			dialog: document.getElementsByClassName('dialog')[0],
-			closeDialog: document.getElementsByClassName('close-dialog')[0],
-			dialogOverlay: document.getElementsByClassName('dialog-overlay')[0],
-			infoBtn: document.getElementsByClassName('info-toggle')[0],
 			playStateBtn: document.getElementsByClassName('play-state')[0],
-			fullscreen: document.getElementsByClassName('fullscreen')[0],
-			volume: document.getElementsByClassName('volume-slider')[0],
-			options: document.getElementsByClassName('options')[0],
 			currentItem: null
 		},
 		mousePosition: {
@@ -161,25 +154,9 @@ module.exports = {
 
 		c.elems.sort.addEventListener('click', utils.delegate(utils.criteria.hasTagNames(['span', 'strong']), sortClickHandler));
 
-		c.elems.fullscreen.addEventListener('click', this.toggleFullscreen);
-
 		c.elems.playStateBtn.addEventListener('click', function ( ) {
 			audio.toggleState();
 		});
-
-		c.elems.infoBtn.addEventListener('click', this.toggleDialog);
-
-		c.elems.dialogOverlay.addEventListener('click', function ( ) {
-			this.toggleDialog();
-		}.bind(this));
-
-		c.elems.closeDialog.addEventListener('click', function ( ) {
-			c.elems.HTML.classList.remove('overlay');
-		});
-
-		c.elems.volume.addEventListener('input', function (e) {
-			audio.setVolume(e.target.value / 100);
-		}.bind(this));
 
 		c.elems.collectionSubTitle.addEventListener('click', function (e) {
 			utils.scrollToPosition(0, 400);
@@ -314,51 +291,6 @@ module.exports = {
 		}
 	},
 
-	toggleFullscreen: function ( ) {
-		document.fullscreenEnabled =
-			document.fullscreenEnabled ||
-			document.mozFullScreenEnabled ||
-			document.msFullscreenEnabled ||
-			document.documentElement.webkitRequestFullScreen;
-
-		if (!document.fullscreenElement && !document.mozFullScreenElement &&
-				!document.webkitFullscreenElement && !document.msFullscreenElement) {
-			if (document.documentElement.requestFullscreen) {
-				document.documentElement.requestFullscreen();
-			} else if (document.documentElement.msRequestFullscreen) {
-				document.documentElement.msRequestFullscreen();
-			} else if (document.documentElement.mozRequestFullScreen) {
-				document.documentElement.mozRequestFullScreen();
-			} else if (document.documentElement.webkitRequestFullscreen) {
-				document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-			}
-
-			pubsub.publish('fullscreen', true);
-		} else {
-			if (document.exitFullscreen) {
-				document.exitFullscreen();
-			} else if (document.msExitFullscreen) {
-				document.msExitFullscreen();
-			} else if (document.mozCancelFullScreen) {
-				document.mozCancelFullScreen();
-			} else if (document.webkitExitFullscreen) {
-				document.webkitExitFullscreen();
-			}
-
-			pubsub.publish('fullscreen', false);
-		}
-	},
-
-	toggleDialog: function ( ) {
-		if (c.elems.HTML.classList.contains('overlay')) {
-			c.elems.dialog.setAttribute('aria-hidden', true);
-			c.elems.HTML.classList.remove('overlay');
-		} else {
-			c.elems.dialog.setAttribute('aria-hidden', false);
-			c.elems.HTML.classList.add('overlay');
-		}
-	},
-
 	registerKeyboardEvents: function ( ) {
 		var keys = [];
 
@@ -375,8 +307,7 @@ module.exports = {
 				// Esc
 				case 27:
 					e.preventDefault();
-					c.elems.dialog.setAttribute('aria-hidden', true);
-					c.elems.HTML.classList.remove('overlay');
+					pubsub.publish('keysPressed', 27);
 					break;
 
 				// Space
@@ -397,20 +328,20 @@ module.exports = {
 				case 40:
 					e.preventDefault();
 					audio.next();
+					pubsub.publish('keysPressed', [39, 40]);
 					break;
 
-				// Fullscreen
 				case 16: // Alt
 				case 70: // F
 					if (keys[16] && keys[70]) {
 						e.preventDefault();
-						this.toggleFullscreen();
+						pubsub.publish('keysPressed', [16, 70]);
 					}
 					break;
 
 				default: return;
 			}
-		}.bind(this);
+		};
 
 		var keysReleased = function (e) {
 			keys[e.keyCode] = false;
@@ -459,9 +390,6 @@ module.exports = {
 	},
 
 	setupAudio: function ( ) {
-		// Set initial (visual) volume state
-		c.elems.volume.value = audio.getVolume() * 100;
-
 		// Private variables
 		var elem, currentProgress, progressBar, position, percent;
 
