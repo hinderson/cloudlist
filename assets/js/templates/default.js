@@ -2,6 +2,7 @@
 
 // Requires
 var main = require('../main.js');
+var utils = require('../utils.js');
 var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
 var collection = require('../data/collection.js');
@@ -10,6 +11,7 @@ var covers = require('../components/random-covers.js');
 var elems = {
 	heroContent: document.getElementsByClassName('hero-inner')[0],
 	playBtn: document.querySelector('.hero button'),
+	goToTop: document.getElementsByClassName('go-to-top')[0],
 };
 
 function updateParallax (lastScrollY) {
@@ -77,3 +79,8 @@ elems.playBtn.addEventListener('click', function (e) {
 	// Play first song in collection
 	audio.toggleState();
 }, false);
+
+elems.goToTop.addEventListener('click', function (e) {
+	utils.scrollToPosition(0, 400);
+	e.preventDefault();
+});

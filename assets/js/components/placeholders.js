@@ -1,12 +1,12 @@
 'use strict';
 
 // Requires
-var utils = require('./utils.js');
-var config = require('./config.js');
-var collection = require('./data/collection.js');
+var utils = require('../utils.js');
+var config = require('../config.js');
+var collection = require('../data/collection.js');
 
 // Vendor requires
-var stackBlur = require('./vendor/stackblur.js');
+var stackBlur = require('../vendor/stackblur.js');
 
 var ticking = false;
 var unloadedItems = [];

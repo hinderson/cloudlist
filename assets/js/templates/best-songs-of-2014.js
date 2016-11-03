@@ -2,9 +2,17 @@
 
 // Requires
 var main = require('../main.js');
+var utils = require('../utils.js');
 var pubsub = require('../pubsub.js');
 var collection = require('../data/collection.js');
 var covers = require('../components/random-covers.js');
+var fullscreen = require('../components/fullscreen.js')(document.getElementsByClassName('fullscreen')[0]);
+var volume = require('../components/volume.js')(document.getElementsByClassName('volume-slider')[0]);
+var dialog = require('../components/dialog.js')(document.getElementsByClassName('info-toggle')[0]);
+
+var elems = {
+	goToTop: document.getElementsByClassName('go-to-top')[0],
+};
 
 // TODO: Clean up this intro animation
 setTimeout(function ( ) {
@@ -40,9 +48,15 @@ function showItemCover (target) {
 	covers.show(target);
 }
 
-main.init();
-
 pubsub.subscribe('itemMouseover', showItemCover);
 pubsub.subscribe('audioLoading', loading);
 pubsub.subscribe('audioFailedLoading', failedLoading);
 pubsub.subscribe('audioStopped', stopped);
+
+// Register events
+elems.goToTop.addEventListener('click', function (e) {
+	utils.scrollToPosition(0, 400);
+	e.preventDefault();
+});
+
+main.init();

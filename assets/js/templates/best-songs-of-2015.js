@@ -6,8 +6,11 @@ var pubsub = require('../pubsub.js');
 var collection = require('../data/collection.js');
 var config = require('../config.js');
 var utils = require('../utils.js');
-var placeholders = require('../placeholders.js');
+var placeholders = require('../components/placeholders.js');
 var covers = require('../components/random-covers.js');
+var fullscreen = require('../components/fullscreen.js')(document.getElementsByClassName('fullscreen')[0]);
+var volume = require('../components/volume.js')(document.getElementsByClassName('volume-slider')[0]);
+var dialog = require('../components/dialog.js')(document.getElementsByClassName('info-toggle')[0]);
 
 // Extend config
 config.api.version = 'v1';
@@ -15,6 +18,7 @@ config.api.version = 'v1';
 // Cached elems
 var elems = {
 	headerShadow: document.getElementsByClassName('header-shadow')[0],
+	goToTop: document.getElementsByClassName('go-to-top')[0],
 };
 
 function updateParallax (lastScrollY) {
@@ -46,7 +50,7 @@ function updateHero (lastScrollY) {
 function updateDocumentColors (rgb, contrast) {
 	// Change background color
 	var lighterColor = utils.shadeRGBColor(rgb.toString(), contrast === 'dark' ? 0.37 : 0.1);
-	main.cache.elems.body.style.backgroundColor = 'rgb(' + lighterColor + ')';
+	document.body.style.backgroundColor = 'rgb(' + lighterColor + ')';
 
 	var gradient = document.createElement('DIV');
 	gradient.className = 'gradient';
@@ -63,7 +67,7 @@ function updateDocumentColors (rgb, contrast) {
 	});
 
 	var bgContrast = utils.getContrastYIQ(lighterColor.split(','));
-	main.cache.elems.body.setAttribute('data-color-contrast', bgContrast);
+	document.body.setAttribute('data-color-contrast', bgContrast);
 }
 
 function resetDocumentColors ( ) {
@@ -126,11 +130,8 @@ pubsub.subscribe('historyChanged', function (event) {
 	if (!event) { resetDocumentColors(); }
 });
 
-// Events
-var elemGoToTop = document.querySelector('.go-to-top');
-if (elemGoToTop) {
-	elemGoToTop.addEventListener('click', function (e) {
-		utils.scrollToPosition(0, 400);
-		e.preventDefault();
-	});
-}
+// Register events
+elems.goToTop.addEventListener('click', function (e) {
+	utils.scrollToPosition(0, 400);
+	e.preventDefault();
+});
