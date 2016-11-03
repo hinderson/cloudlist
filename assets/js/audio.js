@@ -108,7 +108,6 @@ var play = function (id, time) {
 			/* jshint ignore:end */
 		},
 		onEnd: function ( ) {
-			console.log('ENDED', id);
 			stop(id);
 			next();
 		},
@@ -130,11 +129,9 @@ var play = function (id, time) {
 
 			switch (e.target.error.code) {
 				case e.target.error.MEDIA_ERR_ABORTED:
-					console.log('You aborted the video playback.', url);
 					fail();
 					break;
 				case e.target.error.MEDIA_ERR_NETWORK:
-					console.log('A network error caused the audio download to fail.', url);
 					if (currentPausedTime > 2) {
 						play(id, currentPausedTime);
 					} else {
@@ -142,15 +139,12 @@ var play = function (id, time) {
 					}
 					break;
 				case e.target.error.MEDIA_ERR_DECODE:
-					console.log('The audio playback was aborted due to a corruption problem or because the video used features your browser did not support.', url);
 					fail();
 					break;
 				case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-					console.log('The audio could not be loaded, either because the server or network failed or because the format is not supported.', url);
 					fail();
 					break;
 				default:
-					console.log('An unknown error occurred.', url);
 					fail();
 					break;
 			}
@@ -183,7 +177,6 @@ var pause = function (id) {
 };
 
 var resume = function (id) {
-	console.log('Resuming', id);
 	setState('playing');
 	pubsub.publish('audioResumed', id);
 	audioElement.play();
