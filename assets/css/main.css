@@ -79,10 +79,12 @@ body {
 -------------------------------------------------- */
 .group {
     box-sizing: border-box;
-    padding: 0 1.5rem;
+    padding-left: calc(var(--site-padding) * 0.5);
+    padding-right: calc(var(--site-padding) * 0.5);
 
     @media screen and (--large) {
-        padding: 0 3rem;
+        padding-left: var(--site-padding);
+        padding-right: var(--site-padding);
     }
 
     &::after {

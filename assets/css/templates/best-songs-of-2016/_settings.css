@@ -1,4 +1,7 @@
 :root {
+    /*Layout */
+    --site-padding: 3.5rem;
+
     /* Fonts */
     --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
     --collection-font-size: 1.85rem;
