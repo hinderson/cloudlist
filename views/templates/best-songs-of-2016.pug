@@ -1,5 +1,20 @@
 extends ../layout
 
+block logo
+	span.svg-container
+		include ../../client/img/templates/best-songs-of-2016/logo-cloudlist-2016.svg
+
+block controls
+	input.volume-slider(type="range", step="1", value="90", min="0", max="100")
+	button.play-state
+		span.visuallyhidden Toggle play/pause
+		div.play
+			span.svg-container
+				include ../../client/img/icon-state-play.svg
+		div.pause
+			span.svg-container
+				include ../../client/img/templates/best-songs-of-2015/icon-state-pause.svg
+
 block hero
 	section.hero
 		div.hero-inner
