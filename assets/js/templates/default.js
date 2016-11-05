@@ -7,10 +7,12 @@ var pubsub = require('../pubsub.js');
 var audio = require('../audio.js');
 var collection = require('../data/collection.js');
 var covers = require('../components/random-covers.js');
+var fullscreen = require('../components/fullscreen.js')(document.getElementsByClassName('fullscreen')[0]);
+var volume = require('../components/volume.js')(document.getElementsByClassName('volume-slider')[0]);
+var dialog = require('../components/dialog.js')(document.getElementsByClassName('info-toggle')[0]);
 
 var elems = {
 	heroContent: document.getElementsByClassName('hero-inner')[0],
-	playBtn: document.querySelector('.hero button'),
 	goToTop: document.getElementsByClassName('go-to-top')[0],
 };
 
@@ -75,11 +77,6 @@ pubsub.subscribe('audioFailedLoading', failedLoading);
 pubsub.subscribe('audioStopped', stopped);
 
 // Events
-elems.playBtn.addEventListener('click', function (e) {
-	// Play first song in collection
-	audio.toggleState();
-}, false);
-
 elems.goToTop.addEventListener('click', function (e) {
 	utils.scrollToPosition(0, 400);
 	e.preventDefault();

@@ -21,8 +21,9 @@ html(lang="en", class="no-js " + collection.template)
 						a(href="/", title="Go to main page")
 							span.visuallyhidden Cloudlist
 							div.logo
-								span.svg-container
-									include ../client/img/cloudlist-logo.svg
+								block logo
+									span.svg-container
+										include ../client/img/cloudlist-logo.svg
 
 						div.controls
 							block controls
@@ -57,6 +58,7 @@ html(lang="en", class="no-js " + collection.template)
 									div.gradient
 
 								block collectionSubtitle
+									h3.collection-sub-title= collection.title
 
 								block collectionSort
 									strong.visuallyhidden Sort tracks:
