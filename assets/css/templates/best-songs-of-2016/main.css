@@ -24,9 +24,10 @@
 -------------------------------------------------- */
 body {
 	background-color: #f2f2f2;
-	transition: background-color 0.5s ease;
+	transition: background-color 1.676s cubic-bezier(0.17, 1.1, 0.11, 1.13);
     font-family: var(--font-main);
 	-webkit-font-smoothing: antialiased;
+	will-change: background;
 }
 
 a,
@@ -38,12 +39,17 @@ a:visited {
 
 /* Header */
 .header-main {
+	top: 2.5rem;
 	color: var(--color-black);
 	fill: var(--color-black);
 
     .group-inner {
         max-width: none;
     }
+
+	.logo {
+		width: 10.5rem;
+	}
 }
 
 
