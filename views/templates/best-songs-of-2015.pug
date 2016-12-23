@@ -23,6 +23,16 @@ block collectionList
 			li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
 				a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/", data-color-contrast=song.covers[0].colors.contrast)
 					div.cols
+						div.col.col-play-state
+							span.icon.icon-state-loading(aria-hidden="true")
+								span.svg-container
+									include ../../client/img/templates/best-songs-of-2015/icon-state-loading.svg
+							span.icon.icon-state-paused(aria-hidden="true")
+								span.svg-container
+									include ../../client/img/templates/best-songs-of-2015/icon-outline-audio-paused.svg
+							span.icon.icon-state-playing(aria-hidden="true")
+								span.svg-container
+									include ../../client/img/templates/best-songs-of-2015/icon-outline-audio-playing.svg
 						div.col.col-index= index+1
 						div.col.col-title
 							span= song.title

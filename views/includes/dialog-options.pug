@@ -2,34 +2,34 @@ div.dialog-overlay
 div.dialog(aria-hidden="true")
     button.close-dialog
         span.visuallyhidden Close
-        include ../../client/img/icon-close.svg
-    section.keyboard-mapping.group
-        header
-            h4 Keyboard commands
-        dl.big
-            dt
-                kbd space
-            dd Play/pause track
-        dl.arrow
-            dt
-                kbd →
-                kbd ↓
-            dd Play next track
-        dl
-            dt
-                kbd ⇧
-                span +
-                kbd F
-            dd Switch to fullscreen
-        dl.arrow
-            dt
-                kbd ←
-                kbd ↑
-            dd Play previous track
-    section.settings.group
+        span.svg-container
+            include ../../client/img/icon-close.svg
+    section.keyboard-mapping
+        h4 Keyboard commands
+        div.keyboard-shortcuts
+            dl.big
+                dt
+                    kbd space
+                dd Play/pause track
+            dl.arrow
+                dt
+                    kbd →
+                    kbd ↓
+                dd Play next track
+            dl
+                dt
+                    kbd ⇧
+                    span +
+                    kbd F
+                dd Switch to fullscreen
+            dl.arrow
+                dt
+                    kbd ←
+                    kbd ↑
+                dd Play previous track
+    section.settings
         div.share-options
-            header
-                h4 Share options
+            h4 Share options
             ul
                 li.twitter
                     a(href="https://twitter.com/share?url=https%3A%2F%2Fcloudlist.io", target="_blank" class="twitter", rel="nofollow")

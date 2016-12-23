@@ -294,6 +294,18 @@ utils = {
         }
 	},
 
+	createSVGElement: function (shape, params) {
+		var container = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	    container.setAttribute('viewBox', params.viewBox);
+
+	    var shapeElem = document.createElementNS('http://www.w3.org/2000/svg', shape);
+	    shapeElem.setAttributeNS(null, params.attribute, params.descriptions);
+
+	    container.appendChild(shapeElem);
+
+	    return container;
+	},
+
 	createSVGFragment: function (name, viewBox) {
 		var container = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 		container.setAttribute('viewBox', viewBox);

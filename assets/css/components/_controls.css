@@ -4,40 +4,20 @@
 	justify-content: center;
 	line-height: 1;
 
-	.fullscreen {
-		display: none;
-		width: 25px;
+	button {
 		padding: 0;
 		border: 0;
-		margin: 0 0 0 15px;
-		line-height: 0;
 		background: none;
-		fill: currentColor;
+		outline: 0;
+	}
 
-	    &:hover,
-	    &:focus {
-	    	opacity: 0.9;
-	    	transform: scale(1.05);
-	    	outline: 0;
-	    }
-
-	    &:active {
-	    	transform: scale(0.97);
-	    }
-
-	    .no-touch & {
-	        display: block;
-	    }
+	> * {
+		margin: 0 0.4em;
 	}
 
 	.volume-slider {
 		display: none;
-		width: 8.5rem;
-		height: 1px;
-		margin-right: 2.3rem;
 		outline: 0;
-		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-		background: rgba(255, 255, 255, 0.35);
 		-webkit-appearance: none;
 
 	    .no-touch & {
@@ -45,104 +25,42 @@
 	    }
 
 	    &::-moz-range-track {
-	    	height: 1px;
 	    	margin: 0;
 	    	padding: 0;
 	    	outline: 0;
-	    	background: #555;
 	    }
 
 	    &::-moz-range-thumb {
-	    	width: 16px;
-	    	height: 16px;
-	    	border-radius: 100%;
-	    	box-shadow: 0 2px 4px rgba(0,0,0,.4);
-	    	background: #f0f0f2;
+			width: 1.2em;
+		    height: 1.2em;
 	    	border: 0;
-	    	background: linear-gradient(#fcfcfc, #ededed);
 	    	cursor: pointer;
-	    }
-
-	    &::-moz-range-thumb:hover,
-	    &::-moz-range-thumb:focus {
-	    	opacity: 0.9;
-	    	transform: scale(1.1);
 	    }
 
 	    &::-webkit-slider-thumb {
-	    	width: 17px;
-	    	height: 17px;
-	    	border-radius: 100%;
-	    	box-shadow: 0 2px 4px rgba(0,0,0,.4);
-	    	background: #f0f0f2;
-	    	background: linear-gradient(#fcfcfc, #ededed);
+			width: 1.2em;
+		    height: 1.2em;
 	    	-webkit-appearance: none;
 	    	cursor: pointer;
-	    }
-
-	    &::-webkit-slider-thumb:hover,
-	    &::-webkit-slider-thumb:focus {
-	    	opacity: 0.9;
-	    	transform: scale(1.1);
-	    }
-	}
-
-	.info-toggle {
-	    width: 3.2rem;
-		margin-left: 1rem;
-		border: 0;
-		background: none;
-		fill: currentColor;
-
-	    &:hover,
-	    &:focus {
-	    	opacity: 0.9;
-	    	-webkit-transform: scale(1.05);
-	    	transform: scale(1.05);
-	    	outline: 0;
-	    }
-
-	    &:active {
-	    	-webkit-transform: scale(0.97);
-	    	transform: scale(0.97);
 	    }
 	}
 
 	.play-state {
-		width: 1.85rem;
-		border: 0;
-		padding: 0;
-		background: none;
-		cursor: pointer;
-		fill: currentColor;
+		.pause {
+			display: none;
+		}
 
-	    &:hover,
-	    &:focus {
-	    	opacity: 0.9;
-	    	transform: scale(1.06);
-	    	outline: 0;
-	    }
+		&.playing .play,
+		&.paused .pause {
+			display: none;
+		}
 
-	    &:active {
-	    	transform: scale(0.97);
-	    }
-
-	    .pause {
-	    	display: none;
-	    }
-
-	    &.playing {
-	        .pause {
-	            display: block;
-	        }
-
-	        .play {
-	            display: none;
-	        }
-	    }
+		&.paused .play,
+		&.playing .pause {
+			display: block;
+		}
 	}
 }
-
 
 /* Hide if js is disabled */
 .no-js {

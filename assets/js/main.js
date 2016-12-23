@@ -72,13 +72,21 @@ var sortClickHandler = function (e) {
 		newStrong.classList.remove('asc');
 		newStrong.classList.add('desc');
 
-		var desc = utils.createSVGFragment('icon-caret-desc', '0 0 586.666 293.333');
+		var desc = utils.createSVGElement('path', {
+			viewBox: '0 0 586.666 293.333',
+			attribute: 'd',
+			descriptions: 'M293.333 0l-293.333 293.333h586.666l-293.333-293.333z'
+		});
 		newStrong.appendChild(desc);
 	} else {
 		newStrong.classList.remove('desc');
 		newStrong.classList.add('asc');
 
-		var asc = utils.createSVGFragment('icon-caret-asc', '0 0 612 306');
+		var asc = utils.createSVGElement('path', {
+			viewBox: '0 0 612 306',
+			attribute: 'd',
+			descriptions: 'M306 306l306-306h-612l306 306z'
+		});
 		newStrong.appendChild(asc);
 	}
 
@@ -89,7 +97,6 @@ var sortClickHandler = function (e) {
 };
 
 module.exports = {
-
 	cache: {
 		elems: {
 			HTML: document.documentElement,

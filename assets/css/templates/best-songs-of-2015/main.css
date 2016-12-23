@@ -18,6 +18,7 @@
 @import "_settings.css";
 @import "_animation.css";
 @import "_fonts.css";
+@import "_controls.css";
 
 
 /* Template styling
@@ -29,8 +30,7 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-a,
-a:visited {
+a, a:visited {
 	color: #000;
     text-decoration: none;
 }
@@ -81,89 +81,6 @@ a:visited {
 
 .transition .gradient:last-child {
 	opacity: 1;
-}
-
-
-/* Player controls */
-.controls {
-    .play-state svg,
-    .info-toggle svg,
-    .fullscreen svg {
-    	fill: #212121;
-    	transition: fill 0.5s ease;
-    }
-
-    .fullscreen:hover,
-    .fullscreen:focus,
-    .info-toggle:hover,
-    .info-toggle:focus,
-    .play-state:hover,
-    .play-state:focus {
-    	opacity: 0.7;
-    	transform: none;
-    }
-
-    .fullscreen {
-    	margin-left: 14px;
-    }
-
-    [data-color-contrast="bright"] & .play-state svg,
-    [data-color-contrast="bright"] & .info-toggle svg,
-    [data-color-contrast="bright"] & .fullscreen svg {
-    	fill: rgba(255, 255, 255, 0.85);
-    }
-
-    .volume-slider {
-    	width: 72px;
-    	box-shadow: none;
-    	background: rgba(0, 0, 0, 0.15);
-
-        [data-color-contrast="bright"] & {
-        	background: rgba(255, 255, 255, 0.1);
-        }
-
-        &::-moz-range-thumb {
-        	width: 14px;
-        	height: 14px;
-        	border-radius: 50%;
-        	box-shadow: none;
-        	background: #212121;
-        	cursor: pointer;
-
-            &:hover,
-            &:focus {
-                transform: none;
-            }
-        }
-
-        [data-color-contrast="bright"] &::-moz-range-thumb {
-        	background: rgba(255, 255, 255, 0.85);
-        }
-
-        &::-moz-range-thumb:hover,
-        &::-moz-range-thumb:focus {
-        	transform: scale(1.1);
-        }
-
-        &::-webkit-slider-thumb {
-        	width: 15px;
-        	height: 15px;
-        	border-radius: 50%;
-        	box-shadow: none;
-        	background: #212121;
-        	-webkit-appearance: none;
-        	cursor: pointer;
-
-            &:hover,
-            &:focus {
-                transform: scale(1.1);
-            }
-        }
-
-        [data-color-contrast="bright"] &::-webkit-slider-thumb {
-        	background: rgba(255, 255, 255, 0.85);
-        }
-    }
 }
 
 
@@ -379,15 +296,11 @@ a:visited {
     	color: rgba(0, 0, 0, 0.9);
     }
 
-    a[data-color-contrast="bright"] .state-loading,
-    a[data-color-contrast="bright"] .state-playing,
-    a[data-color-contrast="bright"] .state-paused {
+    a[data-color-contrast="bright"] .col-play-state {
     	fill: rgba(255, 255, 255, 0.82);
     }
 
-    a[data-color-contrast="dark"] .state-loading,
-    a[data-color-contrast="dark"] .state-playing,
-    a[data-color-contrast="dark"] .state-paused {
+    a[data-color-contrast="dark"] .col-play-state {
     	fill: rgba(0, 0, 0, 0.9);
     }
 

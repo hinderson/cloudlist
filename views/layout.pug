@@ -64,7 +64,8 @@ html(lang="en", class="no-js " + collection.template)
 									strong.visuallyhidden Sort tracks:
 									ul(class="sort-collection cols")
 										li(class="col col-index", data-sort-type="index")
-											strong.asc Index<svg viewBox="0 0 612 306"><use xlink:href="#icon-caret-asc"></use></svg>
+											strong.asc Index
+												include ../client/img/icon-caret-asc.svg
 										li(class="col col-title", data-sort-type="title")
 											span Title
 										li(class="col col-artist", data-sort-type="artist")
@@ -82,6 +83,7 @@ html(lang="en", class="no-js " + collection.template)
 									li(class=song.available === true ? undefined : "unavailable", data-id=obfuscatedId)
 										a(href=config.host.protocol + "://" + config.host.name + "/" + path + "/" + song.permalink + "/")
 											div.cols
+												div.col.col-play-state
 												div.col.col-index= index+1
 												div.col.col-title
 													span= song.title

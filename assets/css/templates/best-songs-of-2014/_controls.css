@@ -1,4 +1,30 @@
 .controls {
+    .fullscreen {
+		display: none;
+		width: 25px;
+		padding: 0;
+		border: 0;
+		margin: 0 0 0 15px;
+		line-height: 0;
+		background: none;
+		fill: currentColor;
+
+	    &:hover,
+	    &:focus {
+	    	opacity: 0.9;
+	    	transform: scale(1.05);
+	    	outline: 0;
+	    }
+
+	    &:active {
+	    	transform: scale(0.97);
+	    }
+
+	    .no-touch & {
+	        display: block;
+	    }
+	}
+
 	.volume-slider {
 		display: none;
 		width: 8.5rem;
@@ -74,6 +100,40 @@
 	    &:active {
 	    	-webkit-transform: scale(0.97);
 	    	transform: scale(0.97);
+	    }
+	}
+
+	.play-state {
+		width: 1.85rem;
+		border: 0;
+		padding: 0;
+		background: none;
+		cursor: pointer;
+		fill: currentColor;
+
+	    &:hover,
+	    &:focus {
+	    	opacity: 0.9;
+	    	transform: scale(1.06);
+	    	outline: 0;
+	    }
+
+	    &:active {
+	    	transform: scale(0.97);
+	    }
+
+	    .pause {
+	    	display: none;
+	    }
+
+	    &.playing {
+	        .pause {
+	            display: block;
+	        }
+
+	        .play {
+	            display: none;
+	        }
 	    }
 	}
 }
