@@ -8,9 +8,9 @@ var https = require('https');
 var env = process.env.NODE_ENV;
 if ('production' === env) {
 	var httpsOptions = {
-		ca: fs.readFileSync('./config/private/ssl/cloudlist_io.ca-bundle'),
-		key: fs.readFileSync('./config/private/ssl/cloudlist_io.key'),
-		cert: fs.readFileSync('./config/private/ssl/cloudlist_io.crt')
+		key: fs.readFileSync('/etc/letsencrypt/live/www.cloudlist.io/privkey.pem'),
+		cert: fs.readFileSync('/etc/letsencrypt/live/www.cloudlist.io/cert.pem'),
+		ca: fs.readFileSync('/etc/letsencrypt/live/www.cloudlist.io/chain.pem')
 	};
 
 	var server = http.createServer(app);

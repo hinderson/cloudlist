@@ -78,6 +78,9 @@ app.use(multer({ dest: './tmp/' }));
 app.use(cookieParser());
 
 if (env === 'production') {
+	// Serve Let's Encrypt acme challenge
+	app.use(express.static(path.join(__dirname, 'ssl')));
+
 	app.use(function (req, res, next) {
 		if (!req.secure) {
 			return res.redirect(['https://', req.get('Host'), req.url].join(''));
